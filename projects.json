@@ -1,9 +1,65 @@
 [
   {
-    "title": "Olist Analytics Engineering (dbt + DuckDB)",
-    "description": "Modelled 10 raw e-commerce and marketing tables into tested dbt marts (24 models, 80 tests, CI on every push), then built a Power BI dashboard and a lead-scoring model. Found that only 3% of customers reorder, that untracked lead sources close best at 16.6%, and that scoring leads on arrival lifts the top 10% to a 23% close rate against a 10.5% average.",
-    "tags": ["dbt", "DuckDB", "SQL", "Python", "scikit-learn", "Power BI", "GitHub Actions"],
-    "image": "funnel.png",
-    "link": "https://github.com/AshokReddy010/olist-analytics-engineering"
+    "title": "Olist Analytics Engineering with dbt and DuckDB",
+    "highlight": "Engineering",
+    "description": "An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.",
+    "tags": ["dbt", "DuckDB", "SQL", "Python", "scikit-learn", "Power BI", "DAX", "GitHub Actions"],
+    "link": "https://github.com/AshokReddy010/olist-analytics-engineering",
+    "spec": [
+      ["models", "24 (staging, intermediate, marts)"],
+      ["tests", "80, run on every push"],
+      ["orders", "99,441"],
+      ["leads", "8,000"],
+      ["dashboard", "Power BI, 2 pages"],
+      ["ml", "lead scoring, AUC 0.69"]
+    ],
+    "shots": [
+      { "image": "funnel.png", "caption": "Seller acquisition funnel" },
+      { "image": "retention.png", "caption": "Customer retention by cohort" }
+    ],
+    "case": [
+      {
+        "heading": "Problem",
+        "text": "A marketplace needs to know which marketing channels bring sellers who actually sign, whether customers come back after their first order, and which new leads the sales team should call first. The raw data is ten separate files that cannot answer any of that until it is cleaned, joined and tested."
+      },
+      {
+        "heading": "Approach",
+        "items": [
+          "Staging: one model per raw file to rename columns, fix types and clean keys.",
+          "Intermediate: order items and payments summed per order, the latest review kept, products translated.",
+          "Marts: fact and dimension tables plus reporting tables for the funnel and cohort retention. The orders table loads incrementally.",
+          "Quality: 80 tests, including a custom check that payments reconcile to order value, run by GitHub Actions on every push."
+        ]
+      },
+      {
+        "heading": "Architecture",
+        "wide": true,
+        "flow": [
+          { "title": "Raw CSV files", "text": "10 tables: orders, items, payments, reviews, products, sellers, leads, deals" },
+          { "title": "dbt on DuckDB", "text": "staging, intermediate and marts, with 80 tests and CI" },
+          [
+            { "title": "Power BI", "text": "funnel and retention pages" },
+            { "title": "Lead scoring", "text": "logistic regression in Python" }
+          ]
+        ]
+      },
+      {
+        "heading": "What I found",
+        "items": [
+          "Funnel: 8,000 leads became 842 signed sellers (10.5%), and 379 of those went on to make a sale.",
+          "Channels: paid search closes at 12.3%, social at 5.6%. Leads with an untracked origin close best at 16.6%, so fixing the tracking is the first recommendation.",
+          "Retention: only 3.04% of 94,990 customers ever placed a second order, so sales depend on new customers.",
+          "Lead scoring: tested on the 2,000 most recent leads, the top 10% of scores close at 23.0% against a 10.5% average (2.18x)."
+        ]
+      },
+      {
+        "heading": "What the tests caught",
+        "items": [
+          "Payments: 249 of 98,665 orders (0.25%) do not match their order value by more than 1.00.",
+          "Translations: 2 product categories are missing an English name.",
+          "Dates: 1 signed lead has a close date before its first contact date."
+        ]
+      }
+    ]
   }
 ]

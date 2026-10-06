@@ -270,6 +270,11 @@ a.logo:hover { border-color: var(--g1); box-shadow: 0 10px 24px -14px var(--g1);
 .repo .meta i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: linear-gradient(135deg, var(--g1), var(--g2)); }
 .gh-fallback { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
 .gh-fallback p { color: var(--muted); }
+.pstack { display: grid; gap: 28px; margin-top: 28px; }
+.shots.n1, .shots.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.shots.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pstack .shot { aspect-ratio: 16 / 9; }
+.project.nospec .pmain { grid-column: 1 / -1; }
 .xproj { display: flex; flex-direction: column; gap: 14px; }
 .xproj p { color: var(--muted); }
 .xproj img { display: block; width: 100%; border-radius: 12px; border: 1px solid var(--line); }
@@ -598,7 +603,7 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
         </div>
       </details>
     </article>
-    <div class="grid2" id="more-projects" hidden></div>
+    <div class="pstack" id="more-projects" hidden></div>
     <p class="note rv">More projects are on the way. See everything on <a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">my GitHub profile</a>.</p>
   </section>
 
@@ -981,12 +986,13 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
 (function () {
   var box = document.getElementById('shotbox'), img = document.getElementById('shotbox-img'), cap = document.getElementById('shotbox-cap'), last = null;
   function close() { if (box.hidden) return; box.hidden = true; if (last) last.focus(); }
-  document.querySelectorAll('.shot').forEach(function (b) {
-    b.addEventListener('click', function () {
-      last = b; img.src = b.dataset.shot; img.alt = 'Screenshot: ' + b.dataset.cap; cap.textContent = b.dataset.cap;
-      box.hidden = false; document.getElementById('shotbox-close').focus();
-    });
-  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.shot') : null;
+    if (!b) return;
+    last = b; img.src = b.dataset.shot; img.alt = 'Screenshot: ' + b.dataset.cap; cap.textContent = b.dataset.cap;
+    box.hidden = false; document.getElementById('shotbox-close').focus();
+    e.stopPropagation();
+  }, true);
   box.addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
@@ -1036,7 +1042,7 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
   }
   function safeUrl(u) { return typeof u === 'string' && /^https?:\/\//.test(u) ? u : null; }
 
-  /* projects.json: [{ "title", "description", "tags": [], "link", "image" }] */
+  /* projects.json: [{ "title", "highlight", "description", "tags": [], "link", "spec": [[k, v]], "shots": [{ "image", "caption" }], "case": [{ "heading", "text", "items": [], "flow": [], "wide" }] }] */
   /* repositories already featured under Projects are not repeated in the GitHub list */
   var featured = {};
   function key(u) { return String(u).toLowerCase().split(/[?#]/)[0].replace(/\/+$/, ''); }
@@ -1045,15 +1051,64 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
     if (!Array.isArray(list) || !list.length) return;
     list.forEach(function (pr) { if (pr && safeUrl(pr.link)) featured[key(pr.link)] = 1; });
     var box = document.getElementById('more-projects');
+    function isImg(f) { return typeof f === 'string' && /^[\w.-]+\.(png|jpg|jpeg|webp)$/i.test(f); }
+    function labelled(parent, text) {
+      var m = /^([^:]{1,32}:)\s(.+)$/.exec(String(text));
+      if (m) { parent.appendChild(el('b', null, m[1])); parent.appendChild(document.createTextNode(' ' + m[2])); }
+      else parent.textContent = String(text);
+    }
+    function node(n) { var d = el('div', 'node'); d.appendChild(el('b', null, String(n.title || ''))); d.appendChild(document.createTextNode(String(n.text || ''))); return d; }
     list.forEach(function (pr) {
       if (!pr || !pr.title) return;
-      var card = el('article', 'card lift xproj');
-      if (typeof pr.image === 'string' && /^[\w.-]+\.(png|jpg|jpeg|webp)$/i.test(pr.image)) { var im = el('img'); im.src = pr.image; im.alt = 'Screenshot of ' + pr.title; im.loading = 'lazy'; card.appendChild(im); }
-      card.appendChild(el('h3', null, pr.title));
-      if (pr.description) card.appendChild(el('p', null, pr.description));
-      if (Array.isArray(pr.tags) && pr.tags.length) { var ul = el('ul', 'chips'); pr.tags.forEach(function (t) { ul.appendChild(el('li', 'chip', String(t))); }); card.appendChild(ul); }
+      var card = el('article', 'card lift project'), main = el('div', 'pmain'), h = el('h3');
+      var t = String(pr.title), hl = typeof pr.highlight === 'string' ? pr.highlight : '', i = hl ? t.indexOf(hl) : -1;
+      if (i >= 0) { h.appendChild(document.createTextNode(t.slice(0, i))); h.appendChild(el('span', 'grad', hl)); h.appendChild(document.createTextNode(t.slice(i + hl.length))); }
+      else h.textContent = t;
+      main.appendChild(h);
+      if (pr.description) main.appendChild(el('p', null, pr.description));
+      if (Array.isArray(pr.tags) && pr.tags.length) { var ul = el('ul', 'chips'); pr.tags.forEach(function (x) { ul.appendChild(el('li', 'chip', String(x))); }); main.appendChild(ul); }
       var url = safeUrl(pr.link);
-      if (url) { var w = el('div', 'links'), a = el('a', 'cta solid', 'View code on GitHub →'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; w.appendChild(a); card.appendChild(w); }
+      if (url) { var w = el('div', 'links'), a = el('a', 'cta solid', 'View code on GitHub '); a.appendChild(el('b', null, '→')); a.href = url; a.target = '_blank'; a.rel = 'noopener'; w.appendChild(a); main.appendChild(w); }
+      card.appendChild(main);
+      if (Array.isArray(pr.spec) && pr.spec.length) {
+        var dl = el('dl', 'spec'), dots = el('div', 'dots'); dots.setAttribute('aria-hidden', 'true');
+        dots.appendChild(el('i')); dots.appendChild(el('i')); dots.appendChild(el('i')); dl.appendChild(dots);
+        pr.spec.forEach(function (row) { if (Array.isArray(row) && row.length > 1) { dl.appendChild(el('dt', null, String(row[0]))); dl.appendChild(el('dd', null, String(row[1]))); } });
+        card.appendChild(dl);
+      } else card.className += ' nospec';
+      var shots = (Array.isArray(pr.shots) ? pr.shots : (isImg(pr.image) ? [{ image: pr.image, caption: pr.title }] : [])).filter(function (x) { return x && isImg(x.image); }).slice(0, 4);
+      if (shots.length) {
+        var sw = el('div', 'shots n' + shots.length);
+        shots.forEach(function (x) {
+          var b = el('button', 'shot'), im = el('img'), c = String(x.caption || pr.title);
+          b.type = 'button'; b.dataset.shot = x.image; b.dataset.cap = c;
+          im.src = x.image; im.alt = 'Screenshot: ' + c; im.loading = 'lazy';
+          b.appendChild(im); b.appendChild(el('span', null, c)); sw.appendChild(b);
+        });
+        card.appendChild(sw);
+      }
+      if (Array.isArray(pr['case']) && pr['case'].length) {
+        var det = el('details', 'case'), body = el('div', 'case-body');
+        det.appendChild(el('summary', null, 'Read the case study'));
+        pr['case'].forEach(function (blk) {
+          if (!blk || !blk.heading) return;
+          var d = el('div', 'cblock' + (blk.wide ? ' wide' : ''));
+          d.appendChild(el('h4', null, String(blk.heading)));
+          if (blk.text) d.appendChild(el('p', null, String(blk.text)));
+          if (Array.isArray(blk.items)) { var l = el('ul'); blk.items.forEach(function (it) { var li = el('li'); labelled(li, it); l.appendChild(li); }); d.appendChild(l); }
+          if (Array.isArray(blk.flow) && blk.flow.length === 3) {
+            var ar = el('div', 'arch');
+            blk.flow.forEach(function (st, k) {
+              if (k) { var arw = el('span', 'arrow'); arw.setAttribute('aria-hidden', 'true'); ar.appendChild(arw); }
+              if (Array.isArray(st)) { var sk = el('div', 'stack'); st.forEach(function (n) { sk.appendChild(node(n)); }); ar.appendChild(sk); }
+              else ar.appendChild(node(st || {}));
+            });
+            d.appendChild(ar);
+          }
+          body.appendChild(d);
+        });
+        det.appendChild(body); card.appendChild(det);
+      }
       glow(card); box.appendChild(card);
     });
     if (box.children.length) box.hidden = false;
