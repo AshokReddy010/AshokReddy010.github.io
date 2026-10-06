@@ -3,20 +3,123 @@
     "title": "Olist Analytics Engineering with dbt and DuckDB",
     "highlight": "Engineering",
     "description": "An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.",
-    "tags": ["dbt", "DuckDB", "SQL", "Python", "scikit-learn", "Power BI", "DAX", "GitHub Actions"],
+    "tags": [
+      "dbt",
+      "DuckDB",
+      "SQL",
+      "Python",
+      "scikit-learn",
+      "Power BI",
+      "DAX",
+      "GitHub Actions"
+    ],
     "link": "https://github.com/AshokReddy010/olist-analytics-engineering",
     "spec": [
-      ["models", "24 (staging, intermediate, marts)"],
-      ["tests", "80, run on every push"],
-      ["orders", "99,441"],
-      ["leads", "8,000"],
-      ["dashboard", "Power BI, 2 pages"],
-      ["ml", "lead scoring, AUC 0.69"]
+      [
+        "models",
+        "24 (staging, intermediate, marts)"
+      ],
+      [
+        "tests",
+        "80, run on every push"
+      ],
+      [
+        "orders",
+        "99,441"
+      ],
+      [
+        "leads",
+        "8,000"
+      ],
+      [
+        "dashboard",
+        "Power BI, 2 pages"
+      ],
+      [
+        "ml",
+        "lead scoring, AUC 0.69"
+      ]
     ],
     "shots": [
-      { "image": "funnel.png", "caption": "Seller acquisition funnel" },
-      { "image": "retention.png", "caption": "Customer retention by cohort" }
+      {
+        "image": "funnel.png",
+        "caption": "Seller acquisition funnel"
+      },
+      {
+        "image": "retention.png",
+        "caption": "Customer retention by cohort"
+      }
     ],
+    "funnel": {
+      "heading": "Explore the funnel",
+      "stages": [
+        "Leads",
+        "Signed as sellers",
+        "Made a first sale"
+      ],
+      "rows": [
+        [
+          "Organic search",
+          2296,
+          271,
+          112
+        ],
+        [
+          "Paid search",
+          1586,
+          195,
+          101
+        ],
+        [
+          "Social",
+          1350,
+          75,
+          31
+        ],
+        [
+          "Unknown",
+          1159,
+          193,
+          85
+        ],
+        [
+          "Direct traffic",
+          499,
+          56,
+          31
+        ],
+        [
+          "Email",
+          493,
+          15,
+          6
+        ],
+        [
+          "Referral",
+          284,
+          24,
+          9
+        ],
+        [
+          "Other",
+          150,
+          4,
+          2
+        ],
+        [
+          "Display",
+          118,
+          6,
+          2
+        ],
+        [
+          "Other publicity",
+          65,
+          3,
+          0
+        ]
+      ]
+    },
     "case": [
       {
         "heading": "Problem",
@@ -35,11 +138,23 @@
         "heading": "Architecture",
         "wide": true,
         "flow": [
-          { "title": "Raw CSV files", "text": "10 tables: orders, items, payments, reviews, products, sellers, leads, deals" },
-          { "title": "dbt on DuckDB", "text": "staging, intermediate and marts, with 80 tests and CI" },
+          {
+            "title": "Raw CSV files",
+            "text": "10 tables: orders, items, payments, reviews, products, sellers, leads, deals"
+          },
+          {
+            "title": "dbt on DuckDB",
+            "text": "staging, intermediate and marts, with 80 tests and CI"
+          },
           [
-            { "title": "Power BI", "text": "funnel and retention pages" },
-            { "title": "Lead scoring", "text": "logistic regression in Python" }
+            {
+              "title": "Power BI",
+              "text": "funnel and retention pages"
+            },
+            {
+              "title": "Lead scoring",
+              "text": "logistic regression in Python"
+            }
           ]
         ]
       },

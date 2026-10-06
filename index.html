@@ -276,6 +276,28 @@ a.logo:hover { border-color: var(--g1); box-shadow: 0 10px 24px -14px var(--g1);
 .shots.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .pstack .shot { aspect-ratio: 16 / 9; }
 .project.nospec .pmain { grid-column: 1 / -1; }
+.fx { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 22px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 18px 32px; }
+.fx h4 { grid-column: 1 / -1; margin: 0; font: 500 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--g1); }
+.fx h4 small { font: 400 12px var(--mono); letter-spacing: 0; text-transform: none; color: var(--muted); margin-left: 10px; }
+.fx-list { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fx-opt { display: grid; grid-template-columns: 124px minmax(0, 1fr) 46px; align-items: center; gap: 10px; padding: 6px 10px; border: 1px solid transparent; border-radius: 10px; background: none; color: var(--muted); font: 400 13px var(--mono); text-align: left; cursor: pointer; transition: background .2s, border-color .2s, color .2s; }
+.fx-opt:hover { background: var(--surface2); }
+.fx-opt[aria-pressed="true"] { background: var(--surface2); border-color: var(--line); color: var(--ink); }
+.fx-opt i { display: block; height: 8px; border-radius: 4px; background: var(--line); min-width: 2px; }
+.fx-opt[aria-pressed="true"] i { background: var(--g1); }
+.fx-opt em { font-style: normal; text-align: right; }
+.fx-out { min-width: 0; background: var(--surface2); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; align-self: start; }
+.fx-out h5 { margin: 0; font: 700 20px var(--display); color: var(--ink); }
+.fx-stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 14.5px; color: var(--muted); }
+.fx-stage b { color: var(--ink); font: 600 15px var(--mono); }
+.fx-stage span.t { grid-column: 1 / -1; height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.fx-stage span.t i { display: block; height: 100%; border-radius: 5px; background: var(--g1); transition: width .5s cubic-bezier(.2,.8,.2,1); }
+.fx-say { margin: 0; font-size: 15px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+.fx-say b { color: var(--ink); }
+.building { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-top: 28px; padding: 16px 20px; border: 1px dashed var(--line); border-radius: 14px; background: var(--surface); }
+.building strong { font: 500 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--g1); }
+.building span { color: var(--ink); }
+@media (max-width: 860px) { .fx { grid-template-columns: minmax(0, 1fr); } .fx-opt { grid-template-columns: 112px minmax(0, 1fr) 42px; } }
 .xproj { display: flex; flex-direction: column; gap: 14px; }
 .xproj p { color: var(--muted); }
 .xproj img { display: block; width: 100%; border-radius: 12px; border: 1px solid var(--line); }
@@ -605,7 +627,8 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
       </details>
     </article>
     <div class="pstack" id="more-projects" hidden></div>
-    <p class="note rv">More projects are on the way. See everything on <a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">my GitHub profile</a>.</p>
+    <p class="building rv"><strong>Currently building</strong><span>An A/B testing toolkit in Python: sample size planning, significance tests and experiment readouts.</span></p>
+    <p class="note rv">See everything on <a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">my GitHub profile</a>.</p>
   </section>
 
   <section id="github">
@@ -1087,6 +1110,39 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
           b.appendChild(im); b.appendChild(el('span', null, c)); sw.appendChild(b);
         });
         card.appendChild(sw);
+      }
+      var fd = pr.funnel;
+      if (fd && Array.isArray(fd.rows) && fd.rows.length && Array.isArray(fd.stages) && fd.stages.length === 3) {
+        var rows = fd.rows.filter(function (r) { return Array.isArray(r) && r.length === 4; });
+        var tot = ['All channels', 0, 0, 0]; rows.forEach(function (r) { tot[1] += r[1]; tot[2] += r[2]; tot[3] += r[3]; });
+        var all = [tot].concat(rows), maxL = Math.max.apply(null, rows.map(function (r) { return r[1]; })), avg = tot[2] / tot[1];
+        var fx = el('div', 'fx'), fh = el('h4', null, String(fd.heading || 'Explore the funnel')), list2 = el('div', 'fx-list'), out = el('div', 'fx-out');
+        fh.appendChild(el('small', null, 'pick a channel')); fx.appendChild(fh);
+        function pct(a, b) { return b ? (100 * a / b).toFixed(1) + '%' : '0%'; }
+        function show(r) {
+          out.textContent = '';
+          out.appendChild(el('h5', null, r[0]));
+          [1, 2, 3].forEach(function (k) {
+            var st = el('div', 'fx-stage'), tr = el('span', 't'), fill = el('i');
+            st.appendChild(el('span', null, fd.stages[k - 1] + (k > 1 ? ' (' + pct(r[k], r[1]) + ' of leads)' : '')));
+            st.appendChild(el('b', null, r[k].toLocaleString('en-US')));
+            fill.style.width = (r[1] ? Math.max(100 * r[k] / r[1], r[k] ? 1.5 : 0) : 0) + '%'; tr.appendChild(fill); st.appendChild(tr); out.appendChild(st);
+          });
+          var say = el('p', 'fx-say'), cr = r[1] ? r[2] / r[1] : 0;
+          if (r === tot) { say.appendChild(el('b', null, pct(tot[2], tot[1]))); say.appendChild(document.createTextNode(' of all leads signed as sellers. Pick a channel to compare it with this average.')); }
+          else { say.appendChild(el('b', null, pct(r[2], r[1]) + ' close rate')); say.appendChild(document.createTextNode(', ' + (cr / avg).toFixed(1) + 'x the ' + pct(tot[2], tot[1]) + ' average. This channel brings ' + pct(r[1], tot[1]) + ' of all leads.')); }
+          out.appendChild(say);
+        }
+        all.forEach(function (r, k) {
+          var b = el('button', 'fx-opt'), bar = el('i');
+          b.type = 'button'; b.setAttribute('aria-pressed', k ? 'false' : 'true');
+          b.appendChild(el('span', null, r[0]));
+          bar.style.width = (k ? 100 * r[1] / maxL : 100) + '%'; if (!k) bar.style.visibility = 'hidden';
+          b.appendChild(bar); b.appendChild(el('em', null, r[1].toLocaleString('en-US')));
+          b.addEventListener('click', function () { list2.querySelectorAll('.fx-opt').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); show(r); });
+          list2.appendChild(b);
+        });
+        fx.appendChild(list2); fx.appendChild(out); show(tot); card.appendChild(fx);
       }
       if (Array.isArray(pr['case']) && pr['case'].length) {
         var det = el('details', 'case'), body = el('div', 'case-body');
