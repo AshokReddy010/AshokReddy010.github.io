@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "title": "Olist Analytics Engineering (dbt + DuckDB)",
+    "description": "Modelled 10 raw e-commerce and marketing tables into tested dbt marts (24 models, 80 tests, CI on every push), then built a Power BI dashboard and a lead-scoring model. Found that only 3% of customers reorder, that untracked lead sources close best at 16.6%, and that scoring leads on arrival lifts the top 10% to a 23% close rate against a 10.5% average.",
+    "tags": ["dbt", "DuckDB", "SQL", "Python", "scikit-learn", "Power BI", "GitHub Actions"],
+    "image": "funnel.png",
+    "link": "https://github.com/AshokReddy010/olist-analytics-engineering"
+  }
+]
