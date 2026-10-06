@@ -176,5 +176,115 @@
         ]
       }
     ]
+  },
+  {
+    "title": "A/B Testing Toolkit in Python",
+    "highlight": "Testing",
+    "description": "A toolkit that takes an experiment from planning to a written decision: how many users the test needs, whether the data can be trusted, whether the change worked, and whether to ship it. Its key formulas are checked against simulation, so the error rates are measured, not assumed.",
+    "tags": [
+      "Python",
+      "SciPy",
+      "NumPy",
+      "pandas",
+      "Statistics",
+      "pytest",
+      "GitHub Actions"
+    ],
+    "link": "https://github.com/AshokReddy010/ab-testing-toolkit",
+    "spec": [
+      [
+        "planning",
+        "sample size, power, duration"
+      ],
+      [
+        "tests",
+        "z-test, Welch t-test, bootstrap"
+      ],
+      [
+        "health check",
+        "sample ratio mismatch"
+      ],
+      [
+        "noise reduction",
+        "CUPED"
+      ],
+      [
+        "verified by",
+        "20,000 simulations per check"
+      ],
+      [
+        "unit tests",
+        "30, run on every push"
+      ]
+    ],
+    "shots": [
+      {
+        "image": "ab-peeking.png",
+        "caption": "Why stopping early is wrong"
+      },
+      {
+        "image": "ab-results.png",
+        "caption": "Example experiment results"
+      },
+      {
+        "image": "ab-sample-size.png",
+        "caption": "Sample size planning"
+      }
+    ],
+    "case": [
+      {
+        "heading": "Problem",
+        "text": "A/B tests go wrong in a few well-known ways: the test is stopped at the first good-looking result, users are not split as designed, too many metrics are checked, or the data is too noisy to see the effect. Each of these can turn a change that does nothing into a reported win."
+      },
+      {
+        "heading": "Approach",
+        "items": [
+          "Plan: sample size, power and test length for a given baseline and smallest lift worth detecting.",
+          "Check: a sample ratio mismatch test that blocks the analysis when assignment looks broken.",
+          "Analyse: tests for rates and averages with confidence intervals, a bootstrap second opinion for revenue, and CUPED to reduce noise.",
+          "Decide: fixed rules that return ship, do not ship, inconclusive or do not trust, with a written readout."
+        ]
+      },
+      {
+        "heading": "Architecture",
+        "wide": true,
+        "flow": [
+          {
+            "title": "Experiment data",
+            "text": "one row per user: group, converted, revenue, refunds, past spending"
+          },
+          {
+            "title": "abkit",
+            "text": "health check, tests, noise reduction and corrections, covered by 30 unit tests"
+          },
+          [
+            {
+              "title": "Readout",
+              "text": "decision and results table in markdown"
+            },
+            {
+              "title": "Validation study",
+              "text": "simulations that check every formula"
+            }
+          ]
+        ]
+      },
+      {
+        "heading": "What the simulations showed",
+        "items": [
+          "Accuracy: with no real effect the toolkit calls a false win 4.85% of the time against a 5% target, and its 95% intervals contain the truth 94.98% of the time.",
+          "Power: at the planned 17,169 users per group it detects the planned lift 80.3% of the time, against an 80% target.",
+          "Peeking: checking a test 10 times and stopping at the first win raises false wins from 5% to 19.4%."
+        ]
+      },
+      {
+        "heading": "Example experiment",
+        "items": [
+          "Result: on simulated data with a true lift of 1.0 point, the readout says ship, with conversion up 1.25 points (interval 0.55 to 1.95).",
+          "Caution: revenue per user looks significant alone (p = 0.035) but not after correcting for extra metrics (p = 0.069), so it is not reported as a win.",
+          "Broken test: a 51/49 split across 33,632 users is flagged as a fault, and the metrics are not read."
+        ]
+      }
+    ]
   }
 ]
