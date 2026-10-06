@@ -533,7 +533,7 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
       <p class="label">Selected work</p>
       <h2>Projects</h2>
     </div>
-    <article class="card lift project rv">
+    <article class="card lift project rv" id="stock-project" data-position="3">
       <div class="pmain">
         <h3>Stock Market Analysis and <span class="grad">Prediction</span> Web App</h3>
         <p>A full-stack app that tracks NASDAQ and NSE stock prices, charts their trends and forecasts the next 7 days. It combines those forecasts with sentiment from financial news to give a buy, sell or hold recommendation, and includes user sign-in, currency conversion and an admin area.</p>
@@ -1139,6 +1139,13 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
       }
       glow(card); box.appendChild(card);
     });
+    /* The built-in project card takes the place named in its data-position, among the cards from projects.json. */
+    var fixed = document.getElementById('stock-project');
+    if (fixed && box.children.length) {
+      var place = Math.max(1, parseInt(fixed.dataset.position, 10) || 1) - 1;
+      box.insertBefore(fixed, box.children[place] || null);
+      box.style.marginTop = '0';
+    }
     if (box.children.length) box.hidden = false;
   }).catch(function () {});
 
