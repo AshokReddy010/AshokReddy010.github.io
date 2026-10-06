@@ -1071,7 +1071,7 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
   var featured = {};
   function key(u) { return String(u).toLowerCase().split(/[?#]/)[0].replace(/\/+$/, ''); }
   document.querySelectorAll('#projects a[href*="github.com/AshokReddy010/"]').forEach(function (a) { featured[key(a.href)] = 1; });
-  var ready = fetch('projects.json').then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {
+  var ready = fetch('projects.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {
     if (!Array.isArray(list) || !list.length) return;
     list.forEach(function (pr) { if (pr && safeUrl(pr.link)) featured[key(pr.link)] = 1; });
     var box = document.getElementById('more-projects');
