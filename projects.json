@@ -1,5 +1,117 @@
 [
   {
+    "title": "Do ESG Funds Vote Like ESG Funds?",
+    "highlight": "Vote",
+    "description": "I collected three years of fund voting records from the SEC, 73.8 million votes from 12,416 funds, to test whether funds with ESG in their name vote differently from ordinary funds. They do, a little: the fund house a fund belongs to predicts its votes better than its label.",
+    "tags": [
+      "Python",
+      "DuckDB",
+      "dbt",
+      "SQL",
+      "pandas",
+      "Entity matching",
+      "pytest",
+      "GitHub Actions"
+    ],
+    "link": "https://github.com/AshokReddy010/fund-proxy-voting",
+    "spec": [
+      [
+        "source",
+        "SEC Form N-PX filings"
+      ],
+      [
+        "filings read",
+        "33,929"
+      ],
+      [
+        "votes",
+        "73.8 million"
+      ],
+      [
+        "funds",
+        "12,416"
+      ],
+      [
+        "dbt",
+        "9 models, 21 tests"
+      ],
+      [
+        "runs on",
+        "a laptop, in DuckDB"
+      ]
+    ],
+    "shots": [
+      {
+        "image": "fv-support.png",
+        "caption": "Support by fund group"
+      },
+      {
+        "image": "fv-houses.png",
+        "caption": "ESG funds against siblings"
+      },
+      {
+        "image": "fv-spread.png",
+        "caption": "Spread of ESG-named funds"
+      }
+    ],
+    "case": [
+      {
+        "heading": "Problem",
+        "text": "Funds marketed as ESG or sustainable are expected to back environmental and social proposals at shareholder meetings. Every US fund must publish its votes, but the records are spread across tens of thousands of inconsistent filings, so the claim is hard to check at scale."
+      },
+      {
+        "heading": "Approach",
+        "items": [
+          "Collect: a restartable downloader read 33,929 SEC filings and saved 73.8 million votes.",
+          "Clean: dbt models standardise more than 40 spellings of ten answers and 12 date formats, with 99.97% of votes recognised.",
+          "Match: the same proposal is worded differently by each filer, so 8,274 wordings were matched into 3,850 proposals.",
+          "Label: each proposal's direction comes from how specialist ESG fund houses voted, with keyword rules as a fallback."
+        ]
+      },
+      {
+        "heading": "Architecture",
+        "wide": true,
+        "flow": [
+          {
+            "title": "SEC EDGAR",
+            "text": "33,929 Form N-PX filings in XML, three reporting years"
+          },
+          {
+            "title": "DuckDB and dbt",
+            "text": "cleaned votes, fund labels and one answer per fund per proposal, with 21 tests"
+          },
+          [
+            {
+              "title": "Proposal labels",
+              "text": "wording matcher and direction, checked two ways"
+            },
+            {
+              "title": "Results",
+              "text": "tables and charts in the repository"
+            }
+          ]
+        ]
+      },
+      {
+        "heading": "What I found",
+        "items": [
+          "Label: on proposals that specialist ESG houses backed, ESG-named funds elsewhere voted for 33% in 2026, against 14% for other funds and 92% for the specialists.",
+          "Trend: ordinary funds' support halved in two years, from 28% to 14%.",
+          "Siblings: on the same proposal, an ESG-named fund voted the same way as ordinary funds from its own filer 83% to 87% of the time.",
+          "Range: of 145 ESG-named funds, 41 backed under 10% of these proposals and 21 backed 75% or more."
+        ]
+      },
+      {
+        "heading": "What made it hard",
+        "items": [
+          "Misleading column: a field named for management's recommendation records whether the vote went with or against it. Read correctly, funds vote with management 89.9% of the time.",
+          "Misleading titles: proposals such as \"Revisit Plastics Packaging Policies\" sound pro-ESG but received 0% from specialist houses. Keyword rules alone agreed with those votes 91% of the time.",
+          "Limits: voting is one measure of a fund, the ESG label is read from fund names, and the yardstick is a chosen group of ten fund houses."
+        ]
+      }
+    ]
+  },
+  {
     "title": "Olist Analytics Engineering with dbt and DuckDB",
     "highlight": "Engineering",
     "description": "An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.",
