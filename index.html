@@ -122,6 +122,7 @@ h1 span { display: block; }
 
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 48px; }
 .stat { padding: 18px 20px; }
+a.stat { text-decoration: none; color: inherit; display: block; }
 .stat strong { display: block; font: 800 34px/1.1 var(--display); font-variant-numeric: tabular-nums; }
 .stat span { font: 400 13px var(--mono); color: var(--muted); }
 
@@ -415,9 +416,9 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
     </div>
 
     <div class="stats">
-      <div class="card stat"><strong class="grad" data-count="4.5" data-dec="1">4.5</strong><span>years of experience</span></div>
-      <div class="card stat"><strong class="grad" data-count="3">3</strong><span>companies</span></div>
-      <div class="card stat"><strong class="grad" data-count="3">3</strong><span>industries</span></div>
+      <div class="card stat"><strong class="grad" data-count="4.5" data-dec="1">4.5</strong><span>years at Broadridge, Optum and Dell</span></div>
+      <a class="card stat" href="#projects"><strong class="grad" data-count="73.8" data-dec="1" data-suffix="M">73.8M</strong><span>fund votes analysed from SEC filings</span></a>
+      <a class="card stat" href="#projects"><strong class="grad" data-count="101">101</strong><span>automated dbt data tests in two projects</span></a>
       <div class="card stat"><strong class="grad">M.S.</strong><span>AI and Machine Learning</span></div>
     </div>
 
@@ -797,7 +798,7 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
     function step(t) {
       if (!t0) t0 = t;
       var p = Math.min((t - t0) / 1400, 1), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = (end * e).toFixed(dec);
+      el.textContent = (end * e).toFixed(dec) + (el.dataset.suffix || '');
       if (p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
