@@ -10,6 +10,7 @@
       "SQL",
       "pandas",
       "Entity matching",
+      "LLM evaluation",
       "pytest",
       "GitHub Actions"
     ],
@@ -38,6 +39,10 @@
       [
         "runs on",
         "a laptop, in DuckDB"
+      ],
+      [
+        "llm test",
+        "91.0% on 578 held-out proposals"
       ]
     ],
     "shots": [
@@ -99,6 +104,14 @@
           "Trend: ordinary funds' support halved in two years, from 28% to 14%.",
           "Siblings: on the same proposal, an ESG-named fund voted the same way as ordinary funds from its own filer 83% to 87% of the time.",
           "Range: of 145 ESG-named funds, 41 backed under 10% of these proposals and 21 backed 75% or more."
+        ]
+      },
+      {
+        "heading": "Testing a language model",
+        "items": [
+          "Question: could an LLM label a proposal's direction from its title alone? I scored it against the specialist houses' votes on 815 proposals, split into a practice set and a final set that was scored once.",
+          "Prompt: the same model rose from 69% to 85% accuracy across three prompts. Asking how specialist funds would vote worked better than asking whether a proposal supports ESG.",
+          "Combined: keyword rules first, then the model where the rules gave no answer, reached 91.0% on the 578 final proposals. It still misses about a quarter of opposing proposals."
         ]
       },
       {
