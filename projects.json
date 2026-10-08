@@ -125,6 +125,108 @@
     ]
   },
   {
+    "title": "Data Validation Framework",
+    "highlight": "Validation",
+    "description": "Three systems hold the same transactions and should agree before any report goes out. This framework checks that they do, every day, and names the exact records behind each mismatch. I planted six errors in invented data, and the checks found all six with the right reason, with no false alarms on 113 clean days.",
+    "tags": [
+      "SQL",
+      "dbt",
+      "DuckDB",
+      "Python",
+      "Reconciliation",
+      "pytest",
+      "GitHub Actions"
+    ],
+    "link": "https://github.com/AshokReddy010/data-validation-framework",
+    "spec": [
+      [
+        "sources",
+        "transactions, client feed, billing"
+      ],
+      [
+        "data",
+        "12,000 invented transactions, 60 days"
+      ],
+      [
+        "planted errors",
+        "6, all found"
+      ],
+      [
+        "false alarms",
+        "0 on 113 clean days"
+      ],
+      [
+        "tests",
+        "21 dbt and 10 pytest"
+      ],
+      [
+        "schedule",
+        "daily, on GitHub Actions"
+      ]
+    ],
+    "shots": [
+      {
+        "image": "dv-differences.png",
+        "caption": "Daily difference by source"
+      }
+    ],
+    "case": [
+      {
+        "heading": "Problem",
+        "text": "When the same transactions live in several systems, a late file, a double-billed record or a blank amount can reach a client report unnoticed. Checking by hand before every delivery is slow and misses small differences."
+      },
+      {
+        "heading": "Approach",
+        "items": [
+          "Level 1: count the rows and total the amounts per source per day, then compare each source with the transaction system.",
+          "Level 2: for the days that differ, find the records behind the difference and name the reason: missing, duplicate, wrong date, blank amount or different amount.",
+          "Output: one results table per source per day, a written report, a chart and an optional chat alert.",
+          "Proof: the data generator plants six known errors, so the checks can be scored against them."
+        ]
+      },
+      {
+        "heading": "Architecture",
+        "wide": true,
+        "flow": [
+          {
+            "title": "Three sources",
+            "text": "invented transaction system, client file feed and billing database"
+          },
+          {
+            "title": "dbt and DuckDB",
+            "text": "daily totals, match or break per day, and the records behind each break"
+          },
+          [
+            {
+              "title": "Report and alert",
+              "text": "summary, results table, chart and webhook"
+            },
+            {
+              "title": "Daily schedule",
+              "text": "GitHub Actions run, with the report saved"
+            }
+          ]
+        ]
+      },
+      {
+        "heading": "What it found",
+        "items": [
+          "All six: 37 missing records, 25 duplicates, 12 changed amounts, one missing day, 9 records filed under the wrong day and 5 blank amounts.",
+          "Totals matter: on two of the days every record was present, so a row count alone would have passed them.",
+          "No noise: none of the 113 clean source-days was flagged."
+        ]
+      },
+      {
+        "heading": "What made it hard",
+        "items": [
+          "Two days, one cause: a record filed under the wrong day throws off the day it left and the day it landed on. My first drill-down explained only one, and a test I had written for the checks themselves caught it.",
+          "Testing the tester: three dbt tests guard the checks, including one that fails if a clean-looking day hides errors that cancel out.",
+          "Limits: the data is invented and small, the transaction system is assumed correct, and matching relies on a shared transaction ID."
+        ]
+      }
+    ]
+  },
+  {
     "title": "Olist Analytics Engineering with dbt and DuckDB",
     "highlight": "Engineering",
     "description": "An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.",
