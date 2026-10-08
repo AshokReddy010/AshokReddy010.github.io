@@ -1064,7 +1064,10 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
       if (pr.description) main.appendChild(el('p', null, pr.description));
       if (Array.isArray(pr.tags) && pr.tags.length) { var ul = el('ul', 'chips'); pr.tags.forEach(function (x) { ul.appendChild(el('li', 'chip', String(x))); }); main.appendChild(ul); }
       var url = safeUrl(pr.link);
-      if (url) { var w = el('div', 'links'), a = el('a', 'cta solid', 'View code on GitHub '); a.appendChild(el('b', null, '→')); a.href = url; a.target = '_blank'; a.rel = 'noopener'; w.appendChild(a); main.appendChild(w); }
+      if (url) { var w = el('div', 'links'), a = el('a', 'cta solid', 'View code on GitHub '); a.appendChild(el('b', null, '→')); a.href = url; a.target = '_blank'; a.rel = 'noopener'; w.appendChild(a);
+        var demo = safeUrl(pr.demo);
+        if (demo) { var d = el('a', 'cta', (pr.demoLabel || 'Open live dashboard') + ' '); d.appendChild(el('b', null, '↗')); d.href = demo; d.target = '_blank'; d.rel = 'noopener'; w.appendChild(d); }
+        main.appendChild(w); }
       card.appendChild(main);
       if (Array.isArray(pr.spec) && pr.spec.length) {
         var dl = el('dl', 'spec'), dots = el('div', 'dots'); dots.setAttribute('aria-hidden', 'true');

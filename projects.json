@@ -7,6 +7,7 @@
       "Python",
       "DuckDB",
       "dbt",
+      "BigQuery",
       "SQL",
       "pandas",
       "Entity matching",
@@ -37,12 +38,12 @@
         "9 models, 21 tests"
       ],
       [
-        "runs on",
-        "a laptop, in DuckDB"
-      ],
-      [
         "llm test",
         "91.0% on 578 held-out proposals"
+      ],
+      [
+        "cloud",
+        "BigQuery, public dashboard"
       ]
     ],
     "shots": [
@@ -87,12 +88,12 @@
           },
           [
             {
-              "title": "Proposal labels",
-              "text": "wording matcher and direction, checked two ways"
+              "title": "BigQuery",
+              "text": "curated tables published with a row-count audit, reporting models built by dbt"
             },
             {
-              "title": "Results",
-              "text": "tables and charts in the repository"
+              "title": "Public dashboard",
+              "text": "Data Studio, open to anyone with the link"
             }
           ]
         ]
@@ -122,7 +123,8 @@
           "Limits: voting is one measure of a fund, the ESG label is read from fund names, and the yardstick is a chosen group of ten fund houses."
         ]
       }
-    ]
+    ],
+    "demo": "https://datastudio.google.com/reporting/018f69c4-a00a-4e0b-80dc-5e1085eabdd0"
   },
   {
     "title": "Data Validation Framework",
