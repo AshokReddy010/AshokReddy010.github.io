@@ -1,519 +1,901 @@
 [
-  {
-    "title": "Do ESG Funds Vote Like ESG Funds?",
-    "highlight": "Vote",
-    "description": "I collected three years of fund voting records from the SEC, 73.8 million votes from 12,416 funds, to test whether funds with ESG in their name vote differently from ordinary funds. They do, a little: the fund house a fund belongs to predicts its votes better than its label.",
-    "tags": [
-      "Python",
-      "DuckDB",
-      "dbt",
-      "BigQuery",
-      "SQL",
-      "pandas",
-      "Entity matching",
-      "LLM evaluation",
-      "pytest",
-      "GitHub Actions"
-    ],
-    "link": "https://github.com/AshokReddy010/fund-proxy-voting",
-    "spec": [
-      [
-        "source",
-        "SEC Form N-PX filings"
-      ],
-      [
-        "filings read",
-        "33,929"
-      ],
-      [
-        "votes",
-        "73.8 million"
-      ],
-      [
-        "funds",
-        "12,416"
-      ],
-      [
-        "dbt",
-        "9 models, 21 tests"
-      ],
-      [
-        "llm test",
-        "91.0% on 578 held-out proposals"
-      ],
-      [
-        "cloud",
-        "BigQuery, public dashboard"
-      ]
-    ],
-    "shots": [
-      {
-        "image": "fv-support.png",
-        "caption": "Support by fund group"
-      },
-      {
-        "image": "fv-houses.png",
-        "caption": "ESG funds against siblings"
-      },
-      {
-        "image": "fv-spread.png",
-        "caption": "Spread of ESG-named funds"
-      }
-    ],
-    "case": [
-      {
-        "heading": "Problem",
-        "text": "Funds marketed as ESG or sustainable are expected to back environmental and social proposals at shareholder meetings. Every US fund must publish its votes, but the records are spread across tens of thousands of inconsistent filings, so the claim is hard to check at scale."
-      },
-      {
-        "heading": "Approach",
-        "items": [
-          "Collect: a restartable downloader read 33,929 SEC filings and saved 73.8 million votes.",
-          "Clean: dbt models standardise more than 40 spellings of ten answers and 12 date formats, with 99.97% of votes recognised.",
-          "Match: the same proposal is worded differently by each filer, so 8,274 wordings were matched into 3,850 proposals.",
-          "Label: each proposal's direction comes from how specialist ESG fund houses voted, with keyword rules as a fallback."
-        ]
-      },
-      {
-        "heading": "Architecture",
-        "wide": true,
-        "flow": [
-          {
-            "title": "SEC EDGAR",
-            "text": "33,929 Form N-PX filings in XML, three reporting years"
-          },
-          {
-            "title": "DuckDB and dbt",
-            "text": "cleaned votes, fund labels and one answer per fund per proposal, with 21 tests"
-          },
-          [
-            {
-              "title": "BigQuery",
-              "text": "curated tables published with a row-count audit, reporting models built by dbt"
-            },
-            {
-              "title": "Public dashboard",
-              "text": "Data Studio, open to anyone with the link"
-            }
-          ]
-        ]
-      },
-      {
-        "heading": "What I found",
-        "items": [
-          "Label: on proposals that specialist ESG houses backed, ESG-named funds elsewhere voted for 33% in 2026, against 14% for other funds and 92% for the specialists.",
-          "Trend: ordinary funds' support halved in two years, from 28% to 14%.",
-          "Siblings: on the same proposal, an ESG-named fund voted the same way as ordinary funds from its own filer 83% to 87% of the time.",
-          "Range: of 145 ESG-named funds, 41 backed under 10% of these proposals and 21 backed 75% or more."
-        ]
-      },
-      {
-        "heading": "Testing a language model",
-        "items": [
-          "Question: could an LLM label a proposal's direction from its title alone? I scored it against the specialist houses' votes on 815 proposals, split into a practice set and a final set that was scored once.",
-          "Prompt: the same model rose from 69% to 85% accuracy across three prompts. Asking how specialist funds would vote worked better than asking whether a proposal supports ESG.",
-          "Combined: keyword rules first, then the model where the rules gave no answer, reached 91.0% on the 578 final proposals. It still misses about a quarter of opposing proposals."
-        ]
-      },
-      {
-        "heading": "What made it hard",
-        "items": [
-          "Misleading column: a field named for management's recommendation records whether the vote went with or against it. Read correctly, funds vote with management 89.9% of the time.",
-          "Misleading titles: proposals such as \"Revisit Plastics Packaging Policies\" sound pro-ESG but received 0% from specialist houses. Keyword rules alone agreed with those votes 91% of the time.",
-          "Limits: voting is one measure of a fund, the ESG label is read from fund names, and the yardstick is a chosen group of ten fund houses."
-        ]
-      }
-    ],
-    "demo": "https://datastudio.google.com/reporting/018f69c4-a00a-4e0b-80dc-5e1085eabdd0"
-  },
-  {
-    "title": "Data Validation Framework",
-    "highlight": "Validation",
-    "description": "Three systems hold the same transactions and should agree before any report goes out. This framework checks that they do, every day, and names the exact records behind each mismatch. I planted six errors in invented data, and the checks found all six with the right reason, with no false alarms on 113 clean days.",
-    "tags": [
-      "SQL",
-      "dbt",
-      "DuckDB",
-      "Python",
-      "Reconciliation",
-      "pytest",
-      "GitHub Actions"
-    ],
-    "link": "https://github.com/AshokReddy010/data-validation-framework",
-    "spec": [
-      [
-        "sources",
-        "transactions, client feed, billing"
-      ],
-      [
-        "data",
-        "12,000 invented transactions, 60 days"
-      ],
-      [
-        "planted errors",
-        "6, all found"
-      ],
-      [
-        "false alarms",
-        "0 on 113 clean days"
-      ],
-      [
-        "tests",
-        "21 dbt and 10 pytest"
-      ],
-      [
-        "schedule",
-        "daily, on GitHub Actions"
-      ]
-    ],
-    "shots": [
-      {
-        "image": "dv-differences.png",
-        "caption": "Daily difference by source"
-      }
-    ],
-    "case": [
-      {
-        "heading": "Problem",
-        "text": "When the same transactions live in several systems, a late file, a double-billed record or a blank amount can reach a client report unnoticed. Checking by hand before every delivery is slow and misses small differences."
-      },
-      {
-        "heading": "Approach",
-        "items": [
-          "Level 1: count the rows and total the amounts per source per day, then compare each source with the transaction system.",
-          "Level 2: for the days that differ, find the records behind the difference and name the reason: missing, duplicate, wrong date, blank amount or different amount.",
-          "Output: one results table per source per day, a written report, a chart and an optional chat alert.",
-          "Proof: the data generator plants six known errors, so the checks can be scored against them."
-        ]
-      },
-      {
-        "heading": "Architecture",
-        "wide": true,
-        "flow": [
-          {
-            "title": "Three sources",
-            "text": "invented transaction system, client file feed and billing database"
-          },
-          {
-            "title": "dbt and DuckDB",
-            "text": "daily totals, match or break per day, and the records behind each break"
-          },
-          [
-            {
-              "title": "Report and alert",
-              "text": "summary, results table, chart and webhook"
-            },
-            {
-              "title": "Daily schedule",
-              "text": "GitHub Actions run, with the report saved"
-            }
-          ]
-        ]
-      },
-      {
-        "heading": "What it found",
-        "items": [
-          "All six: 37 missing records, 25 duplicates, 12 changed amounts, one missing day, 9 records filed under the wrong day and 5 blank amounts.",
-          "Totals matter: on two of the days every record was present, so a row count alone would have passed them.",
-          "No noise: none of the 113 clean source-days was flagged."
-        ]
-      },
-      {
-        "heading": "What made it hard",
-        "items": [
-          "Two days, one cause: a record filed under the wrong day throws off the day it left and the day it landed on. My first drill-down explained only one, and a test I had written for the checks themselves caught it.",
-          "Testing the tester: three dbt tests guard the checks, including one that fails if a clean-looking day hides errors that cancel out.",
-          "Limits: the data is invented and small, the transaction system is assumed correct, and matching relies on a shared transaction ID."
-        ]
-      }
+ {
+  "title": "Do ESG Funds Vote Like ESG Funds?",
+  "highlight": "Vote",
+  "description": "I collected three years of fund voting records from the SEC, 73.8 million votes from 12,416 funds, to test whether funds with ESG in their name vote differently from ordinary funds. They do, a little: the fund house a fund belongs to predicts its votes better than its label.",
+  "tags": [
+   "Python",
+   "DuckDB",
+   "dbt",
+   "BigQuery",
+   "SQL",
+   "pandas",
+   "Entity matching",
+   "LLM evaluation",
+   "pytest",
+   "GitHub Actions"
+  ],
+  "link": "https://github.com/AshokReddy010/fund-proxy-voting",
+  "spec": [
+   [
+    "source",
+    "SEC Form N-PX filings"
+   ],
+   [
+    "filings read",
+    "33,929"
+   ],
+   [
+    "votes",
+    "73.8 million"
+   ],
+   [
+    "funds",
+    "12,416"
+   ],
+   [
+    "dbt",
+    "9 models, 21 tests"
+   ],
+   [
+    "llm test",
+    "91.0% on 578 held-out proposals"
+   ],
+   [
+    "cloud",
+    "BigQuery, public dashboard"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "fv-support.png",
+    "caption": "Support by fund group"
+   },
+   {
+    "image": "fv-houses.png",
+    "caption": "ESG funds against siblings"
+   },
+   {
+    "image": "fv-spread.png",
+    "caption": "Spread of ESG-named funds"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "Funds marketed as ESG or sustainable are expected to back environmental and social proposals at shareholder meetings. Every US fund must publish its votes, but the records are spread across tens of thousands of inconsistent filings, so the claim is hard to check at scale."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Collect: a restartable downloader read 33,929 SEC filings and saved 73.8 million votes.",
+     "Clean: dbt models standardise more than 40 spellings of ten answers and 12 date formats, with 99.97% of votes recognised.",
+     "Match: the same proposal is worded differently by each filer, so 8,274 wordings were matched into 3,850 proposals.",
+     "Label: each proposal's direction comes from how specialist ESG fund houses voted, with keyword rules as a fallback."
     ]
-  },
-  {
-    "title": "Olist Analytics Engineering with dbt and DuckDB",
-    "highlight": "Engineering",
-    "description": "An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.",
-    "tags": [
-      "dbt",
-      "DuckDB",
-      "SQL",
-      "Python",
-      "scikit-learn",
-      "Power BI",
-      "DAX",
-      "GitHub Actions"
-    ],
-    "link": "https://github.com/AshokReddy010/olist-analytics-engineering",
-    "spec": [
-      [
-        "models",
-        "24 (staging, intermediate, marts)"
-      ],
-      [
-        "tests",
-        "80, run on every push"
-      ],
-      [
-        "orders",
-        "99,441"
-      ],
-      [
-        "leads",
-        "8,000"
-      ],
-      [
-        "dashboard",
-        "Power BI, 2 pages"
-      ],
-      [
-        "ml",
-        "lead scoring, AUC 0.69"
-      ]
-    ],
-    "shots": [
+   },
+   {
+    "heading": "Architecture",
+    "wide": true,
+    "flow": [
+     {
+      "title": "SEC EDGAR",
+      "text": "33,929 Form N-PX filings in XML, three reporting years"
+     },
+     {
+      "title": "DuckDB and dbt",
+      "text": "cleaned votes, fund labels and one answer per fund per proposal, with 21 tests"
+     },
+     [
       {
-        "image": "funnel.png",
-        "caption": "Seller acquisition funnel"
+       "title": "BigQuery",
+       "text": "curated tables published with a row-count audit, reporting models built by dbt"
       },
       {
-        "image": "retention.png",
-        "caption": "Customer retention by cohort"
+       "title": "Public dashboard",
+       "text": "Data Studio, open to anyone with the link"
       }
-    ],
-    "funnel": {
-      "heading": "Explore the funnel",
-      "stages": [
-        "Leads",
-        "Signed as sellers",
-        "Made a first sale"
-      ],
-      "rows": [
-        [
-          "Organic search",
-          2296,
-          271,
-          112
-        ],
-        [
-          "Paid search",
-          1586,
-          195,
-          101
-        ],
-        [
-          "Social",
-          1350,
-          75,
-          31
-        ],
-        [
-          "Unknown",
-          1159,
-          193,
-          85
-        ],
-        [
-          "Direct traffic",
-          499,
-          56,
-          31
-        ],
-        [
-          "Email",
-          493,
-          15,
-          6
-        ],
-        [
-          "Referral",
-          284,
-          24,
-          9
-        ],
-        [
-          "Other",
-          150,
-          4,
-          2
-        ],
-        [
-          "Display",
-          118,
-          6,
-          2
-        ],
-        [
-          "Other publicity",
-          65,
-          3,
-          0
-        ]
-      ]
-    },
-    "case": [
-      {
-        "heading": "Problem",
-        "text": "A marketplace needs to know which marketing channels bring sellers who actually sign, whether customers come back after their first order, and which new leads the sales team should call first. The raw data is ten separate files that cannot answer any of that until it is cleaned, joined and tested."
-      },
-      {
-        "heading": "Approach",
-        "items": [
-          "Staging: one model per raw file to rename columns, fix types and clean keys.",
-          "Intermediate: order items and payments summed per order, the latest review kept, products translated.",
-          "Marts: fact and dimension tables plus reporting tables for the funnel and cohort retention. The orders table loads incrementally.",
-          "Quality: 80 tests, including a custom check that payments reconcile to order value, run by GitHub Actions on every push."
-        ]
-      },
-      {
-        "heading": "Architecture",
-        "wide": true,
-        "flow": [
-          {
-            "title": "Raw CSV files",
-            "text": "10 tables: orders, items, payments, reviews, products, sellers, leads, deals"
-          },
-          {
-            "title": "dbt on DuckDB",
-            "text": "staging, intermediate and marts, with 80 tests and CI"
-          },
-          [
-            {
-              "title": "Power BI",
-              "text": "funnel and retention pages"
-            },
-            {
-              "title": "Lead scoring",
-              "text": "logistic regression in Python"
-            }
-          ]
-        ]
-      },
-      {
-        "heading": "What I found",
-        "items": [
-          "Funnel: 8,000 leads became 842 signed sellers (10.5%), and 379 of those went on to make a sale.",
-          "Channels: paid search closes at 12.3%, social at 5.6%. Leads with an untracked origin close best at 16.6%, so fixing the tracking is the first recommendation.",
-          "Retention: only 3.04% of 94,990 customers ever placed a second order, so sales depend on new customers.",
-          "Lead scoring: tested on the 2,000 most recent leads, the top 10% of scores close at 23.0% against a 10.5% average (2.18x)."
-        ]
-      },
-      {
-        "heading": "What the tests caught",
-        "items": [
-          "Payments: 249 of 98,665 orders (0.25%) do not match their order value by more than 1.00.",
-          "Translations: 2 product categories are missing an English name.",
-          "Dates: 1 signed lead has a close date before its first contact date."
-        ]
-      }
+     ]
     ]
-  },
-  {
-    "title": "A/B Testing Toolkit in Python",
-    "highlight": "Testing",
-    "description": "A toolkit that takes an experiment from planning to a written decision: how many users the test needs, whether the data can be trusted, whether the change worked, and whether to ship it. Its key formulas are checked against simulation, so the error rates are measured, not assumed.",
-    "tags": [
-      "Python",
-      "SciPy",
-      "NumPy",
-      "pandas",
-      "Statistics",
-      "pytest",
-      "GitHub Actions"
-    ],
-    "link": "https://github.com/AshokReddy010/ab-testing-toolkit",
-    "spec": [
-      [
-        "planning",
-        "sample size, power, duration"
-      ],
-      [
-        "tests",
-        "z-test, Welch t-test, bootstrap"
-      ],
-      [
-        "health check",
-        "sample ratio mismatch"
-      ],
-      [
-        "noise reduction",
-        "CUPED"
-      ],
-      [
-        "verified by",
-        "20,000 simulations per check"
-      ],
-      [
-        "unit tests",
-        "30, run on every push"
-      ]
-    ],
-    "shots": [
-      {
-        "image": "ab-peeking.png",
-        "caption": "Why stopping early is wrong"
-      },
-      {
-        "image": "ab-results.png",
-        "caption": "Example experiment results"
-      },
-      {
-        "image": "ab-sample-size.png",
-        "caption": "Sample size planning"
-      }
-    ],
-    "case": [
-      {
-        "heading": "Problem",
-        "text": "A/B tests go wrong in a few well-known ways: the test is stopped at the first good-looking result, users are not split as designed, too many metrics are checked, or the data is too noisy to see the effect. Each of these can turn a change that does nothing into a reported win."
-      },
-      {
-        "heading": "Approach",
-        "items": [
-          "Plan: sample size, power and test length for a given baseline and smallest lift worth detecting.",
-          "Check: a sample ratio mismatch test that blocks the analysis when assignment looks broken.",
-          "Analyse: tests for rates and averages with confidence intervals, a bootstrap second opinion for revenue, and CUPED to reduce noise.",
-          "Decide: fixed rules that return ship, do not ship, inconclusive or do not trust, with a written readout."
-        ]
-      },
-      {
-        "heading": "Architecture",
-        "wide": true,
-        "flow": [
-          {
-            "title": "Experiment data",
-            "text": "one row per user: group, converted, revenue, refunds, past spending"
-          },
-          {
-            "title": "abkit",
-            "text": "health check, tests, noise reduction and corrections, covered by 30 unit tests"
-          },
-          [
-            {
-              "title": "Readout",
-              "text": "decision and results table in markdown"
-            },
-            {
-              "title": "Validation study",
-              "text": "simulations that check every formula"
-            }
-          ]
-        ]
-      },
-      {
-        "heading": "What the simulations showed",
-        "items": [
-          "Accuracy: with no real effect the toolkit calls a false win 4.85% of the time against a 5% target, and its 95% intervals contain the truth 94.98% of the time.",
-          "Power: at the planned 17,169 users per group it detects the planned lift 80.3% of the time, against an 80% target.",
-          "Peeking: checking a test 10 times and stopping at the first win raises false wins from 5% to 19.4%."
-        ]
-      },
-      {
-        "heading": "Example experiment",
-        "items": [
-          "Result: on simulated data with a true lift of 1.0 point, the readout says ship, with conversion up 1.25 points (interval 0.55 to 1.95).",
-          "Caution: revenue per user looks significant alone (p = 0.035) but not after correcting for extra metrics (p = 0.069), so it is not reported as a win.",
-          "Broken test: a 51/49 split across 33,632 users is flagged as a fault, and the metrics are not read."
-        ]
-      }
+   },
+   {
+    "heading": "What I found",
+    "items": [
+     "Label: on proposals that specialist ESG houses backed, ESG-named funds elsewhere voted for 33% in 2026, against 14% for other funds and 92% for the specialists.",
+     "Trend: ordinary funds' support halved in two years, from 28% to 14%.",
+     "Siblings: on the same proposal, an ESG-named fund voted the same way as ordinary funds from its own filer 83% to 87% of the time.",
+     "Range: of 145 ESG-named funds, 41 backed under 10% of these proposals and 21 backed 75% or more."
     ]
-  }
+   },
+   {
+    "heading": "Testing a language model",
+    "items": [
+     "Question: could an LLM label a proposal's direction from its title alone? I scored it against the specialist houses' votes on 815 proposals, split into a practice set and a final set that was scored once.",
+     "Prompt: the same model rose from 69% to 85% accuracy across three prompts. Asking how specialist funds would vote worked better than asking whether a proposal supports ESG.",
+     "Combined: keyword rules first, then the model where the rules gave no answer, reached 91.0% on the 578 final proposals. It still misses about a quarter of opposing proposals."
+    ]
+   },
+   {
+    "heading": "What made it hard",
+    "items": [
+     "Misleading column: a field named for management's recommendation records whether the vote went with or against it. Read correctly, funds vote with management 89.9% of the time.",
+     "Misleading titles: proposals such as \"Revisit Plastics Packaging Policies\" sound pro-ESG but received 0% from specialist houses. Keyword rules alone agreed with those votes 91% of the time.",
+     "Limits: voting is one measure of a fund, the ESG label is read from fund names, and the yardstick is a chosen group of ten fund houses."
+    ]
+   }
+  ],
+  "demo": "https://ashokreddy010.github.io/fund-proxy-voting/",
+  "demoLabel": "Open the vote explorer"
+ },
+ {
+  "title": "Same Diagnosis, Different Bill",
+  "highlight": "Different Bill",
+  "description": "Every public release of CMS's Medicare inpatient data, 2013 to 2024, modelled in dbt and DuckDB to compare what hospitals bill with what they are paid for the same diagnosis. In 2024 hospitals billed $5.03 for every $1 of payment, and for sepsis the 90th-percentile hospital bills 4.4 times what the 10th does while being paid only 1.8 times as much.",
+  "tags": [
+   "dbt",
+   "DuckDB",
+   "SQL",
+   "Python",
+   "pandas",
+   "GitHub Actions",
+   "Data modelling",
+   "Healthcare"
+  ],
+  "link": "https://github.com/AshokReddy010/medicare-cost-analysis",
+  "demo": "https://ashokreddy010.github.io/medicare-cost-analysis/",
+  "demoLabel": "Open the dashboard",
+  "spec": [
+   [
+    "source",
+    "CMS inpatient, by provider and service"
+   ],
+   [
+    "years",
+    "2013–2024"
+   ],
+   [
+    "rows",
+    "2.13 million"
+   ],
+   [
+    "hospitals",
+    "2,906 in 2024"
+   ],
+   [
+    "dbt",
+    "11 models, 27 tests"
+   ],
+   [
+    "method",
+    "case-mix-adjusted indices"
+   ],
+   [
+    "refresh",
+    "monthly, GitHub Actions"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "med-strip.jpg",
+    "caption": "Every hospital, billed vs paid"
+   },
+   {
+    "image": "med-states.jpg",
+    "caption": "States after case-mix adjustment"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "List prices for the same hospital stay vary wildly, but payment is set by Medicare's formula. Comparing hospitals fairly means removing the effect of what each one treats."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Ingest: file URLs come from the data.gov catalog, so new years load automatically; renamed columns are mapped by alias and an unknown layout fails the job.",
+     "Model: staging, a national DRG-year yardstick, and marts for hospitals, states, area types and DRG price spreads.",
+     "Adjust: each hospital's dollars divided by the yardstick for its own diagnoses and volumes, so 1.00 is the national average.",
+     "Test: keys, ranges, relationships, and a reconciliation test that every discharge and dollar reaches every mart."
+    ]
+   },
+   {
+    "heading": "Architecture",
+    "wide": true,
+    "flow": [
+     {
+      "title": "data.gov + CMS",
+      "text": "12 yearly CSV releases"
+     },
+     {
+      "title": "Python ingest",
+      "text": "alias mapping, one Parquet file per year"
+     },
+     {
+      "title": "dbt + DuckDB",
+      "text": "staging, yardstick, marts, tests"
+     },
+     {
+      "title": "Dashboard",
+      "text": "JSON export and a findings section written from the data"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "SQL Bench: Text-to-SQL Evaluated by Answers",
+  "highlight": "Text-to-SQL",
+  "description": "A benchmark of 50 business questions over a realistic retail warehouse in DuckDB, scoring language models by whether their query returns the right answer. It handles the traps real warehouses have (cancelled orders, refunds, business definitions), runs generated SQL in a sandbox, and reports accuracy with confidence intervals and a breakdown of how wrong answers go wrong.",
+  "tags": [
+   "Python",
+   "DuckDB",
+   "SQL",
+   "LLM evaluation",
+   "sqlglot",
+   "GitHub Models",
+   "pytest",
+   "GitHub Actions"
+  ],
+  "link": "https://github.com/AshokReddy010/text-to-sql-eval",
+  "demo": "https://ashokreddy010.github.io/text-to-sql-eval/",
+  "demoLabel": "Open the leaderboard",
+  "spec": [
+   [
+    "questions",
+    "50, hand-written gold SQL"
+   ],
+   [
+    "warehouse",
+    "6 tables, 32k orders"
+   ],
+   [
+    "scoring",
+    "result equivalence"
+   ],
+   [
+    "safety",
+    "read-only sandbox, timeouts"
+   ],
+   [
+    "stats",
+    "Wilson 95% intervals"
+   ],
+   [
+    "ablation",
+    "schema vs business context"
+   ],
+   [
+    "refresh",
+    "daily on GitHub Models"
+   ]
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "Text-to-SQL demos look good on simple counts. Real questions hide definitions (what counts as revenue, who is an active customer), and a query can look right while returning the wrong number."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Warehouse: generated from a fixed seed so the benchmark is reproducible, with cancellations, refunds and split payments.",
+     "Scoring: results are compared, not SQL text, allowing column order, row order (unless asked) and the precision the question requested.",
+     "Safety: one read-only statement, no file access, a 20-second timeout and a row cap.",
+     "Honesty: a gold-query self-check gates every run, and every miss is classified by running the query."
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Feed Watch: Data Observability for Public Feeds",
+  "highlight": "Observability",
+  "description": "A monitor that runs for real every 3 hours on three public datasets (USGS earthquakes, Wikipedia pageviews, Chicago crimes). It profiles each batch and checks freshness, volume, schema, completeness, uniqueness and drift against that feed's own history, then opens and closes GitHub issues for incidents. The live status page shows the latest real run.",
+  "tags": [
+   "Python",
+   "pandas",
+   "Anomaly detection",
+   "GitHub Actions",
+   "Monitoring",
+   "pytest",
+   "mypy"
+  ],
+  "link": "https://github.com/AshokReddy010/pipeline-observability",
+  "demo": "https://ashokreddy010.github.io/pipeline-observability/",
+  "demoLabel": "Open the live status page",
+  "spec": [
+   [
+    "feeds",
+    "3 real public APIs"
+   ],
+   [
+    "cadence",
+    "every 3 hours"
+   ],
+   [
+    "monitors",
+    "7"
+   ],
+   [
+    "volume",
+    "robust z, weekday-aware"
+   ],
+   [
+    "drift",
+    "population stability index"
+   ],
+   [
+    "alerts",
+    "GitHub issues, auto-close"
+   ],
+   [
+    "tests",
+    "40, 94% coverage"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "fw-status.jpg",
+    "caption": "Live status, run by run"
+   },
+   {
+    "image": "fw-incidents.jpg",
+    "caption": "Incidents and what each check means"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "Most data incidents are ordinary: a feed stops updating, volume drops, a column disappears or goes blank. They are cheap to catch at the boundary and expensive to find in a dashboard a week later."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Profiles, not raw data: each run is reduced to a few kilobytes of JSON, so months of history live in git.",
+     "Baselines use medians and MAD and leave out failed runs, so one outage does not teach the monitor that outages are normal.",
+     "Weekly rhythm is learned: until four same-weekday runs exist, volume can warn but never page.",
+     "Incidents open one GitHub issue each and close themselves when the check passes."
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Data Contract Guard",
+  "highlight": "Contract",
+  "description": "A Python tool and GitHub Action that enforces data contracts written in YAML: it validates CSV, Parquet and JSON files against column, key, range and business-rule promises, drafts a contract from sample data, and classifies contract changes as breaking or safe with the version bump each needs. A browser playground runs the real package with Pyodide.",
+  "tags": [
+   "Python",
+   "pandas",
+   "YAML",
+   "GitHub Actions",
+   "Pyodide",
+   "pytest",
+   "mypy",
+   "ruff"
+  ],
+  "link": "https://github.com/AshokReddy010/data-contract-guard",
+  "demo": "https://ashokreddy010.github.io/data-contract-guard/",
+  "demoLabel": "Try it in your browser",
+  "spec": [
+   [
+    "commands",
+    "validate, infer, diff"
+   ],
+   [
+    "formats",
+    "CSV, Parquet, JSON Lines"
+   ],
+   [
+    "reports",
+    "text, JSON, Markdown, JUnit"
+   ],
+   [
+    "CI",
+    "composite GitHub Action"
+   ],
+   [
+    "tests",
+    "75, 95% coverage"
+   ],
+   [
+    "python",
+    "3.10 to 3.13"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "dcg-validate.jpg",
+    "caption": "Ten planted problems, each caught"
+   },
+   {
+    "image": "dcg-diff.jpg",
+    "caption": "Breaking vs safe contract changes"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "Upstream teams change data without warning: an enum gains a value, a column is renamed, negative quantities slip in. A contract makes the boundary between teams explicit and testable."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "CSV is read as text so a value like 12a in an integer column is caught, not silently converted.",
+     "A broken contract never passes data: every contract mistake is reported before any row is read.",
+     "Breaking is defined from the consumer's side, and diff enforces the semantic-version bump.",
+     "The action writes a Markdown report to the pull request's job summary and can emit JUnit XML."
+    ]
+   }
+  ]
+ },
+ {
+  "title": "NYC 311 Pulse",
+  "highlight": "Pulse",
+  "description": "A daily briefing on New York City's 311 service requests from NYC Open Data: yesterday's volume against a typical day, the complaint types furthest above normal for that weekday, a map of every request, two years of weekly trends, and how fast each agency closes requests. A scheduled workflow refreshes it every morning.",
+  "tags": [
+   "Python",
+   "pandas",
+   "Socrata API",
+   "Anomaly detection",
+   "GitHub Actions",
+   "Leaflet",
+   "pytest"
+  ],
+  "link": "https://github.com/AshokReddy010/nyc-311-pulse",
+  "demo": "https://ashokreddy010.github.io/nyc-311-pulse/",
+  "demoLabel": "Open the live dashboard",
+  "spec": [
+   [
+    "source",
+    "NYC Open Data, 311 requests"
+   ],
+   [
+    "history",
+    "two years, 7.5M requests"
+   ],
+   [
+    "refresh",
+    "daily"
+   ],
+   [
+    "anomalies",
+    "same-weekday robust z"
+   ],
+   [
+    "closure",
+    "1, 3 and 7-day rates by agency"
+   ],
+   [
+    "storage",
+    "monthly CSVs upserted by day"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "nyc-pulse.jpg",
+    "caption": "Yesterday in 311 and what was unusual"
+   },
+   {
+    "image": "nyc-closure.jpg",
+    "caption": "Closure speed and the 311 calendar"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "311 has a strong weekly rhythm and records keep arriving for days, so naive day-over-day comparisons cry wolf."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Aggregate at the source: daily counts come from the Socrata API's group-by, so two years arrive as small tables.",
+     "Re-pull the last ten days on every run, and skip a headline day that is still filling in.",
+     "Compare each day with the same weekday over eight weeks; rank only rises, since recent drops are usually late data.",
+     "Measure closure only on requests at least eight days old, treating impossible closed dates as unknown."
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Data Validation Framework",
+  "highlight": "Validation",
+  "description": "Three systems hold the same transactions and should agree before any report goes out. This framework checks that they do, every day, and names the exact records behind each mismatch. I planted six errors in invented data, and the checks found all six with the right reason, with no false alarms on 113 clean days. A live console rebuilds 60 days of three simulated systems every morning, injects random faults the checks are not told about, and scores whether every one was caught with the right reason.",
+  "tags": [
+   "SQL",
+   "dbt",
+   "DuckDB",
+   "Python",
+   "Reconciliation",
+   "pytest",
+   "GitHub Actions"
+  ],
+  "link": "https://github.com/AshokReddy010/data-validation-framework",
+  "spec": [
+   [
+    "sources",
+    "transactions, client feed, billing"
+   ],
+   [
+    "data",
+    "12,000 invented transactions, 60 days"
+   ],
+   [
+    "planted errors",
+    "6, all found"
+   ],
+   [
+    "false alarms",
+    "0 on 113 clean days"
+   ],
+   [
+    "tests",
+    "21 dbt and 10 pytest"
+   ],
+   [
+    "schedule",
+    "daily, on GitHub Actions"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "dv-console.jpg",
+    "caption": "Live console: random faults injected daily"
+   },
+   {
+    "image": "dv-differences.png",
+    "caption": "Daily difference by source"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "When the same transactions live in several systems, a late file, a double-billed record or a blank amount can reach a client report unnoticed. Checking by hand before every delivery is slow and misses small differences."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Level 1: count the rows and total the amounts per source per day, then compare each source with the transaction system.",
+     "Level 2: for the days that differ, find the records behind the difference and name the reason: missing, duplicate, wrong date, blank amount or different amount.",
+     "Output: one results table per source per day, a written report, a chart and an optional chat alert.",
+     "Proof: the data generator plants six known errors, so the checks can be scored against them."
+    ]
+   },
+   {
+    "heading": "Architecture",
+    "wide": true,
+    "flow": [
+     {
+      "title": "Three sources",
+      "text": "invented transaction system, client file feed and billing database"
+     },
+     {
+      "title": "dbt and DuckDB",
+      "text": "daily totals, match or break per day, and the records behind each break"
+     },
+     [
+      {
+       "title": "Report and alert",
+       "text": "summary, results table, chart and webhook"
+      },
+      {
+       "title": "Daily schedule",
+       "text": "GitHub Actions run, with the report saved"
+      }
+     ]
+    ]
+   },
+   {
+    "heading": "What it found",
+    "items": [
+     "All six: 37 missing records, 25 duplicates, 12 changed amounts, one missing day, 9 records filed under the wrong day and 5 blank amounts.",
+     "Totals matter: on two of the days every record was present, so a row count alone would have passed them.",
+     "No noise: none of the 113 clean source-days was flagged."
+    ]
+   },
+   {
+    "heading": "What made it hard",
+    "items": [
+     "Two days, one cause: a record filed under the wrong day throws off the day it left and the day it landed on. My first drill-down explained only one, and a test I had written for the checks themselves caught it.",
+     "Testing the tester: three dbt tests guard the checks, including one that fails if a clean-looking day hides errors that cancel out.",
+     "Limits: the data is invented and small, the transaction system is assumed correct, and matching relies on a shared transaction ID."
+    ]
+   }
+  ],
+  "demo": "https://ashokreddy010.github.io/data-validation-framework/",
+  "demoLabel": "Open the live console"
+ },
+ {
+  "title": "Olist Analytics Engineering with dbt and DuckDB",
+  "highlight": "Engineering",
+  "description": "An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.",
+  "tags": [
+   "dbt",
+   "DuckDB",
+   "SQL",
+   "Python",
+   "scikit-learn",
+   "Power BI",
+   "DAX",
+   "GitHub Actions"
+  ],
+  "link": "https://github.com/AshokReddy010/olist-analytics-engineering",
+  "spec": [
+   [
+    "models",
+    "24 (staging, intermediate, marts)"
+   ],
+   [
+    "tests",
+    "80, run on every push"
+   ],
+   [
+    "orders",
+    "99,441"
+   ],
+   [
+    "leads",
+    "8,000"
+   ],
+   [
+    "dashboard",
+    "Power BI, 2 pages"
+   ],
+   [
+    "ml",
+    "lead scoring, AUC 0.69"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "ol-late.jpg",
+    "caption": "Late deliveries and reviews"
+   },
+   {
+    "image": "funnel.png",
+    "caption": "Seller acquisition funnel"
+   },
+   {
+    "image": "retention.png",
+    "caption": "Customer retention by cohort"
+   }
+  ],
+  "funnel": {
+   "heading": "Explore the funnel",
+   "stages": [
+    "Leads",
+    "Signed as sellers",
+    "Made a first sale"
+   ],
+   "rows": [
+    [
+     "Organic search",
+     2296,
+     271,
+     112
+    ],
+    [
+     "Paid search",
+     1586,
+     195,
+     101
+    ],
+    [
+     "Social",
+     1350,
+     75,
+     31
+    ],
+    [
+     "Unknown",
+     1159,
+     193,
+     85
+    ],
+    [
+     "Direct traffic",
+     499,
+     56,
+     31
+    ],
+    [
+     "Email",
+     493,
+     15,
+     6
+    ],
+    [
+     "Referral",
+     284,
+     24,
+     9
+    ],
+    [
+     "Other",
+     150,
+     4,
+     2
+    ],
+    [
+     "Display",
+     118,
+     6,
+     2
+    ],
+    [
+     "Other publicity",
+     65,
+     3,
+     0
+    ]
+   ]
+  },
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "A marketplace needs to know which marketing channels bring sellers who actually sign, whether customers come back after their first order, and which new leads the sales team should call first. The raw data is ten separate files that cannot answer any of that until it is cleaned, joined and tested."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Staging: one model per raw file to rename columns, fix types and clean keys.",
+     "Intermediate: order items and payments summed per order, the latest review kept, products translated.",
+     "Marts: fact and dimension tables plus reporting tables for the funnel and cohort retention. The orders table loads incrementally.",
+     "Quality: 80 tests, including a custom check that payments reconcile to order value, run by GitHub Actions on every push."
+    ]
+   },
+   {
+    "heading": "Architecture",
+    "wide": true,
+    "flow": [
+     {
+      "title": "Raw CSV files",
+      "text": "10 tables: orders, items, payments, reviews, products, sellers, leads, deals"
+     },
+     {
+      "title": "dbt on DuckDB",
+      "text": "staging, intermediate and marts, with 80 tests and CI"
+     },
+     [
+      {
+       "title": "Power BI",
+       "text": "funnel and retention pages"
+      },
+      {
+       "title": "Lead scoring",
+       "text": "logistic regression in Python"
+      }
+     ]
+    ]
+   },
+   {
+    "heading": "What I found",
+    "items": [
+     "Funnel: 8,000 leads became 842 signed sellers (10.5%), and 379 of those went on to make a sale.",
+     "Channels: paid search closes at 12.3%, social at 5.6%. Leads with an untracked origin close best at 16.6%, so fixing the tracking is the first recommendation.",
+     "Retention: only 3.04% of 94,990 customers ever placed a second order, so sales depend on new customers.",
+     "Lead scoring: tested on the 2,000 most recent leads, the top 10% of scores close at 23.0% against a 10.5% average (2.18x)."
+    ]
+   },
+   {
+    "heading": "What the tests caught",
+    "items": [
+     "Payments: 249 of 98,665 orders (0.25%) do not match their order value by more than 1.00.",
+     "Translations: 2 product categories are missing an English name.",
+     "Dates: 1 signed lead has a close date before its first contact date."
+    ]
+   }
+  ],
+  "demo": "https://ashokreddy010.github.io/olist-analytics-engineering/",
+  "demoLabel": "Open the dashboard"
+ },
+ {
+  "title": "A/B Testing Toolkit in Python",
+  "highlight": "Testing",
+  "description": "A toolkit that takes an experiment from planning to a written decision: how many users the test needs, whether the data can be trusted, whether the change worked, and whether to ship it. Its key formulas are checked against simulation, so the error rates are measured, not assumed.",
+  "tags": [
+   "Python",
+   "SciPy",
+   "NumPy",
+   "pandas",
+   "Statistics",
+   "pytest",
+   "GitHub Actions"
+  ],
+  "link": "https://github.com/AshokReddy010/ab-testing-toolkit",
+  "spec": [
+   [
+    "planning",
+    "sample size, power, duration"
+   ],
+   [
+    "tests",
+    "z-test, Welch t-test, bootstrap"
+   ],
+   [
+    "health check",
+    "sample ratio mismatch"
+   ],
+   [
+    "noise reduction",
+    "CUPED"
+   ],
+   [
+    "verified by",
+    "20,000 simulations per check"
+   ],
+   [
+    "unit tests",
+    "30, run on every push"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "ab-desk.jpg",
+    "caption": "Experiment Desk running abkit in the browser"
+   },
+   {
+    "image": "ab-peeking.png",
+    "caption": "Why stopping early is wrong"
+   },
+   {
+    "image": "ab-results.png",
+    "caption": "Example experiment results"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "A/B tests go wrong in a few well-known ways: the test is stopped at the first good-looking result, users are not split as designed, too many metrics are checked, or the data is too noisy to see the effect. Each of these can turn a change that does nothing into a reported win."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Plan: sample size, power and test length for a given baseline and smallest lift worth detecting.",
+     "Check: a sample ratio mismatch test that blocks the analysis when assignment looks broken.",
+     "Analyse: tests for rates and averages with confidence intervals, a bootstrap second opinion for revenue, and CUPED to reduce noise.",
+     "Decide: fixed rules that return ship, do not ship, inconclusive or do not trust, with a written readout."
+    ]
+   },
+   {
+    "heading": "Architecture",
+    "wide": true,
+    "flow": [
+     {
+      "title": "Experiment data",
+      "text": "one row per user: group, converted, revenue, refunds, past spending"
+     },
+     {
+      "title": "abkit",
+      "text": "health check, tests, noise reduction and corrections, covered by 30 unit tests"
+     },
+     [
+      {
+       "title": "Readout",
+       "text": "decision and results table in markdown"
+      },
+      {
+       "title": "Validation study",
+       "text": "simulations that check every formula"
+      }
+     ]
+    ]
+   },
+   {
+    "heading": "What the simulations showed",
+    "items": [
+     "Accuracy: with no real effect the toolkit calls a false win 4.85% of the time against a 5% target, and its 95% intervals contain the truth 94.98% of the time.",
+     "Power: at the planned 17,169 users per group it detects the planned lift 80.3% of the time, against an 80% target.",
+     "Peeking: checking a test 10 times and stopping at the first win raises false wins from 5% to 19.4%."
+    ]
+   },
+   {
+    "heading": "Example experiment",
+    "items": [
+     "Result: on simulated data with a true lift of 1.0 point, the readout says ship, with conversion up 1.25 points (interval 0.55 to 1.95).",
+     "Caution: revenue per user looks significant alone (p = 0.035) but not after correcting for extra metrics (p = 0.069), so it is not reported as a win.",
+     "Broken test: a 51/49 split across 33,632 users is flagged as a fault, and the metrics are not read."
+    ]
+   }
+  ],
+  "demo": "https://ashokreddy010.github.io/ab-testing-toolkit/",
+  "demoLabel": "Try it in your browser"
+ }
 ]

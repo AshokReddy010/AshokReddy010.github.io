@@ -538,7 +538,7 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
       <div class="pmain">
         <h3>Stock Market Analysis and <span class="grad">Prediction</span> Web App</h3>
         <p>A full-stack app that tracks NASDAQ and NSE stock prices, charts their trends and forecasts the next 7 days. It combines those forecasts with sentiment from financial news to give a buy, sell or hold recommendation, and includes user sign-in, currency conversion and an admin area.</p>
-        <ul class="chips"><li class="chip">Python</li><li class="chip">FastAPI</li><li class="chip">React</li><li class="chip">Keras</li><li class="chip">scikit-learn</li><li class="chip">Pandas</li><li class="chip">SQLite</li><li class="chip">yfinance</li><li class="chip">NewsAPI</li></ul>
+        <ul class="chips"><li class="chip">Python</li><li class="chip">FastAPI</li><li class="chip">React</li><li class="chip">Keras</li><li class="chip">scikit-learn</li><li class="chip">Pandas</li><li class="chip">SQLite</li><li class="chip">yfinance</li><li class="chip">NewsAPI</li><li class="chip">pytest</li><li class="chip">Docker</li></ul>
         <div class="links"><a class="cta solid" href="https://github.com/AshokReddy010/Stock-Market-Analysis-and-Prediction" target="_blank" rel="noopener">View code on GitHub <b>→</b></a></div>
       </div>
       <dl class="spec">
@@ -549,6 +549,8 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
         <dt>signal</dt><dd>buy / sell / hold</dd>
         <dt>inputs</dt><dd>prices + news sentiment</dd>
         <dt>auth</dt><dd>JWT</dd>
+        <dt>evaluation</dt><dd>7-day out-of-sample backtest</dd>
+        <dt>delivery</dt><dd>pytest, CI, Docker Compose</dd>
       </dl>
       <div class="shots">
         <button class="shot" type="button" data-shot="shot-overview.jpg" data-cap="Live market overview"><img src="shot-overview.jpg" alt="Screenshot: Live market overview" loading="lazy"><span>Live market overview</span></button>
@@ -587,12 +589,12 @@ footer { border-top: 1px solid var(--line); padding-block: 26px 44px; color: var
             </div>
           </div>
           <div class="cblock wide">
-            <h4>What I would improve next</h4>
+            <h4>What changed in the second version</h4>
             <ul>
-              <li>Score the models on held-out data with walk-forward validation and report the error in dollars. The current score is measured on the same data the models were trained on, so it reads too high.</li>
-              <li>Train each model once and cache it, so a page load does not retrain all three.</li>
-              <li>Swap the general-purpose sentiment scorer for one trained on financial text.</li>
-              <li>Package the app with Docker and host a live demo.</li>
+              <li><b>Honest evaluation:</b> each model is refit without the last 7 trading days and scored on them against a "price stays the same" baseline, instead of reporting in-sample fit as accuracy.</li>
+              <li><b>Security:</b> the signing key and settings moved to environment variables, and self-registration can no longer request admin rights.</li>
+              <li><b>Reliability:</b> endpoints call each other's functions instead of HTTP requests to localhost, and the tests found and fixed a crash in admin user search.</li>
+              <li><b>Delivery:</b> a pytest suite and CI for the API, the React build and the Docker images; one command runs the whole app with Docker Compose.</li>
             </ul>
           </div>
         </div>
