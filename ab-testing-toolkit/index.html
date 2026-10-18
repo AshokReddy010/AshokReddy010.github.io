@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Experiment Desk</title>
+<meta name="description" content="Plan an A/B test, read out its results and see why peeking breaks it. Runs the abkit Python toolkit in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #f7f8fb; --panel: #ffffff; --ink: #161a2b; --muted: #5d6378; --line: #dfe2ea; --soft: #eef0f5;
+  --ctl: #7a8194; --trt: #6d28d9; --trt-soft: #ede5fb; --ship: #15803d; --ship-soft: #e3f4e8;
+  --stop: #b91c1c; --stop-soft: #fbe6e6; --wait: #b45309; --wait-soft: #fbefdc; --focus: #6d28d9;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f111a; --panel: #171a26; --ink: #e8eaf2; --muted: #9aa0b5; --line: #2a2e40; --soft: #1f2232;
+    --ctl: #8b92a8; --trt: #a78bfa; --trt-soft: #2a2148; --ship: #4ade80; --ship-soft: #133022;
+    --stop: #f87171; --stop-soft: #3a1717; --wait: #fbbf24; --wait-soft: #35290f; --focus: #a78bfa; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f111a; --panel: #171a26; --ink: #e8eaf2; --muted: #9aa0b5; --line: #2a2e40; --soft: #1f2232;
+  --ctl: #8b92a8; --trt: #a78bfa; --trt-soft: #2a2148; --ship: #4ade80; --ship-soft: #133022;
+  --stop: #f87171; --stop-soft: #3a1717; --wait: #fbbf24; --wait-soft: #35290f; --focus: #a78bfa; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.6 Sora, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 60px; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+header { padding-block: 40px 18px; display: grid; gap: 10px; }
+h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.1; letter-spacing: -0.03em; }
+.lede { margin: 0; color: var(--muted); max-width: 66ch; }
+.status { font-size: 13px; color: var(--muted); }
+nav { display: flex; gap: 6px; flex-wrap: wrap; margin-block: 14px 20px; }
+nav button { font: inherit; font-weight: 600; border: 1px solid var(--line); background: var(--panel); color: var(--muted); padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+nav button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; min-width: 0; }
+.form { display: grid; gap: 14px; }
+.f { display: grid; gap: 5px; }
+.f label { font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.f label span { color: var(--muted); font-weight: 400; }
+.f input, .f select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; }
+.f small { color: var(--muted); font-size: 12.5px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 10px 16px; background: var(--trt); color: #fff; cursor: pointer; }
+.btn.quiet { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+.btn[disabled] { opacity: .5; cursor: wait; }
+label.file { position: relative; overflow: hidden; display: inline-block; }
+label.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.answer { font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin: 4px 0 6px; }
+.answer small { font-size: 1rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0 8px; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr 1fr; } }
+.facts div { background: var(--soft); border-radius: 8px; padding: 10px 12px; display: grid; }
+.facts b { font-size: 1.1rem; } .facts span { color: var(--muted); font-size: 12.5px; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--muted); font: 12px Sora, system-ui, sans-serif; }
+svg .grid line { stroke: var(--line); }
+.verdict { border-radius: 10px; padding: 16px 18px; display: grid; gap: 4px; }
+.verdict b { font-size: 1.35rem; letter-spacing: -0.02em; }
+.verdict.ship { background: var(--ship-soft); } .verdict.ship b { color: var(--ship); }
+.verdict.stop { background: var(--stop-soft); } .verdict.stop b { color: var(--stop); }
+.verdict.wait { background: var(--wait-soft); } .verdict.wait b { color: var(--wait); }
+h3 { font-size: 15px; margin: 22px 0 8px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 620px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+td.sig { font-weight: 700; color: var(--trt); }
+.ci { position: relative; height: 14px; min-width: 120px; }
+.ci .zero { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--muted); }
+.ci .bar { position: absolute; top: 5px; height: 4px; background: var(--trt); border-radius: 2px; }
+.ci .pt { position: absolute; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--trt); transform: translateX(-50%); }
+ul.notes { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+.msg { color: var(--muted); }
+footer { margin-top: 40px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
+footer p { margin: 0; max-width: 80ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Experiment Desk</h1>
+    <p class="lede">Plan an A/B test, read out the results with the checks a careful analyst runs, and see for yourself why peeking at a running test inflates false wins. Every number comes from the <a href="https://github.com/AshokReddy010/ab-testing-toolkit">abkit</a> Python package, running in your browser.</p>
+    <div class="status" id="status" role="status">Starting Python (numpy, scipy, pandas; about 25 MB the first time)…</div>
+  </header>
+  <nav role="tablist" aria-label="Tools">
+    <button role="tab" aria-selected="true" data-tab="plan">Plan a test</button>
+    <button role="tab" aria-selected="false" data-tab="read">Read out results</button>
+    <button role="tab" aria-selected="false" data-tab="peek">Why not peek?</button>
+  </nav>
+
+  <section data-panel="plan" class="grid">
+    <form class="panel form" id="plan-form">
+      <div class="f"><label for="base">Current conversion rate <span>%</span></label><input id="base" type="number" step="0.1" min="0.1" max="99" value="12"></div>
+      <div class="f"><label for="mde">Smallest lift worth detecting <span>% relative</span></label><input id="mde" type="number" step="0.5" min="0.5" value="5"><small>5 means 12.0% → 12.6%</small></div>
+      <div class="row2">
+        <div class="f"><label for="alpha">Significance</label><select id="alpha"><option value="0.1">0.10</option><option value="0.05" selected>0.05</option><option value="0.01">0.01</option></select></div>
+        <div class="f"><label for="power">Power</label><select id="power"><option value="0.8" selected>80%</option><option value="0.9">90%</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="f"><label for="daily">Users per day</label><input id="daily" type="number" min="1" value="5000"></div>
+        <div class="f"><label for="share">In the test <span>%</span></label><input id="share" type="number" min="1" max="100" value="100"></div>
+      </div>
+      <button class="btn" type="submit" disabled>Calculate</button>
+    </form>
+    <div class="panel" id="plan-out"><p class="msg">Waiting for Python…</p></div>
+  </section>
+
+  <section data-panel="read" class="grid" hidden>
+    <div class="panel form">
+      <p class="msg" style="margin:0">One row per user with columns <b>group</b> (control/treatment), <b>converted</b> (0/1), and optionally <b>revenue</b>, <b>pre_revenue</b> and <b>refunded</b>.</p>
+      <button class="btn" data-ex="checkout_experiment.csv" disabled>Analyse the checkout example</button>
+      <button class="btn quiet" data-ex="checkout_experiment_broken.csv" disabled>Analyse a broken experiment</button>
+      <label class="btn quiet file">Open my CSV<input type="file" id="csv" accept=".csv,text/csv" disabled></label>
+      <small class="msg">Your file is read in the browser and never uploaded.</small>
+    </div>
+    <div class="panel" id="read-out"><p class="msg">Pick an example or open a CSV.</p></div>
+  </section>
+
+  <section data-panel="peek" class="grid" hidden>
+    <form class="panel form" id="peek-form">
+      <div class="f"><label for="pk-rate">Conversion rate in both groups <span>%</span></label><input id="pk-rate" type="number" step="0.5" value="10"><small>There is no real difference: every "win" is a false positive.</small></div>
+      <div class="f"><label for="pk-n">Users per group at the end</label><input id="pk-n" type="number" value="10000"></div>
+      <div class="f"><label for="pk-sims">Simulated experiments</label><select id="pk-sims"><option value="2000">2,000</option><option value="5000" selected>5,000</option><option value="10000">10,000</option></select></div>
+      <button class="btn" type="submit" disabled>Simulate</button>
+    </form>
+    <div class="panel" id="peek-out"><p class="msg">Waiting for Python…</p></div>
+  </section>
+
+  <footer>
+    <p>abkit covers sample size and power, two-proportion z-tests and Welch t-tests with relative-lift intervals, a bootstrap check, CUPED variance reduction, sample-ratio-mismatch detection, multiple-testing corrections and a rule-based ship decision. Its validation study simulates thousands of experiments to confirm the false positive rate, power and interval coverage match theory.</p>
+    <p><a href="https://github.com/AshokReddy010/ab-testing-toolkit">Source, tests and validation study on GitHub</a></p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let py = null;
+
+const GLUE = `
+import io, json, math
+import numpy as np
+import pandas as pd
+from abkit import sample_size_proportions, duration_days, power_proportions, analyse_experiment
+from abkit.simulate import peeking_false_positive_rate
+
+def plan(base, mde, alpha, power, daily, share):
+    n = sample_size_proportions(base, mde, alpha, power, relative=True)
+    days = duration_days(n, daily, traffic_share=share)
+    target = base * (1 + mde)
+    curve = []
+    for k in np.linspace(0.1, 2.0, 40):
+        m = int(max(10, n * k))
+        curve.append([m, power_proportions(base, target, m, alpha)])
+    lifts = []
+    for rel in (0.02, 0.03, 0.05, 0.075, 0.10, 0.15, 0.20):
+        try:
+            lifts.append([rel, sample_size_proportions(base, rel, alpha, power, relative=True)])
+        except ValueError:
+            pass
+    return json.dumps({"n": n, "total": 2 * n, "days": days, "target": target, "curve": curve, "lifts": lifts})
+
+def _res(r):
+    d = r.to_dict()
+    return {k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in d.items()}
+
+def readout(text, name):
+    df = pd.read_csv(io.StringIO(text))
+    missing = [c for c in ("group", "converted") if c not in df.columns]
+    if missing:
+        return json.dumps({"error": f"missing column(s): {', '.join(missing)}"})
+    groups = set(df["group"].astype(str).unique())
+    if not {"control", "treatment"} <= groups:
+        return json.dumps({"error": f"the group column must contain 'control' and 'treatment', found {sorted(groups)[:6]}"})
+    df["group"] = df["group"].astype(str)
+    r = analyse_experiment(df, name=name)
+    s = r.srm
+    return json.dumps({"name": r.name, "decision": r.decision, "reason": r.reason,
+        "srm": {"passed": bool(s.passed), "p": float(s.p_value), "n_c": int(s.n_control), "n_t": int(s.n_treatment),
+                "share": float(s.observed_control_share)},
+        "primary": _res(r.primary), "secondary": [_res(x) for x in r.secondary], "guardrails": [_res(x) for x in r.guardrails],
+        "cuped": r.cuped, "notes": r.notes})
+
+def peek(rate, n, sims):
+    out = []
+    for looks in (1, 2, 3, 5, 10, 20):
+        naive = peeking_false_positive_rate(rate, n, looks, n_sims=sims, seed=1)
+        fixed = peeking_false_positive_rate(rate, n, looks, n_sims=sims, seed=1, corrected=True)
+        out.append([looks, naive, fixed])
+    return json.dumps(out)
+`;
+
+const pct = (x, d = 1) => `${(x * 100).toFixed(d)}%`;
+const call = (fn, ...args) => JSON.parse(py.globals.get(fn)(...args));
+
+function lineSvg(points, opts) {
+  const W = 640, H = 240, L = 50, R = 16, T = 12, B = 34;
+  const xs = points.map((p) => p[0]), xmax = Math.max(...xs), xmin = Math.min(...xs);
+  const x = (v) => L + (v - xmin) / (xmax - xmin || 1) * (W - L - R), y = (v) => T + (1 - v / opts.ymax) * (H - T - B);
+  const yt = opts.yticks.map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label)}"><g class="grid">${yt}</g>
+    ${opts.yticks.map((v) => `<text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${opts.yfmt(v)}</text>`).join("")}
+    ${opts.xticks.map((v) => `<text x="${x(v)}" y="${H - 12}" text-anchor="middle">${opts.xfmt(v)}</text>`).join("")}
+    <text x="${W - R}" y="${H}" text-anchor="end">${esc(opts.xlabel)}</text>
+    ${(opts.extra || "")}
+    ${opts.series.map((s) => `<path d="${s.pts.map((p, i) => `${i ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join("")}" fill="none" stroke="${s.color}" stroke-width="2.5"/>
+      ${s.pts.map((p) => s.dots ? `<circle cx="${x(p[0])}" cy="${y(p[1])}" r="3.5" fill="${s.color}"><title>${opts.xfmt(p[0])}: ${opts.yfmt(p[1])}</title></circle>` : "").join("")}`).join("")}</svg>`;
+}
+
+function doPlan(e) {
+  e?.preventDefault();
+  const base = +$("#base").value / 100, mde = +$("#mde").value / 100;
+  let r;
+  try { r = call("plan", base, mde, +$("#alpha").value, +$("#power").value, +$("#daily").value, +$("#share").value / 100); }
+  catch (err) { $("#plan-out").innerHTML = `<p class="msg">${esc(String(err.message).split("\n").filter(Boolean).pop())}</p>`; return; }
+  const n = r.n, xs = [Math.round(n * 0.5), n, Math.round(n * 1.5)];
+  $("#plan-out").innerHTML = `<div class="msg">Each group needs</div><div class="answer num">${n.toLocaleString()} <small>users</small></div>
+    <div class="msg">to detect ${pct(base)} → ${pct(r.target, 2)} with ${Math.round(+$("#power").value * 100)}% power.</div>
+    <div class="facts"><div><b class="num">${r.total.toLocaleString()}</b><span>users in total</span></div><div><b class="num">${r.days.toLocaleString()} days</b><span>at your traffic</span></div><div><b class="num">${pct(+$("#alpha").value, 0)}</b><span>false positive rate</span></div></div>
+    <h3>Power as the test grows</h3>
+    ${lineSvg(r.curve, { label: "Power by users per group", ymax: 1, yticks: [0, .25, .5, .8, 1], yfmt: (v) => pct(v, 0), xticks: xs, xfmt: (v) => v.toLocaleString(), xlabel: "users per group",
+      series: [{ pts: r.curve, color: "var(--trt)" }], extra: "" })}
+    <h3>Smaller lifts cost much more</h3>
+    <div class="scroll"><table style="min-width:0"><thead><tr><th>Relative lift</th><th>Users per group</th><th>Days</th></tr></thead><tbody>
+    ${r.lifts.map(([l, m]) => `<tr${Math.abs(l - mde) < 1e-9 ? ' style="font-weight:700"' : ""}><td>${pct(l, 1)}</td><td class="num">${m.toLocaleString()}</td><td class="num">${Math.ceil(2 * m / (+$("#daily").value * +$("#share").value / 100)).toLocaleString()}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function ciCell(r, rate) {
+  const span = Math.max(Math.abs(r.ci_low), Math.abs(r.ci_high), 1e-9) * 1.15;
+  const p = (v) => 50 + v / span * 50;
+  return `<div class="ci" title="${rate ? pct(r.ci_low, 2) + " to " + pct(r.ci_high, 2) : r.ci_low.toFixed(3) + " to " + r.ci_high.toFixed(3)}"><span class="zero"></span><span class="bar" style="left:${p(r.ci_low)}%;width:${p(r.ci_high) - p(r.ci_low)}%"></span><span class="pt" style="left:${p(r.abs_diff)}%"></span></div>`;
+}
+
+function row(r, rate) {
+  const f = rate ? (v) => pct(v, 2) : (v) => v.toFixed(3);
+  const d = rate ? (v) => `${v >= 0 ? "+" : ""}${(v * 100).toFixed(2)} pts` : (v) => `${v >= 0 ? "+" : ""}${v.toFixed(3)}`;
+  return `<tr><td>${esc(r.metric)}</td><td class="num">${f(r.control)}</td><td class="num">${f(r.treatment)}</td><td class="num">${d(r.abs_diff)}</td><td>${ciCell(r, rate)}</td>
+    <td class="num">${r.rel_lift == null ? "–" : (r.rel_lift >= 0 ? "+" : "") + pct(r.rel_lift)}</td><td class="num ${r.significant ? "sig" : ""}">${r.p_value < 0.0001 ? "<0.0001" : r.p_value.toFixed(4)}</td></tr>`;
+}
+
+function showReadout(r) {
+  if (r.error) { $("#read-out").innerHTML = `<div class="verdict stop"><b>Cannot analyse this file</b><span>${esc(r.error)}</span></div>`; return; }
+  const cls = { Ship: "ship", "Do not ship": "stop", "Do not trust": "stop", Inconclusive: "wait" }[r.decision] || "wait";
+  const s = r.srm;
+  $("#read-out").innerHTML = `<div class="verdict ${cls}"><b>${esc(r.decision)}</b><span>${esc(r.reason)}</span></div>
+    <h3>Health check</h3><p class="msg" style="margin:0">${s.n_c.toLocaleString()} control and ${s.n_t.toLocaleString()} treatment users (${pct(s.share, 2)} in control). Sample ratio check: <b style="color:var(${s.passed ? "--ship" : "--stop"})">${s.passed ? "passed" : "failed"}</b> (p = ${s.p.toPrecision(3)}).</p>
+    <h3>Results</h3><div class="scroll"><table><thead><tr><th>Metric</th><th>Control</th><th>Treatment</th><th>Difference</th><th>95% interval</th><th>Lift</th><th>p-value</th></tr></thead>
+    <tbody>${row(r.primary, true)}${r.secondary.map((x) => row(x, false)).join("")}${r.guardrails.map((x) => row(x, true)).join("")}</tbody></table></div>
+    ${r.cuped && r.cuped.variance_reduction != null ? `<h3>Variance reduction</h3><p class="msg" style="margin:0">CUPED with pre-experiment revenue removed <b>${pct(r.cuped.variance_reduction)}</b> of the variance in revenue per user; the interval got ${pct(1 - r.cuped.ci_width_cuped / r.cuped.ci_width_raw)} narrower.</p>` : ""}
+    ${r.notes.length ? `<h3>Notes</h3><ul class="notes">${r.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}`;
+}
+
+async function readFile(name, text) {
+  $("#read-out").innerHTML = `<p class="msg">Analysing ${esc(name)}…</p>`;
+  await new Promise((r) => setTimeout(r, 30));
+  try { showReadout(call("readout", text, name.replace(/\.csv$/i, "").replace(/_/g, " "))); }
+  catch (err) { showReadout({ error: String(err.message).split("\n").filter(Boolean).pop() }); }
+}
+
+async function doPeek(e) {
+  e?.preventDefault();
+  $("#peek-out").innerHTML = `<p class="msg">Simulating…</p>`;
+  await new Promise((r) => setTimeout(r, 30));
+  const rows = call("peek", +$("#pk-rate").value / 100, +$("#pk-n").value, +$("#pk-sims").value);
+  const max = Math.max(0.3, ...rows.map((r) => r[1])) * 1.1;
+  const worst = rows[rows.length - 1];
+  $("#peek-out").innerHTML = `<div class="msg">Checking ${worst[0]} times and stopping at the first significant result declares a winner in</div>
+    <div class="answer num">${pct(worst[1], 0)} <small>of tests with no real effect</small></div>
+    <div class="msg">instead of the promised 5%. Splitting alpha across the looks keeps it at ${pct(worst[2])}.</div>
+    <h3>False positive rate by number of looks</h3>
+    ${lineSvg(rows.map((r) => [r[0], r[1]]), { label: "False positive rate by number of looks", ymax: max, yticks: [0, .05, .1, .2, .3].filter((v) => v <= max), yfmt: (v) => pct(v, 0),
+      xticks: rows.map((r) => r[0]), xfmt: (v) => String(v), xlabel: "looks during the test",
+      series: [{ pts: rows.map((r) => [r[0], r[1]]), color: "var(--stop)", dots: true }, { pts: rows.map((r) => [r[0], r[2]]), color: "var(--ship)", dots: true }] })}
+    <p class="msg" style="font-size:13px"><span style="color:var(--stop)">●</span> peek and stop at p &lt; 0.05 · <span style="color:var(--ship)">●</span> Bonferroni-corrected looks</p>`;
+}
+
+document.querySelectorAll("nav button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+  document.querySelectorAll("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== b.dataset.tab));
+});
+$("#plan-form").onsubmit = doPlan;
+$("#peek-form").onsubmit = doPeek;
+["base", "mde", "alpha", "power", "daily", "share"].forEach((id) => $("#" + id).addEventListener("change", () => py && doPlan()));
+document.querySelectorAll("[data-ex]").forEach((b) => b.onclick = async () => readFile(b.dataset.ex, await (await fetch("examples/" + b.dataset.ex)).text()));
+$("#csv").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const fr = new FileReader(); fr.onload = () => readFile(f.name, fr.result); fr.readAsText(f); e.target.value = ""; };
+
+(async function boot() {
+  try {
+    py = await loadPyodide();
+    $("#status").textContent = "Loading numpy, scipy and pandas…";
+    await py.loadPackage(["numpy", "scipy", "pandas"]);
+    const manifest = await (await fetch("manifest.json")).json();
+    py.FS.mkdirTree("/pkg/abkit");
+    for (const f of manifest.files) py.FS.writeFile(`/pkg/${f}`, await (await fetch(`py/${f}`)).text());
+    py.runPython("import sys; sys.path.insert(0, '/pkg')");
+    py.runPython(GLUE);
+    document.querySelectorAll("button[disabled], input[disabled]").forEach((b) => (b.disabled = false));
+    $("#status").textContent = "Ready. Python is running in this tab.";
+    doPlan(); doPeek();
+  } catch (err) {
+    py = null;
+    $("#status").textContent = `Python could not start in this browser (${err.message}). Try a current Chrome, Edge, Firefox or Safari.`;
+  }
+})();
+</script>
+</body>
+</html>
