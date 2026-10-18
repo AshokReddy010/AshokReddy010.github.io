@@ -232,7 +232,7 @@
    "SQL",
    "LLM evaluation",
    "sqlglot",
-   "GitHub Models",
+   "Groq",
    "pytest",
    "GitHub Actions"
   ],
@@ -266,7 +266,7 @@
    ],
    [
     "refresh",
-    "daily on GitHub Models"
+    "daily, free hosted models"
    ]
   ],
   "case": [
