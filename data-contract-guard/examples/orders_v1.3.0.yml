@@ -1,0 +1,70 @@
+# A proposed v1.3.0 of the orders contract, used to show `contract-guard diff`.
+dataset: orders
+version: 1.3.0
+owner: data-platform@example.com
+description: One row per customer order, delivered daily by the checkout service.
+columns:
+- name: order_id
+  type: string
+  nullable: false
+  unique: true
+  pattern: ^ORD-[0-9]{6}$
+  description: Checkout's order number.
+- name: customer_id
+  type: string
+  nullable: false
+  pattern: ^C[0-9]{4}$
+- name: order_date
+  type: date
+  nullable: false
+  min: '2020-01-01'
+- name: ship_date
+  type: date
+- name: status
+  type: string
+  nullable: false
+  allowed:
+  - placed
+  - shipped
+  - delivered
+  - returned
+  - cancelled
+  - on_hold
+- name: country
+  type: string
+  nullable: false
+  min_length: 2
+  max_length: 2
+- name: quantity
+  type: float
+  nullable: false
+  min: 1
+  max: 1000
+- name: unit_price
+  type: float
+  nullable: false
+  min: 0
+- name: discount
+  type: float
+  min: 0
+  max: 0.8
+- name: channel
+  type: string
+  allowed:
+  - web
+  - app
+  - store
+rules:
+- name: ships_on_or_after_order
+  expr: ship_date >= order_date
+  description: An order cannot ship before it was placed.
+dataset_checks:
+  row_count:
+    min: 100
+    max: 100000
+  primary_key:
+  - order_id
+  freshness:
+    column: order_date
+    max_age_days: 3
+  allow_extra_columns: false

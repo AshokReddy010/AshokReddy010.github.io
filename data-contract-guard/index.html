@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Contract Guard Playground</title>
+<meta name="description" content="Validate a CSV against a YAML data contract, draft a contract from data, and find breaking contract changes. Runs the real contract-guard package in your browser with Pyodide; nothing is uploaded.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #eef1f0; --surface: #ffffff; --sunk: #f6f8f7; --ink: #15211d; --muted: #56665f; --line: #d3dbd8;
+  --pass: #0f6b4f; --pass-bg: #e3f2eb; --fail: #b42318; --fail-bg: #fbe9e7; --warn: #8a5a00; --warn-bg: #fbf1dc;
+  --focus: #1d5fd1;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1513; --surface: #16201d; --sunk: #111a17; --ink: #e4ece9; --muted: #92a49e; --line: #283531;
+    --pass: #4cc597; --pass-bg: #143127; --fail: #f2796e; --fail-bg: #3a1a17; --warn: #e6b54d; --warn-bg: #33280f;
+    --focus: #7aa7ff; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1513; --surface: #16201d; --sunk: #111a17; --ink: #e4ece9; --muted: #92a49e; --line: #283531;
+  --pass: #4cc597; --pass-bg: #143127; --fail: #f2796e; --fail-bg: #3a1a17; --warn: #e6b54d; --warn-bg: #33280f;
+  --focus: #7aa7ff; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding: 0 16px 48px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; }
+header { padding-block: 32px 20px; display: grid; gap: 10px; }
+h1 { font-size: clamp(1.6rem, 3.4vw, 2.3rem); line-height: 1.1; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 70ch; }
+.lede a, footer a { color: inherit; text-underline-offset: 3px; }
+code, textarea, .mono { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+
+.modes { display: flex; gap: 4px; flex-wrap: wrap; margin-block: 8px 18px; border-bottom: 1px solid var(--line); }
+.modes button {
+  appearance: none; border: 0; background: none; color: var(--muted); font: inherit; font-weight: 600;
+  padding: 10px 14px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.modes button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, label.file:focus-within {
+  outline: 2px solid var(--focus); outline-offset: 2px;
+}
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.inputs { display: grid; gap: 14px; min-width: 0; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.field-head label { font-weight: 600; }
+.hint { color: var(--muted); font-size: 13px; }
+textarea {
+  width: 100%; min-height: 260px; resize: vertical; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface); color: var(--ink); font-size: 12.5px; line-height: 1.55; tab-size: 2; white-space: pre;
+  overflow: auto;
+}
+textarea.short { min-height: 200px; }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn {
+  appearance: none; font: inherit; font-weight: 600; border-radius: 6px; padding: 9px 16px; cursor: pointer;
+  border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+}
+.btn[disabled] { opacity: .5; cursor: wait; }
+.btn.quiet { background: transparent; color: var(--ink); border-color: var(--line); font-weight: 500; }
+label.file { position: relative; overflow: hidden; }
+label.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.asof { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; }
+.asof input { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; overflow: hidden; }
+.verdict { display: flex; gap: 16px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.stamp {
+  font-weight: 700; font-size: 1.35rem; letter-spacing: 0.04em; padding: 4px 14px; border: 3px solid currentColor;
+  border-radius: 4px; transform: rotate(-3deg); line-height: 1.2;
+}
+.stamp.pass { color: var(--pass); } .stamp.fail { color: var(--fail); } .stamp.idle { color: var(--muted); border-style: dashed; transform: none; }
+@media (prefers-reduced-motion: no-preference) { .stamp.land { animation: land .32s cubic-bezier(.2, 1.4, .4, 1); } }
+@keyframes land { from { transform: rotate(-3deg) scale(1.5); opacity: 0; } to { transform: rotate(-3deg) scale(1); opacity: 1; } }
+.verdict-text { display: grid; gap: 2px; min-width: 0; }
+.verdict-text strong { font-size: 1.05rem; }
+.verdict-text span { color: var(--muted); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 20px; border-bottom: 1px solid var(--line); align-items: start; }
+.rows li:last-child { border-bottom: 0; }
+.tag { font-size: 11.5px; font-weight: 700; padding: 2px 0; border-radius: 4px; text-align: center; letter-spacing: 0.03em; }
+.tag.fail { color: var(--fail); background: var(--fail-bg); } .tag.warn { color: var(--warn); background: var(--warn-bg); }
+.tag.pass { color: var(--pass); background: var(--pass-bg); } .tag.safe { color: var(--pass); background: var(--pass-bg); }
+.what { min-width: 0; }
+.what b { font-weight: 600; }
+.what .msg { color: var(--muted); font-size: 13.5px; overflow-wrap: anywhere; }
+.ex { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+.ex code { font-size: 12px; background: var(--sunk); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; overflow-wrap: anywhere; }
+.count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; white-space: nowrap; }
+details.passed summary { cursor: pointer; padding: 12px 20px; color: var(--muted); font-size: 13.5px; }
+details.passed[open] summary { border-bottom: 1px solid var(--line); }
+.empty { padding: 28px 20px; color: var(--muted); }
+.empty p { margin: 0 0 8px; max-width: 52ch; }
+pre.out { margin: 0; padding: 16px 20px; overflow: auto; font-size: 12.5px; line-height: 1.55; background: var(--sunk); max-height: 70vh; }
+.problems { margin: 0; padding: 14px 20px 18px 40px; color: var(--fail); }
+.status { font-size: 13px; color: var(--muted); }
+footer { margin-top: 36px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
+footer p { margin: 0; max-width: 80ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Data Contract Guard</h1>
+    <p class="lede">A data contract is a YAML file that says what a dataset promises: its columns, types, keys, ranges and business rules. Paste a contract and a CSV, and the real <a href="https://github.com/AshokReddy010/data-contract-guard"><code>contract-guard</code></a> package checks every promise, right here in your browser. Your data never leaves this page.</p>
+  </header>
+
+  <nav class="modes" role="tablist" aria-label="Mode">
+    <button role="tab" aria-selected="true" data-mode="validate">Validate data</button>
+    <button role="tab" aria-selected="false" data-mode="infer">Draft a contract</button>
+    <button role="tab" aria-selected="false" data-mode="diff">Compare versions</button>
+  </nav>
+
+  <div class="grid">
+    <section class="inputs" aria-label="Inputs">
+      <!-- validate -->
+      <div data-panel="validate" class="inputs">
+        <div class="field">
+          <div class="field-head"><label for="contract">Contract</label><span class="hint">YAML</span></div>
+          <textarea id="contract" spellcheck="false" aria-describedby="contract-hint"></textarea>
+          <span class="hint" id="contract-hint">Mistakes in the contract itself are listed before any data is checked.</span>
+        </div>
+        <div class="field">
+          <div class="field-head"><label for="data">Data</label><span class="hint">CSV with a header row</span></div>
+          <textarea id="data" class="short" spellcheck="false"></textarea>
+        </div>
+        <div class="bar">
+          <button class="btn" id="run-validate" disabled>Check the data</button>
+          <label class="btn quiet file">Open a CSV<input type="file" id="file-validate" accept=".csv,.tsv,text/csv"></label>
+          <button class="btn quiet" data-load="broken">Load broken orders</button>
+          <button class="btn quiet" data-load="clean">Load clean orders</button>
+          <span class="asof"><label for="asof">Freshness as of</label><input type="date" id="asof"></span>
+        </div>
+      </div>
+      <!-- infer -->
+      <div data-panel="infer" class="inputs" hidden>
+        <div class="field">
+          <div class="field-head"><label for="infer-data">Sample data</label><span class="hint">CSV with a header row</span></div>
+          <textarea id="infer-data" spellcheck="false"></textarea>
+          <span class="hint">The draft records what is true of this sample. Read every bound before you commit it.</span>
+        </div>
+        <div class="bar">
+          <button class="btn" id="run-infer" disabled>Draft the contract</button>
+          <label class="btn quiet file">Open a CSV<input type="file" id="file-infer" accept=".csv,.tsv,text/csv"></label>
+        </div>
+      </div>
+      <!-- diff -->
+      <div data-panel="diff" class="inputs" hidden>
+        <div class="field">
+          <div class="field-head"><label for="old">Current contract</label><span class="hint">YAML</span></div>
+          <textarea id="old" class="short" spellcheck="false"></textarea>
+        </div>
+        <div class="field">
+          <div class="field-head"><label for="new">Proposed contract</label><span class="hint">YAML</span></div>
+          <textarea id="new" class="short" spellcheck="false"></textarea>
+        </div>
+        <div class="bar"><button class="btn" id="run-diff" disabled>Compare</button></div>
+      </div>
+    </section>
+
+    <section class="report" aria-live="polite" aria-label="Report" id="report">
+      <div class="verdict"><span class="stamp idle">LOADING</span>
+        <div class="verdict-text"><strong>Starting Python in your browser</strong><span class="status" id="boot">Downloading Pyodide, pandas and PyYAML (about 15 MB, cached after the first visit)…</span></div>
+      </div>
+      <div class="empty"><p>The broken example has ten planted problems: a duplicated order number, a malformed id, a blank customer, a quantity of "two", a negative quantity, an unknown status, an order that ships before it was placed, a 90% discount, an impossible date and a bad email (a warning only).</p></div>
+    </section>
+  </div>
+
+  <footer>
+    <p>The same checks run from the command line (<code>contract-guard validate -c orders.yml orders.csv</code>) and as a GitHub Action that writes this report to the pull request's job summary and fails the build on errors.</p>
+    <p><a href="https://github.com/AshokReddy010/data-contract-guard">Source, tests and docs on GitHub</a> · MIT licensed</p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const EXAMPLES = {};
+let py = null, mode = "validate";
+
+const GLUE = `
+import io, json, yaml
+import pandas as pd
+from datetime import datetime, timezone
+from contractguard import ContractError, parse_contract, validate, diff_contracts, infer_contract
+from contractguard.report import to_dict
+from contractguard.contract import contract_to_dict
+
+def _contract(text, label="contract"):
+    try:
+        raw = yaml.safe_load(text)
+    except yaml.YAMLError as e:
+        raise ContractError([f"{label} is not valid YAML: {e}"])
+    return parse_contract(raw)
+
+def _csv(text):
+    sep = "\\t" if text.split("\\n", 1)[0].count("\\t") > text.split("\\n", 1)[0].count(",") else ","
+    return pd.read_csv(io.StringIO(text), sep=sep, dtype=str, keep_default_na=False, na_values=[""])
+
+def run_validate(contract_text, data_text, as_of):
+    try:
+        c = _contract(contract_text)
+    except ContractError as e:
+        return json.dumps({"contract_error": e.problems})
+    try:
+        df = _csv(data_text)
+    except Exception as e:
+        return json.dumps({"data_error": f"could not read the CSV: {e}"})
+    when = datetime.fromisoformat(as_of).replace(tzinfo=timezone.utc) if as_of else datetime.now(timezone.utc)
+    return json.dumps(to_dict(validate(df, c, as_of=when)), default=str)
+
+def run_infer(data_text):
+    try:
+        df = _csv(data_text)
+    except Exception as e:
+        return json.dumps({"data_error": f"could not read the CSV: {e}"})
+    c = infer_contract(df, dataset="my_dataset")
+    y = "# Drafted from a sample. Review every bound before committing.\\n" + yaml.safe_dump(contract_to_dict(c), sort_keys=False)
+    return json.dumps({"yaml": y, "columns": len(c.columns), "rows": len(df)})
+
+def run_diff(old_text, new_text):
+    try:
+        old, new = _contract(old_text, "current contract"), _contract(new_text, "proposed contract")
+    except ContractError as e:
+        return json.dumps({"contract_error": e.problems})
+    d = diff_contracts(old, new)
+    return json.dumps({"old": d.old_version, "new": d.new_version, "bump": d.required_bump, "version_ok": d.version_ok,
+                       "changes": [c.__dict__ for c in d.changes]})
+`;
+
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function fmtEx(v) { const s = typeof v === "string" ? v : JSON.stringify(v); return s.length > 90 ? s.slice(0, 87) + "…" : s; }
+function plural(n, w) { return `${n.toLocaleString()} ${w}${n === 1 ? "" : "s"}`; }
+
+function verdict(kind, title, sub, land = true) {
+  const word = { pass: "PASSED", fail: "FAILED", idle: "READY" }[kind];
+  return `<div class="verdict"><span class="stamp ${kind}${land && kind !== "idle" ? " land" : ""}">${word}</span>
+    <div class="verdict-text"><strong>${esc(title)}</strong><span>${esc(sub)}</span></div></div>`;
+}
+
+function showProblems(title, problems) {
+  $("#report").innerHTML = verdict("fail", title, "Fix these and run again; no data was checked.") +
+    `<ul class="problems">${problems.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>`;
+}
+
+function renderValidate(r) {
+  if (r.contract_error) return showProblems("The contract itself has mistakes", r.contract_error);
+  if (r.data_error) return showProblems("The data could not be read", [r.data_error]);
+  const bad = r.checks.filter((c) => c.status !== "pass");
+  const good = r.checks.filter((c) => c.status === "pass");
+  const title = r.ok ? (r.warnings ? "The data meets the contract, with warnings" : "The data meets the contract")
+                     : "The data breaks the contract";
+  const sub = `${plural(r.rows, "row")} · ${plural(r.errors, "error")} · ${plural(r.warnings, "warning")} · ${plural(r.checks.length, "check")}`;
+  const row = (c) => `<li><span class="tag ${c.status}">${c.status.toUpperCase()}</span>
+      <div class="what"><b>${esc(c.target)}</b> · ${esc(c.check.replace(/_/g, " "))}<div class="msg">${esc(c.message)}</div>
+      ${c.status !== "pass" && c.examples.length ? `<div class="ex">${c.examples.slice(0, 3).map((e) => `<code>${esc(fmtEx(e))}</code>`).join("")}</div>` : ""}</div>
+      <span class="count">${c.status === "pass" ? "" : plural(c.failing_rows, "row")}</span></li>`;
+  $("#report").innerHTML = verdict(r.ok ? "pass" : "fail", title, sub) +
+    (bad.length ? `<ul class="rows">${bad.map(row).join("")}</ul>` : "") +
+    (good.length ? `<details class="passed"${bad.length ? "" : " open"}><summary>${plural(good.length, "check")} passed</summary><ul class="rows">${good.map(row).join("")}</ul></details>` : "");
+}
+
+function renderInfer(r) {
+  if (r.data_error) return showProblems("The data could not be read", [r.data_error]);
+  $("#report").innerHTML = verdict("idle", `Drafted a contract for ${plural(r.columns, "column")}`, `from ${plural(r.rows, "sample row")}`, false) +
+    `<pre class="out" tabindex="0">${esc(r.yaml)}</pre>
+     <div class="bar" style="padding:14px 20px"><button class="btn quiet" id="copy-yaml">Copy YAML</button>
+     <button class="btn quiet" id="use-yaml">Use it to validate</button></div>`;
+  $("#copy-yaml").onclick = async (e) => {
+    try { await navigator.clipboard.writeText(r.yaml); e.target.textContent = "Copied"; }
+    catch { const sel = getSelection(), rg = document.createRange(); rg.selectNodeContents($("pre.out")); sel.removeAllRanges(); sel.addRange(rg); e.target.textContent = "Selected: press Ctrl+C"; }
+  };
+  $("#use-yaml").onclick = () => { $("#contract").value = r.yaml; $("#data").value = $("#infer-data").value; setMode("validate"); run("validate"); };
+}
+
+function renderDiff(r) {
+  if (r.contract_error) return showProblems("A contract has mistakes", r.contract_error);
+  const nb = r.changes.filter((c) => c.kind === "breaking").length;
+  const ok = r.version_ok;
+  const title = !r.changes.length ? "No changes" : nb ? `${plural(nb, "breaking change")} for consumers` : "Only safe changes";
+  const need = { major: "a major version bump", minor: "a minor version bump", none: "no version bump" }[r.bump];
+  const sub = `${r.old} → ${r.new} · needs ${need} · ${ok ? "the version is bumped correctly" : "the version is not bumped enough"}`;
+  $("#report").innerHTML = verdict(ok ? "pass" : "fail", title, sub) +
+    (r.changes.length ? `<ul class="rows">${r.changes.map((c) => `<li><span class="tag ${c.kind === "breaking" ? "fail" : "safe"}">${c.kind === "breaking" ? "BREAKS" : "SAFE"}</span>
+      <div class="what"><b>${esc(c.target)}</b><div class="msg">${esc(c.message)}</div></div><span class="count"></span></li>`).join("")}</ul>` : "");
+}
+
+async function run(which) {
+  if (!py) return;
+  const btn = $(`#run-${which}`); btn.disabled = true;
+  try {
+    let out;
+    if (which === "validate") out = py.globals.get("run_validate")($("#contract").value, $("#data").value, $("#asof").value);
+    if (which === "infer") out = py.globals.get("run_infer")($("#infer-data").value);
+    if (which === "diff") out = py.globals.get("run_diff")($("#old").value, $("#new").value);
+    const r = JSON.parse(out);
+    ({ validate: renderValidate, infer: renderInfer, diff: renderDiff })[which](r);
+  } catch (err) {
+    showProblems("Something went wrong while checking", [String(err.message || err).split("\n").slice(-3).join(" ")]);
+  } finally { btn.disabled = false; }
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll(".modes button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.mode === m)));
+  document.querySelectorAll("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== m));
+  if (py) $("#report").innerHTML = verdict("idle", { validate: "Ready to check your data", infer: "Ready to draft a contract", diff: "Ready to compare contracts" }[m],
+    { validate: "Press Check the data, or load an example.", infer: "Paste or open a sample CSV.", diff: "The examples compare v1.2.0 with a proposed v1.3.0." }[m], false);
+}
+
+document.querySelectorAll(".modes button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+document.querySelectorAll("[data-load]").forEach((b) => b.addEventListener("click", () => {
+  $("#contract").value = EXAMPLES.contract; $("#data").value = EXAMPLES[b.dataset.load]; $("#asof").value = "2026-10-18"; run("validate");
+}));
+["validate", "infer", "diff"].forEach((m) => $(`#run-${m}`).addEventListener("click", () => run(m)));
+function readFile(input, target, then) {
+  input.addEventListener("change", () => { const f = input.files[0]; if (!f) return;
+    const fr = new FileReader(); fr.onload = () => { $(target).value = fr.result; then(); }; fr.readAsText(f); input.value = ""; });
+}
+readFile($("#file-validate"), "#data", () => run("validate"));
+readFile($("#file-infer"), "#infer-data", () => run("infer"));
+document.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") run(mode); });
+
+(async function boot() {
+  try {
+    const get = (p) => fetch(p).then((r) => { if (!r.ok) throw new Error(`${p}: ${r.status}`); return r.text(); });
+    const [manifest, contract, v13, clean, broken] = await Promise.all([
+      get("manifest.json"), get("examples/orders.yml"), get("examples/orders_v1.3.0.yml"),
+      get("examples/orders_clean.csv"), get("examples/orders_broken.csv")]);
+    Object.assign(EXAMPLES, { contract, v13, clean, broken });
+    $("#contract").value = contract; $("#data").value = broken; $("#asof").value = "2026-10-18";
+    $("#infer-data").value = clean.split("\n").slice(0, 121).join("\n");
+    $("#old").value = contract; $("#new").value = v13;
+
+    py = await loadPyodide();
+    $("#boot").textContent = "Loading pandas and PyYAML…";
+    await py.loadPackage(["pandas", "pyyaml"]);
+    py.FS.mkdirTree("/pkg/contractguard");
+    for (const f of JSON.parse(manifest).files) py.FS.writeFile(`/pkg/${f}`, await get(`py/${f}`));
+    py.runPython("import sys; sys.path.insert(0, '/pkg')");
+    py.runPython(GLUE);
+    ["validate", "infer", "diff"].forEach((m) => ($(`#run-${m}`).disabled = false));
+    run("validate");
+  } catch (err) {
+    py = null;
+    $("#report").innerHTML = verdict("fail", "Python could not start in this browser", String(err.message || err), false) +
+      `<div class="empty"><p>Try a current Chrome, Edge, Firefox or Safari, or install the command-line tool: <code>pip install git+https://github.com/AshokReddy010/data-contract-guard</code></p></div>`;
+  }
+})();
+</script>
+</body>
+</html>

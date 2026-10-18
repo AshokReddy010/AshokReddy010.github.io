@@ -1,0 +1,13 @@
+{
+ "files": [
+  "contractguard/__init__.py",
+  "contractguard/__main__.py",
+  "contractguard/checks.py",
+  "contractguard/cli.py",
+  "contractguard/contract.py",
+  "contractguard/diff.py",
+  "contractguard/infer.py",
+  "contractguard/io.py",
+  "contractguard/report.py"
+ ]
+}
