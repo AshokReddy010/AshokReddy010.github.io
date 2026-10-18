@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ESG Fund Vote Explorer</title>
+<meta name="description" content="Do funds with ESG in their name vote like it? Explore 73.8 million US fund proxy votes from SEC Form N-PX: support by fund group, ESG-named funds against their sibling funds, and every ESG-named fund's record.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap">
+<style>
+:root {
+  --bg: #ffffff; --ink: #1c1b29; --muted: #5f6070; --line: #e3e3ea; --soft: #f3f3f7;
+  --spec: #2b7a5b; --esg: #7b61c9; --other: #9a9aab; --for: #2b7a5b; --against: #c0392b; --focus: #7b61c9;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111118; --ink: #ececf3; --muted: #a0a0b2; --line: #2a2a38; --soft: #1b1b25;
+    --spec: #4fc195; --esg: #a893f0; --other: #6f6f84; --for: #4fc195; --against: #ef6f5f; --focus: #a893f0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111118; --ink: #ececf3; --muted: #a0a0b2; --line: #2a2a38; --soft: #1b1b25;
+  --spec: #4fc195; --esg: #a893f0; --other: #6f6f84; --for: #4fc195; --against: #ef6f5f; --focus: #a893f0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 "Libre Franklin", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
+.wrap { max-width: 1060px; margin: 0 auto; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+header { padding-block: 52px 26px; border-bottom: 3px solid var(--ink); display: grid; gap: 14px; }
+h1 { margin: 0; font-size: clamp(2.2rem, 6vw, 4.2rem); line-height: .98; font-weight: 900; letter-spacing: -0.035em; max-width: 14ch; }
+.dek { margin: 0; font-size: clamp(1.1rem, 2.2vw, 1.3rem); max-width: 48ch; }
+.meta { color: var(--muted); font-size: 14px; }
+section { margin-top: 48px; }
+h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; text-wrap: balance; }
+.sub { margin: 0 0 16px; color: var(--muted); max-width: 70ch; }
+.controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { font: inherit; font-size: 14px; font-weight: 600; border: 0; background: transparent; color: var(--muted); padding: 7px 14px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--muted); font: 12.5px "Libre Franklin", system-ui, sans-serif; }
+svg .grid line { stroke: var(--line); }
+svg .lbl { fill: var(--ink); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.find { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+input[type="search"] { font: inherit; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; max-width: 480px; }
+.scroll { overflow: auto; max-height: 560px; border-top: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { position: sticky; top: 0; background: var(--bg); color: var(--muted); font-weight: 600; font-size: 13px; }
+td.r, th.r { text-align: right; }
+.bar { position: relative; height: 10px; background: var(--soft); border-radius: 5px; min-width: 120px; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--esg); border-radius: 5px; }
+.method { columns: 2 300px; column-gap: 32px; color: var(--muted); font-size: 15px; }
+.method p { margin: 0 0 12px; break-inside: avoid; }
+footer { margin-top: 44px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+footer p { margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Do ESG funds vote like ESG funds?</h1>
+    <p class="dek">Mostly not. Across three years of shareholder votes, the fund house a fund belongs to says more about how it votes than the word "ESG" in its name.</p>
+    <div class="meta" id="meta">Loading SEC Form N-PX results…</div>
+  </header>
+
+  <main>
+    <section aria-labelledby="g-h">
+      <h2 id="g-h">Support for environmental and social proposals</h2>
+      <p class="sub">Share of votes cast FOR, by fund group and reporting year (July to June). "Supports ESG" proposals are the ones specialist ESG fund houses backed; "opposes ESG" ones push the other way, such as asking a company to drop climate targets.</p>
+      <div class="controls"><div class="seg" role="group" aria-label="Proposal direction">
+        <button data-dir="supports ESG" aria-pressed="true">Proposals backed by ESG specialists</button><button data-dir="opposes ESG" aria-pressed="false">Anti-ESG proposals</button>
+      </div></div>
+      <div id="groups"></div>
+      <div class="legend"><span><i style="background:var(--spec)"></i>Specialist ESG fund houses</span><span><i style="background:var(--esg)"></i>ESG-named funds at other houses</span><span><i style="background:var(--other)"></i>All other funds</span></div>
+    </section>
+
+    <section aria-labelledby="s-h">
+      <h2 id="s-h">The same proposal, the same fund house</h2>
+      <p class="sub">The fairest test: an ESG-named fund against ordinary funds from the same filer, voting on the same proposal. Each line joins the two support rates at one fund house (at least 50 proposals compared); a long line means the ESG label changes the vote there.</p>
+      <div id="houses"></div>
+      <div class="legend"><span><i style="background:var(--other)"></i>Sibling funds</span><span><i style="background:var(--esg)"></i>ESG-named funds</span></div>
+    </section>
+
+    <section aria-labelledby="f-h">
+      <h2 id="f-h">Every ESG-named fund</h2>
+      <p class="sub" id="fund-sub">ESG-named funds outside the specialist houses with at least 20 votes on proposals the specialists backed, all three years together.</p>
+      <div id="spread"></div>
+      <div class="find">
+        <input type="search" id="q" placeholder="Search a fund or fund house" aria-label="Search funds">
+        <div class="scroll"><table><thead><tr><th>Fund</th><th>Filer</th><th class="r">Votes</th><th class="r">Voted for</th><th style="width:28%"></th></tr></thead><tbody id="funds"></tbody></table></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="m-h">
+      <h2 id="m-h">How it was built</h2>
+      <div class="method">
+        <p><b>Data.</b> Every US fund files Form N-PX with the SEC each year listing every vote it cast. A restartable downloader collected 33,929 filings and 73.8 million votes for the reporting years ending June 2024, 2025 and 2026.</p>
+        <p><b>Cleaning.</b> dbt models in DuckDB standardise more than 40 spellings of ten vote answers and 12 date formats; 99.97% of votes are recognised.</p>
+        <p><b>Matching.</b> Each filer words the same proposal differently, so 8,274 wordings were matched into 3,850 proposals.</p>
+        <p><b>Direction.</b> A proposal "supports ESG" when specialist ESG houses backed it, with keyword rules as a fallback. An LLM labeller was also tested against a hand-labelled set: 91.0% accuracy on 578 held-out proposals.</p>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p id="gen"></p>
+    <p><a href="https://github.com/AshokReddy010/fund-proxy-voting">Code, dbt models, tests and full tables on GitHub</a> · Source: SEC EDGAR Form N-PX (public).</p>
+  </footer>
+</div>
+<script>
+const BASE = new URLSearchParams(location.search).get("base") || "https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/tables/";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const GROUP = { "1 Specialist ESG houses": ["Specialists", "var(--spec)"], "2 ESG-named funds elsewhere": ["ESG-named", "var(--esg)"], "3 Other funds": ["Other funds", "var(--other)"] };
+const nice = (s) => s.replace(/\b([A-Za-z])([A-Za-z]*)\b/g, (m, a, b) => /^(ETF|ESG|MSCI|USA|SPDR|DFA|DBX|HC|TIAA|CREF|II|III|US|S&P|EAFE|ACWI|ISHARES)$/i.test(m) ? m.toUpperCase().replace("ISHARES", "iShares") : a.toUpperCase() + b.toLowerCase());
+
+function csv(text) {
+  const rows = [];
+  let row = [], cur = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"' && text[i + 1] === '"') { cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+    else if (c === '"') q = true; else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cur); cur = ""; if (row.length > 1 || row[0]) rows.push(row); row = []; }
+    else cur += c;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  const [h, ...body] = rows;
+  return body.map((r) => Object.fromEntries(h.map((k, i) => [k, isNaN(r[i]) || r[i] === "" ? r[i] : +r[i]])));
+}
+
+let SUP = [];
+function groups(dir) {
+  const rows = SUP.filter((r) => r.direction === dir && r.direction_basis === "reference votes" && GROUP[r.fund_group]);
+  const years = [...new Set(rows.map((r) => r.report_year))].sort();
+  const keys = Object.keys(GROUP);
+  const W = 960, H = 320, L = 50, R = 10, T = 16, B = 34, max = dir === "supports ESG" ? 100 : Math.max(5, ...rows.map((r) => r.pct_for_all_votes)) * 1.2;
+  const gw = (W - L - R) / years.length, bw = gw * 0.22;
+  const y = (v) => T + (1 - v / max) * (H - T - B);
+  const ticks = [0, .25, .5, .75, 1].map((f) => f * max);
+  $("#groups").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of votes for, by fund group and year">
+    <g class="grid">${ticks.map((t) => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/>`).join("")}</g>
+    ${ticks.map((t) => `<text x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${t.toFixed(max < 20 ? 1 : 0)}%</text>`).join("")}
+    ${years.map((yr, i) => { const x0 = L + i * gw + gw * 0.17;
+      return `<text x="${L + i * gw + gw / 2}" y="${H - 8}" text-anchor="middle" class="lbl">${yr - 1}–${String(yr).slice(2)}</text>` + keys.map((k, j) => {
+        const r = rows.find((x) => x.report_year === yr && x.fund_group === k); if (!r) return "";
+        const v = r.pct_for_all_votes, x = x0 + j * (bw + 6);
+        return `<rect x="${x}" y="${y(v)}" width="${bw}" height="${y(0) - y(v)}" fill="${GROUP[k][1]}" rx="3"><title>${GROUP[k][0]}, ${yr}: ${v}% of ${r.votes.toLocaleString()} votes (${r.funds.toLocaleString()} funds)</title></rect>
+          <text x="${x + bw / 2}" y="${y(v) - 6}" text-anchor="middle" class="lbl num">${v.toFixed(v < 10 ? 1 : 0)}%</text>`; }).join(""); }).join("")}</svg>`;
+}
+
+function houses(rows) {
+  const hs = rows.filter((r) => r.proposals_compared >= 50).sort((a, b) => (b.esg_pct_for - b.siblings_pct_for) - (a.esg_pct_for - a.siblings_pct_for));
+  const W = 960, rowH = 26, L = 270, R = 60, H = hs.length * rowH + 30;
+  const x = (v) => L + v / 100 * (W - L - R);
+  $("#houses").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="ESG-named funds against sibling funds, by fund house">
+    <g class="grid">${[0, 25, 50, 75, 100].map((t) => `<line x1="${x(t)}" x2="${x(t)}" y1="0" y2="${H - 24}"/><text x="${x(t)}" y="${H - 6}" text-anchor="middle">${t}%</text>`).join("")}</g>
+    ${hs.map((h, i) => { const yy = 12 + i * rowH, a = x(h.siblings_pct_for), b = x(h.esg_pct_for);
+      return `<g><title>${esc(nice(h.filer_name))}: ESG-named ${h.esg_pct_for}%, siblings ${h.siblings_pct_for}% (${h.proposals_compared} proposals; same vote ${h.pct_same}%)</title>
+        <text x="${L - 12}" y="${yy + 4}" text-anchor="end" class="lbl">${esc(nice(h.filer_name)).slice(0, 38)}</text>
+        <line x1="${Math.min(a, b)}" x2="${Math.max(a, b)}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="${a}" cy="${yy}" r="6" fill="var(--other)"/><circle cx="${b}" cy="${yy}" r="6" fill="var(--esg)"/>
+        <text x="${W - R + 8}" y="${yy + 4}" class="num">${h.esg_pct_for - h.siblings_pct_for >= 0 ? "+" : ""}${(h.esg_pct_for - h.siblings_pct_for).toFixed(0)}</text></g>`; }).join("")}</svg>`;
+}
+
+let FUNDS = [];
+function spread() {
+  const W = 960, H = 110, L = 10, R = 10;
+  const x = (v) => L + v / 100 * (W - L - R);
+  const bins = Array(20).fill(0);
+  FUNDS.forEach((f) => bins[Math.min(19, Math.floor(f.pct_for / 5))]++);
+  const max = Math.max(...bins), bw = (W - L - R) / 20;
+  const low = FUNDS.filter((f) => f.pct_for < 10).length, high = FUNDS.filter((f) => f.pct_for >= 75).length;
+  $("#fund-sub").textContent = `${FUNDS.length} ESG-named funds outside the specialist houses with at least 20 votes on proposals the specialists backed. ${low} backed fewer than 10% of them; ${high} backed 75% or more.`;
+  $("#spread").innerHTML = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="How many ESG-named funds fall in each band of support">
+    ${bins.map((n, i) => `<rect x="${L + i * bw + 2}" y="${H - n / max * (H - 16)}" width="${bw - 4}" height="${n / max * (H - 16)}" fill="var(--esg)" rx="2"><title>${i * 5}–${i * 5 + 5}%: ${n} funds</title></rect>${n ? `<text x="${L + i * bw + bw / 2}" y="${H - n / max * (H - 16) - 4}" text-anchor="middle" class="num">${n}</text>` : ""}`).join("")}
+    ${[0, 25, 50, 75, 100].map((t) => `<text x="${x(t)}" y="${H + 18}" text-anchor="middle">${t}%</text>`).join("")}</svg>`;
+}
+
+function funds() {
+  const q = $("#q").value.trim().toLowerCase();
+  const list = FUNDS.filter((f) => !q || `${f.fund_name} ${f.filer_name}`.toLowerCase().includes(q)).sort((a, b) => b.pct_for - a.pct_for);
+  $("#funds").innerHTML = list.map((f) => `<tr><td>${esc(f.fund_name)}</td><td>${esc(nice(f.filer_name))}</td><td class="r num">${f.votes.toLocaleString()}</td><td class="r num">${f.pct_for.toFixed(1)}%</td>
+    <td><div class="bar" role="img" aria-label="${f.pct_for.toFixed(1)}%"><i style="width:${f.pct_for}%"></i></div></td></tr>`).join("") || `<tr><td colspan="5" style="color:var(--muted)">No fund matches “${esc(q)}”.</td></tr>`;
+}
+
+Promise.all(["support_by_direction.csv", "sibling_comparison_by_house.csv", "esg_named_fund_support.csv", "data_quality_summary.csv"]
+  .map((f) => fetch(BASE + f, { cache: "no-store" }).then((r) => { if (!r.ok) throw new Error(`${f}: HTTP ${r.status}`); return r.text(); }).then(csv)))
+  .then(([sup, hs, fs, dq]) => {
+    SUP = sup; FUNDS = fs;
+    const q = dq[0];
+    $("#meta").textContent = `SEC Form N-PX · ${(q.votes / 1e6).toFixed(1)} million votes · ${q.filings_with_votes.toLocaleString()} filings with votes · reporting years ending June 2024–2026`;
+    groups("supports ESG");
+    document.querySelectorAll(".seg button").forEach((b) => b.onclick = () => { document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); groups(b.dataset.dir); });
+    houses(hs); spread(); funds(); $("#q").oninput = funds;
+    $("#gen").textContent = "Figures load from the project's published result tables, which update when the data is refreshed.";
+  })
+  .catch((e) => { $("#meta").textContent = `Could not load the result tables (${e.message}).`; });
+</script>
+</body>
+</html>
