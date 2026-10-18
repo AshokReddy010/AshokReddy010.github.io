@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Olist Marketplace Dashboard</title>
+<meta name="description" content="Brazilian e-commerce marketplace, 2017-2018: how late deliveries drive bad reviews, where customers and sellers come from, and which leads to call first. Built from dbt marts in DuckDB.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #0b2a3c; --muted: #5b6b78; --line: #dde3e8; --soft: #edf1f4;
+  --a: #e4572e; --a-soft: #fbe3db; --b: #1f7a8c; --b-soft: #dcefF2; --gold: #e0a030; --good: #2f8f5b; --focus: #1f7a8c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a1620; --panel: #10212e; --ink: #e5eef4; --muted: #92a6b5; --line: #20374a; --soft: #16293a;
+    --a: #ff7b55; --a-soft: #3b1e16; --b: #4fb3c6; --b-soft: #11303a; --gold: #f2b84b; --good: #5ccf8e; --focus: #4fb3c6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a1620; --panel: #10212e; --ink: #e5eef4; --muted: #92a6b5; --line: #20374a; --soft: #16293a;
+  --a: #ff7b55; --a-soft: #3b1e16; --b: #4fb3c6; --b-soft: #11303a; --gold: #f2b84b; --good: #5ccf8e; --focus: #4fb3c6; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15.5px/1.6 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
+.wrap { max-width: 1120px; margin: 0 auto; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+header { padding-block: 44px 20px; display: grid; gap: 12px; }
+h1 { margin: 0; font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.06; font-weight: 800; letter-spacing: -0.03em; max-width: 22ch; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 68ch; }
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
+@media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpis div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; }
+.kpis b { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
+.kpis span { color: var(--muted); font-size: 13px; }
+section { margin-top: 44px; }
+h2 { font-size: clamp(1.35rem, 2.8vw, 1.8rem); margin: 0 0 6px; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+.sub { margin: 0 0 16px; color: var(--muted); max-width: 72ch; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 860px) { .two { grid-template-columns: minmax(0, 1fr); } }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--muted); font: 12px "Plus Jakarta Sans", system-ui, sans-serif; }
+svg .grid line { stroke: var(--line); }
+svg .v { fill: var(--ink); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.big-note { font-size: 1.15rem; font-weight: 600; margin: 0 0 12px; max-width: 52ch; }
+.big-note b { color: var(--a); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; font-size: 12.5px; cursor: pointer; user-select: none; }
+th[aria-sort="descending"]::after { content: " ↓"; } th[aria-sort="ascending"]::after { content: " ↑"; }
+td.r, th.r { text-align: right; }
+.cohort td { padding: 4px 3px; text-align: center; font-size: 11.5px; min-width: 36px; }
+.cohort th { cursor: default; font-size: 11.5px; text-align: center; padding: 4px 3px; }
+.cohort td.c0 { text-align: left; font-weight: 600; white-space: nowrap; padding-right: 8px; }
+footer { margin-top: 44px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
+footer p { margin: 0; max-width: 85ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>One late parcel undoes a five-star marketplace</h1>
+    <p class="lede">Olist connects small Brazilian sellers to large online stores. This dashboard covers its public data for January 2017 to August 2018: about 100,000 orders, their deliveries and reviews, plus 8,000 seller-acquisition leads. Every figure comes from dbt models built and tested in DuckDB.</p>
+    <div class="kpis" id="kpis"></div>
+  </header>
+  <main>
+    <section aria-labelledby="late-h">
+      <h2 id="late-h">Delivery against the promised date</h2>
+      <p class="sub">Orders grouped by how far from the estimated date they arrived, with the average review and the share of one-star reviews. Most parcels arrive early; the ones that do not are where the bad reviews come from.</p>
+      <div class="panel"><p class="big-note" id="late-note"></p><div id="late"></div>
+        <div class="legend"><span><i style="background:var(--b)"></i>Average review (1–5)</span><span><i style="background:var(--a)"></i>Share of one-star reviews</span></div></div>
+    </section>
+
+    <section aria-labelledby="m-h">
+      <h2 id="m-h">Month by month</h2>
+      <p class="sub">Orders grew fourfold through 2017, peaking with Black Friday in November. The late-delivery rate spiked in early 2018 and reviews dipped with it.</p>
+      <div class="two">
+        <div class="panel"><div id="orders"></div></div>
+        <div class="panel"><div id="late-rate"></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="f-h">
+      <div class="two">
+        <div>
+          <h2 id="f-h">Where good sellers come from</h2>
+          <p class="sub">Marketing leads by channel and the share that signed as sellers.</p>
+          <div class="panel"><div id="funnel"></div></div>
+        </div>
+        <div>
+          <h2 id="l-h">Which leads to call first</h2>
+          <p class="sub">A logistic regression scores each lead on the day it arrives. Tested on the 2,000 most recent leads, ranked into tenths by score.</p>
+          <div class="panel"><div id="leads"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="c-h">
+      <h2 id="c-h">Do customers come back?</h2>
+      <p class="sub">Share of each month's new customers who ordered again in later months. Almost nobody does: growth here is all new customers.</p>
+      <div class="panel scroll"><table class="cohort" id="cohort"></table></div>
+    </section>
+
+    <section aria-labelledby="t-h">
+      <div class="two">
+        <div>
+          <h2 id="t-h">States</h2>
+          <p class="sub">Sort by any column. Remote northern and northeastern states wait two to three times as long and review lower.</p>
+          <div class="panel scroll"><table id="states"></table></div>
+        </div>
+        <div>
+          <h2 id="cat-h">Top categories</h2>
+          <p class="sub">The 20 largest categories by revenue. Freight is a third of the price on cheap, bulky goods.</p>
+          <div class="panel scroll"><table id="cats"></table></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>Data: Olist Brazilian E-Commerce and Marketing Funnel datasets (public, CC BY-NC-SA 4.0). Models: 24 dbt models with 80+ tests in DuckDB.</p>
+    <p><a href="https://github.com/AshokReddy010/olist-analytics-engineering">Code and findings on GitHub</a> · <a href="dbt-docs.html">dbt documentation and lineage</a></p>
+  </footer>
+</div>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const brl = (x) => x >= 1e6 ? `R$${(x / 1e6).toFixed(1)}M` : `R$${Math.round(x).toLocaleString()}`;
+const pct = (x, d = 1) => x == null ? "–" : `${(x * 100).toFixed(d)}%`;
+const nice = (s) => s.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+
+function bars(el, items, { label, value, value2, fmt, fmt2, max, max2, color = "var(--b)", color2 = "var(--a)", aria, W = 720, L = 150, R = 70 }) {
+  const rowH = 34, H = items.length * rowH + 10;
+  const x = (v, m) => L + v / m * (W - L - R);
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${items.map((it, i) => {
+    const y = 6 + i * rowH;
+    return `<text x="${L - 10}" y="${y + 17}" text-anchor="end" style="fill:var(--ink)">${esc(label(it))}</text>
+      <rect x="${L}" y="${y + 3}" width="${Math.max(1, x(value(it), max) - L)}" height="${value2 ? 12 : 22}" rx="3" fill="${color}"/>
+      <text x="${x(value(it), max) + 6}" y="${y + (value2 ? 13 : 18)}" class="v">${fmt(value(it))}</text>
+      ${value2 ? `<rect x="${L}" y="${y + 17}" width="${Math.max(1, x(value2(it), max2) - L)}" height="12" rx="3" fill="${color2}"/><text x="${x(value2(it), max2) + 6}" y="${y + 27}" style="fill:${color2};font-weight:700">${fmt2(value2(it))}</text>` : ""}`;
+  }).join("")}</svg>`;
+}
+
+function line(el, pts, { fmt, title, color, aria, ymax }) {
+  const W = 560, H = 240, L = 54, R = 14, T = 30, B = 26;
+  const max = ymax || Math.max(...pts.map((p) => p[1])) * 1.1;
+  const x = (i) => L + i / (pts.length - 1) * (W - L - R), y = (v) => T + (1 - v / max) * (H - T - B);
+  const ticks = [0, .25, .5, .75, 1].map((f) => f * max);
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}"><text x="0" y="14" style="fill:var(--ink);font-weight:700;font-size:14px">${esc(title)}</text>
+    <g class="grid">${ticks.map((t) => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/>`).join("")}</g>
+    ${ticks.map((t) => `<text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${fmt(t)}</text>`).join("")}
+    ${pts.map((p, i) => (i % 3 === 0) ? `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${p[0].slice(2).replace("-", "/")}</text>` : "").join("")}
+    <path d="${pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join("")}" fill="none" stroke="${color}" stroke-width="2.5"/>
+    ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p[1])}" r="3" fill="${color}"><title>${p[0]}: ${fmt(p[1])}</title></circle>`).join("")}</svg>`;
+}
+
+function table(el, rows, cols, sortKey) {
+  let key = sortKey, dir = -1;
+  const draw = () => {
+    const sorted = rows.slice().sort((a, b) => (a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0) * dir);
+    el.innerHTML = `<thead><tr>${cols.map((c) => `<th class="${c.r ? "r" : ""}" data-k="${c.k}" tabindex="0" aria-sort="${c.k === key ? (dir < 0 ? "descending" : "ascending") : "none"}">${c.t}</th>`).join("")}</tr></thead>
+      <tbody>${sorted.map((r) => `<tr>${cols.map((c) => `<td class="${c.r ? "r num" : ""}">${c.f ? c.f(r[c.k]) : esc(r[c.k])}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    el.querySelectorAll("th").forEach((th) => { const go = () => { if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = -1; } draw(); };
+      th.onclick = go; th.onkeydown = (e) => { if (e.key === "Enter") go(); }; });
+  };
+  draw();
+}
+
+fetch("data/olist.json").then((r) => r.json()).then((d) => {
+  const k = d.kpi;
+  $("#kpis").innerHTML = [[k.orders.toLocaleString(), "orders"], [brl(k.revenue), "order value"], [k.avg_review.toFixed(2), "average review"],
+    [pct(k.late_share), "delivered late"], [`${k.median_days_to_deliver} days`, "median delivery time"]].map(([b, s]) => `<div><b class="num">${b}</b><span>${s}</span></div>`).join("");
+
+  const L = d.lateness, early = L.filter((r) => r.sort_key < 0), late = L.filter((r) => r.sort_key >= 4);
+  const w = (rs, f) => rs.reduce((a, r) => a + r[f] * r.orders, 0) / rs.reduce((a, r) => a + r.orders, 0);
+  $("#late-note").innerHTML = `Arriving early earns a ${w(early, "avg_review").toFixed(1)}-star average with ${pct(w(early, "one_star"), 0)} one-star reviews. Four or more days late, the average falls to <b>${w(late, "avg_review").toFixed(1)}</b> and <b>${pct(w(late, "one_star"), 0)}</b> of reviews are one star.`;
+  bars($("#late"), L, { label: (r) => r.bucket, value: (r) => r.avg_review, value2: (r) => r.one_star, fmt: (v) => v.toFixed(2), fmt2: (v) => pct(v, 0), max: 5, max2: 1, aria: "Average review and one-star share by delivery lateness" });
+
+  const m = d.monthly;
+  line($("#orders"), m.map((r) => [r.month, r.orders]), { fmt: (v) => Math.round(v).toLocaleString(), title: "Orders per month", color: "var(--b)", aria: "Orders per month" });
+  line($("#late-rate"), m.map((r) => [r.month, r.late_share]), { fmt: (v) => pct(v, 0), title: "Share delivered late", color: "var(--a)", aria: "Late delivery share per month" });
+
+  const f = d.funnel.filter((r) => r.leads >= 50);
+  bars($("#funnel"), f, { label: (r) => nice(r.origin), value: (r) => r.leads, value2: (r) => r.lead_to_close_rate, fmt: (v) => v.toLocaleString() + " leads", fmt2: (v) => pct(v) + " signed", max: Math.max(...f.map((r) => r.leads)), max2: 0.25, aria: "Leads and close rate by channel", W: 480, L: 108, R: 92 });
+
+  const ls = d.lead_scoring;
+  bars($("#leads"), ls.deciles, { label: (r) => r.decile === 1 ? "Top tenth" : r.decile === 10 ? "Bottom tenth" : `Tenth ${r.decile}`, value: (r) => r.close_rate, fmt: (v) => pct(v), max: 0.3, color: "var(--good)", aria: "Close rate by score decile", W: 480, L: 96, R: 56 });
+  $("#leads").insertAdjacentHTML("beforeend", `<p class="sub" style="margin:10px 0 0">Average close rate ${pct(ls.base_rate)}; the top tenth closes at ${pct(ls.deciles[0].close_rate)}, ${(ls.deciles[0].close_rate / ls.base_rate).toFixed(1)}× the average.</p>`);
+
+  const cohorts = [...new Set(d.cohorts.map((c) => c.cohort))].filter((c) => c >= "2017-01" && c <= "2018-06");
+  const maxM = 12;
+  const get = (c, mm) => d.cohorts.find((r) => r.cohort === c && r.m === mm);
+  $("#cohort").innerHTML = `<thead><tr><th>Cohort</th><th>Size</th>${Array.from({ length: maxM }, (_, i) => `<th>+${i + 1}</th>`).join("")}</tr></thead><tbody>${cohorts.map((c) => {
+    const size = get(c, 0)?.cohort_size || 0;
+    return `<tr><td class="c0">${c}</td><td class="num">${size.toLocaleString()}</td>${Array.from({ length: maxM }, (_, i) => { const r = get(c, i + 1); if (!r) return "<td></td>";
+      const a = Math.min(1, r.retention_rate / 0.008); return `<td class="num" style="background:color-mix(in oklab, var(--b) ${Math.round(a * 85)}%, var(--panel));color:${a > 0.55 ? "#fff" : "var(--ink)"}" title="${r.active_customers} of ${r.cohort_size}">${(r.retention_rate * 100).toFixed(2)}</td>`; }).join("")}</tr>`; }).join("")}</tbody>`;
+
+  table($("#states"), d.states.filter((s) => s.orders >= 300), [
+    { k: "state", t: "State" }, { k: "orders", t: "Orders", r: 1, f: (v) => v.toLocaleString() }, { k: "median_days", t: "Days", r: 1, f: (v) => v.toFixed(0) },
+    { k: "late_share", t: "Late", r: 1, f: (v) => pct(v) }, { k: "avg_review", t: "Review", r: 1, f: (v) => v.toFixed(2) }], "orders");
+  table($("#cats"), d.categories, [
+    { k: "category", t: "Category", f: (v) => esc(nice(v)) }, { k: "revenue", t: "Revenue", r: 1, f: brl }, { k: "median_price", t: "Price", r: 1, f: (v) => `R$${v.toFixed(0)}` },
+    { k: "freight_share", t: "Freight", r: 1, f: (v) => pct(v, 0) }, { k: "avg_review", t: "Review", r: 1, f: (v) => v.toFixed(2) }], "revenue");
+});
+</script>
+</body>
+</html>
