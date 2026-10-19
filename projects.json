@@ -289,7 +289,7 @@
    }
   ],
   "group": "system",
-  "finding": "Scores language models on 50 real analyst questions by whether the query returns the right answer, not whether it looks right.",
+  "finding": "Business context is worth more than model size: given the glossary and sample rows, GPT-OSS 120B answers 96% of 50 analyst questions correctly; given only the table definitions, 48%.",
   "shots": [
    {
     "image": "sqlb-board.jpg",
