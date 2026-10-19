@@ -7,7 +7,7 @@
 <meta name="description" content="Brazilian e-commerce marketplace, 2017-2018: how late deliveries drive bad reviews, where customers and sellers come from, and which leads to call first. Built from dbt marts in DuckDB.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #f6f7f9; --panel: #ffffff; --ink: #0b2a3c; --muted: #5b6b78; --line: #dde3e8; --soft: #edf1f4;
@@ -26,7 +26,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 15.5px/1.6 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
+body { background: var(--bg); color: var(--ink); font: 15.5px/1.6 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
 .wrap { max-width: 1120px; margin: 0 auto; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -46,7 +46,7 @@ h2 { font-size: clamp(1.35rem, 2.8vw, 1.8rem); margin: 0 0 6px; font-weight: 800
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
 @media (max-width: 860px) { .two { grid-template-columns: minmax(0, 1fr); } }
 svg { display: block; width: 100%; height: auto; overflow: visible; }
-svg text { fill: var(--muted); font: 12px "Plus Jakarta Sans", system-ui, sans-serif; }
+svg text { fill: var(--muted); font: 12px "Schibsted Grotesk", system-ui, sans-serif; }
 svg .grid line { stroke: var(--line); }
 svg .v { fill: var(--ink); font-weight: 700; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin-top: 8px; }
@@ -65,8 +65,10 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 44px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
 footer p { margin: 0; max-width: 85ch; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">Olist analytics</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/olist-analytics-engineering" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="wrap">
   <header>
     <h1>One late parcel undoes a five-star marketplace</h1>
@@ -130,6 +132,8 @@ footer p { margin: 0; max-width: 85ch; }
     <p>Data: Olist Brazilian E-Commerce and Marketing Funnel datasets (public, CC BY-NC-SA 4.0). Models: 24 dbt models with 80+ tests in DuckDB.</p>
     <p><a href="https://github.com/AshokReddy010/olist-analytics-engineering">Code and findings on GitHub</a> · <a href="dbt-docs.html">dbt documentation and lineage</a></p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/medicare-cost-analysis/"><small>Previous project</small><b>Medicare costs</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/ab-testing-toolkit/"><small>Next project</small><b>A/B testing toolkit</b></a></nav>
+
 </div>
 <script>
 const $ = (s) => document.querySelector(s);

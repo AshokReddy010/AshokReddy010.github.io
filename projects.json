@@ -2,7 +2,7 @@
  {
   "title": "Do ESG Funds Vote Like ESG Funds?",
   "highlight": "Vote",
-  "description": "I collected three years of fund voting records from the SEC, 73.8 million votes from 12,416 funds, to test whether funds with ESG in their name vote differently from ordinary funds. They do, a little: the fund house a fund belongs to predicts its votes better than its label.",
+  "description": "I collected three years of fund voting records from the SEC, 73.8 million votes from 12,416 funds, and tested whether funds with ESG in their name vote differently from ordinary funds on environmental and social proposals.",
   "tags": [
    "Python",
    "DuckDB",
@@ -18,31 +18,31 @@
   "link": "https://github.com/AshokReddy010/fund-proxy-voting",
   "spec": [
    [
-    "source",
+    "Source",
     "SEC Form N-PX filings"
    ],
    [
-    "filings read",
+    "Filings read",
     "33,929"
    ],
    [
-    "votes",
+    "Votes",
     "73.8 million"
    ],
    [
-    "funds",
+    "Funds",
     "12,416"
    ],
    [
-    "dbt",
+    "dbt models",
     "9 models, 21 tests"
    ],
    [
-    "llm test",
+    "LLM test",
     "91.0% on 578 held-out proposals"
    ],
    [
-    "cloud",
+    "Cloud",
     "BigQuery, public dashboard"
    ]
   ],
@@ -125,12 +125,14 @@
    }
   ],
   "demo": "https://ashokreddy010.github.io/fund-proxy-voting/",
-  "demoLabel": "Open the vote explorer"
+  "demoLabel": "Open the vote explorer",
+  "group": "analysis",
+  "finding": "ESG-named funds backed ESG proposals 33% of the time, against 14% for ordinary funds. Which fund house runs a fund predicts its vote better than its label."
  },
  {
   "title": "Same Diagnosis, Different Bill",
   "highlight": "Different Bill",
-  "description": "Every public release of CMS's Medicare inpatient data, 2013 to 2024, modelled in dbt and DuckDB to compare what hospitals bill with what they are paid for the same diagnosis. In 2024 hospitals billed $5.03 for every $1 of payment, and for sepsis the 90th-percentile hospital bills 4.4 times what the 10th does while being paid only 1.8 times as much.",
+  "description": "Every public release of CMS's Medicare inpatient data, 2013 to 2024, modelled in dbt and DuckDB to compare what hospitals bill with what they are paid for the same diagnosis, adjusted for case mix, and refreshed monthly.",
   "tags": [
    "dbt",
    "DuckDB",
@@ -146,31 +148,31 @@
   "demoLabel": "Open the dashboard",
   "spec": [
    [
-    "source",
+    "Source",
     "CMS inpatient, by provider and service"
    ],
    [
-    "years",
+    "Years",
     "2013–2024"
    ],
    [
-    "rows",
+    "Rows",
     "2.13 million"
    ],
    [
-    "hospitals",
+    "Hospitals",
     "2,906 in 2024"
    ],
    [
-    "dbt",
+    "dbt models",
     "11 models, 27 tests"
    ],
    [
-    "method",
+    "Method",
     "case-mix-adjusted indices"
    ],
    [
-    "refresh",
+    "Refresh",
     "monthly, GitHub Actions"
    ]
   ],
@@ -220,7 +222,9 @@
      }
     ]
    }
-  ]
+  ],
+  "group": "analysis",
+  "finding": "In 2024 hospitals billed $5.03 for every $1 Medicare paid. For sepsis the 90th-percentile hospital bills 4.4 times what the 10th does, but is paid only 1.8 times as much."
  },
  {
   "title": "SQL Bench: Text-to-SQL Evaluated by Answers",
@@ -241,31 +245,31 @@
   "demoLabel": "Open the leaderboard",
   "spec": [
    [
-    "questions",
+    "Questions",
     "50, hand-written gold SQL"
    ],
    [
-    "warehouse",
+    "Warehouse",
     "6 tables, 32k orders"
    ],
    [
-    "scoring",
+    "Scoring",
     "result equivalence"
    ],
    [
-    "safety",
+    "Safety",
     "read-only sandbox, timeouts"
    ],
    [
-    "stats",
+    "Stats",
     "Wilson 95% intervals"
    ],
    [
-    "ablation",
+    "Ablation",
     "schema vs business context"
    ],
    [
-    "refresh",
+    "Refresh",
     "daily, free hosted models"
    ]
   ],
@@ -282,6 +286,14 @@
      "Safety: one read-only statement, no file access, a 20-second timeout and a row cap.",
      "Honesty: a gold-query self-check gates every run, and every miss is classified by running the query."
     ]
+   }
+  ],
+  "group": "system",
+  "finding": "Scores language models on 50 real analyst questions by whether the query returns the right answer, not whether it looks right.",
+  "shots": [
+   {
+    "image": "sqlb-board.jpg",
+    "caption": "Leaderboard, failure breakdown and accuracy by kind of question"
    }
   ]
  },
@@ -303,31 +315,31 @@
   "demoLabel": "Open the live status page",
   "spec": [
    [
-    "feeds",
+    "Feeds",
     "3 real public APIs"
    ],
    [
-    "cadence",
+    "Cadence",
     "every 3 hours"
    ],
    [
-    "monitors",
+    "Monitors",
     "7"
    ],
    [
-    "volume",
+    "Volume",
     "robust z, weekday-aware"
    ],
    [
-    "drift",
+    "Drift",
     "population stability index"
    ],
    [
-    "alerts",
+    "Alerts",
     "GitHub issues, auto-close"
    ],
    [
-    "tests",
+    "Tests",
     "40, 94% coverage"
    ]
   ],
@@ -338,7 +350,7 @@
    },
    {
     "image": "fw-incidents.jpg",
-    "caption": "Incidents and what each check means"
+    "caption": "A late feed caught: every check for the Wikipedia feed"
    }
   ],
   "case": [
@@ -355,7 +367,9 @@
      "Incidents open one GitHub issue each and close themselves when the check passes."
     ]
    }
-  ]
+  ],
+  "group": "system",
+  "finding": "Checks three public data feeds every 3 hours for freshness, volume, schema, completeness and drift, and opens and closes its own incident tickets."
  },
  {
   "title": "Data Contract Guard",
@@ -376,15 +390,15 @@
   "demoLabel": "Try it in your browser",
   "spec": [
    [
-    "commands",
+    "Commands",
     "validate, infer, diff"
    ],
    [
-    "formats",
+    "Formats",
     "CSV, Parquet, JSON Lines"
    ],
    [
-    "reports",
+    "Reports",
     "text, JSON, Markdown, JUnit"
    ],
    [
@@ -392,11 +406,11 @@
     "composite GitHub Action"
    ],
    [
-    "tests",
+    "Tests",
     "75, 95% coverage"
    ],
    [
-    "python",
+    "Python",
     "3.10 to 3.13"
    ]
   ],
@@ -424,12 +438,14 @@
      "The action writes a Markdown report to the pull request's job summary and can emit JUnit XML."
     ]
    }
-  ]
+  ],
+  "group": "system",
+  "finding": "Validates data files against contracts written in YAML, and labels every contract change as breaking or safe with the version bump it needs."
  },
  {
   "title": "NYC 311 Pulse",
   "highlight": "Pulse",
-  "description": "A daily briefing on New York City's 311 service requests from NYC Open Data: yesterday's volume against a typical day, the complaint types furthest above normal for that weekday, a map of every request, two years of weekly trends, and how fast each agency closes requests. A scheduled workflow refreshes it every morning.",
+  "description": "Built from NYC Open Data: a map of every request, two years of weekly trends by borough, how fast each agency closes requests, and a calendar of when each complaint type peaks. A scheduled workflow refreshes it every morning.",
   "tags": [
    "Python",
    "pandas",
@@ -444,27 +460,27 @@
   "demoLabel": "Open the live dashboard",
   "spec": [
    [
-    "source",
+    "Source",
     "NYC Open Data, 311 requests"
    ],
    [
-    "history",
+    "History",
     "two years, 7.5M requests"
    ],
    [
-    "refresh",
+    "Refresh",
     "daily"
    ],
    [
-    "anomalies",
+    "Anomalies",
     "same-weekday robust z"
    ],
    [
-    "closure",
+    "Closure",
     "1, 3 and 7-day rates by agency"
    ],
    [
-    "storage",
+    "Storage",
     "monthly CSVs upserted by day"
    ]
   ],
@@ -492,12 +508,14 @@
      "Measure closure only on requests at least eight days old, treating impossible closed dates as unknown."
     ]
    }
-  ]
+  ],
+  "group": "system",
+  "finding": "Every morning: yesterday's 311 volume against a typical day for that weekday, and the complaint types furthest above normal."
  },
  {
   "title": "Data Validation Framework",
   "highlight": "Validation",
-  "description": "Three systems hold the same transactions and should agree before any report goes out. This framework checks that they do, every day, and names the exact records behind each mismatch. I planted six errors in invented data, and the checks found all six with the right reason, with no false alarms on 113 clean days. A live console rebuilds 60 days of three simulated systems every morning, injects random faults the checks are not told about, and scores whether every one was caught with the right reason.",
+  "description": "Three systems hold the same transactions and should agree before any report goes out. This framework checks that they do, every day, and names the exact records behind each mismatch. A live console rebuilds 60 days of three simulated systems every morning, injects random faults the checks are not told about, and scores whether each was caught for the right reason.",
   "tags": [
    "SQL",
    "dbt",
@@ -510,27 +528,27 @@
   "link": "https://github.com/AshokReddy010/data-validation-framework",
   "spec": [
    [
-    "sources",
+    "Sources",
     "transactions, client feed, billing"
    ],
    [
-    "data",
+    "Data",
     "12,000 invented transactions, 60 days"
    ],
    [
-    "planted errors",
+    "Planted errors",
     "6, all found"
    ],
    [
-    "false alarms",
+    "False alarms",
     "0 on 113 clean days"
    ],
    [
-    "tests",
+    "Tests",
     "21 dbt and 10 pytest"
    ],
    [
-    "schedule",
+    "Schedule",
     "daily, on GitHub Actions"
    ]
   ],
@@ -600,7 +618,9 @@
    }
   ],
   "demo": "https://ashokreddy010.github.io/data-validation-framework/",
-  "demoLabel": "Open the live console"
+  "demoLabel": "Open the live console",
+  "group": "system",
+  "finding": "I planted six kinds of error across three systems. The checks found all six with the right reason and raised no false alarms on 113 clean days."
  },
  {
   "title": "Olist Analytics Engineering with dbt and DuckDB",
@@ -619,27 +639,27 @@
   "link": "https://github.com/AshokReddy010/olist-analytics-engineering",
   "spec": [
    [
-    "models",
+    "Models",
     "24 (staging, intermediate, marts)"
    ],
    [
-    "tests",
+    "Tests",
     "80, run on every push"
    ],
    [
-    "orders",
+    "Orders",
     "99,441"
    ],
    [
-    "leads",
+    "Leads",
     "8,000"
    ],
    [
-    "dashboard",
+    "Dashboard",
     "Power BI, 2 pages"
    ],
    [
-    "ml",
+    "Machine learning",
     "lead scoring, AUC 0.69"
    ]
   ],
@@ -784,7 +804,9 @@
    }
   ],
   "demo": "https://ashokreddy010.github.io/olist-analytics-engineering/",
-  "demoLabel": "Open the dashboard"
+  "demoLabel": "Open the dashboard",
+  "group": "analysis",
+  "finding": "Only 3% of 94,990 customers ever ordered twice. The lead-scoring model's top 10% of leads close at 2.18 times the average rate."
  },
  {
   "title": "A/B Testing Toolkit in Python",
@@ -802,27 +824,27 @@
   "link": "https://github.com/AshokReddy010/ab-testing-toolkit",
   "spec": [
    [
-    "planning",
+    "Planning",
     "sample size, power, duration"
    ],
    [
-    "tests",
+    "Tests",
     "z-test, Welch t-test, bootstrap"
    ],
    [
-    "health check",
+    "Health check",
     "sample ratio mismatch"
    ],
    [
-    "noise reduction",
+    "Noise reduction",
     "CUPED"
    ],
    [
-    "verified by",
+    "Verified by",
     "20,000 simulations per check"
    ],
    [
-    "unit tests",
+    "Unit tests",
     "30, run on every push"
    ]
   ],
@@ -896,6 +918,129 @@
    }
   ],
   "demo": "https://ashokreddy010.github.io/ab-testing-toolkit/",
-  "demoLabel": "Try it in your browser"
+  "demoLabel": "Try it in your browser",
+  "group": "analysis",
+  "finding": "Verified by 20,000 simulations per check: false wins 4.85% against a 5% target, and peeking ten times inflates them to 19.4%."
+ },
+ {
+  "title": "Stock Market Analysis and Prediction Web App",
+  "group": "analysis",
+  "finding": "Forecasts are scored honestly: each model is refit without the last 7 trading days and judged on them against a “price stays the same” baseline.",
+  "description": "A full-stack app that tracks NASDAQ and NSE stock prices, charts their trends and forecasts the next 7 days. It combines those forecasts with sentiment from financial news to give a buy, sell or hold recommendation, and includes user sign-in, currency conversion and an admin area.",
+  "tags": [
+   "Python",
+   "FastAPI",
+   "React",
+   "Keras",
+   "scikit-learn",
+   "pandas",
+   "SQLite",
+   "yfinance",
+   "NewsAPI",
+   "pytest",
+   "Docker"
+  ],
+  "link": "https://github.com/AshokReddy010/Stock-Market-Analysis-and-Prediction",
+  "spec": [
+   [
+    "Models",
+    "ARIMA, LSTM, linear regression"
+   ],
+   [
+    "Horizon",
+    "7 days"
+   ],
+   [
+    "Markets",
+    "NASDAQ, NSE"
+   ],
+   [
+    "Signal",
+    "buy / sell / hold"
+   ],
+   [
+    "Inputs",
+    "prices + news sentiment"
+   ],
+   [
+    "Evaluation",
+    "7-day out-of-sample backtest"
+   ],
+   [
+    "Delivery",
+    "pytest, CI, Docker Compose"
+   ]
+  ],
+  "shots": [
+   {
+    "image": "shot-overview.jpg",
+    "caption": "Live market overview"
+   },
+   {
+    "image": "shot-analysis.jpg",
+    "caption": "Sentiment, news and recommendation"
+   },
+   {
+    "image": "shot-converter.jpg",
+    "caption": "Currency converter"
+   },
+   {
+    "image": "shot-login.jpg",
+    "caption": "Member sign-in"
+   }
+  ],
+  "case": [
+   {
+    "heading": "Problem",
+    "text": "Someone checking a stock usually has the price in one place, forecasts in another and the news somewhere else. This app puts all three on one page and turns them into a simple buy, sell or hold signal."
+   },
+   {
+    "heading": "Approach",
+    "items": [
+     "Data: five years of daily closing prices from yfinance, and recent headlines from NewsAPI.",
+     "Three forecasts, 7 days ahead: a linear regression on the previous two closes and a 5-day rolling mean, an ARIMA(5,1,0) model, and a two-layer LSTM reading 30-day windows.",
+     "Sentiment: each headline is scored with TextBlob and counted as positive, neutral or negative.",
+     "Signal: buy when the forecast trends up and positive headlines outnumber negative ones, sell when both point down, otherwise hold."
+    ]
+   },
+   {
+    "heading": "Architecture",
+    "wide": true,
+    "flow": [
+     {
+      "title": "React front end",
+      "text": "dashboard, stock page, charts, sign-in"
+     },
+     {
+      "title": "FastAPI back end",
+      "text": "JWT sign-in, forecasts, sentiment, signal, admin"
+     },
+     [
+      {
+       "title": "yfinance",
+       "text": "price history"
+      },
+      {
+       "title": "NewsAPI",
+       "text": "headlines"
+      },
+      {
+       "title": "SQLite",
+       "text": "user accounts"
+      }
+     ]
+    ]
+   },
+   {
+    "heading": "What changed in the second version",
+    "wide": true,
+    "items": [
+     "Honest evaluation: each model is refit without the last 7 trading days and scored on them against a “price stays the same” baseline, instead of reporting in-sample fit as accuracy.",
+     "Security: the signing key and settings moved to environment variables, and self-registration can no longer request admin rights.",
+     "Reliability: endpoints call each other's functions instead of HTTP requests to localhost, and the tests found and fixed a crash in admin user search.",
+     "Delivery: a pytest suite and CI for the API, the React build and the Docker images; one command runs the whole app with Docker Compose."
+    ]
+   }
+  ]
  }
 ]

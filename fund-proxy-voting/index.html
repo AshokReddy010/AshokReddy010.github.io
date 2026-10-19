@@ -7,7 +7,7 @@
 <meta name="description" content="Do funds with ESG in their name vote like it? Explore 73.8 million US fund proxy votes from SEC Form N-PX: support by fund group, ESG-named funds against their sibling funds, and every ESG-named fund's record.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #ffffff; --ink: #1c1b29; --muted: #5f6070; --line: #e3e3ea; --soft: #f3f3f7;
@@ -26,7 +26,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.6 "Libre Franklin", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
 .wrap { max-width: 1060px; margin: 0 auto; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -43,7 +43,7 @@ h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; letter-spacing: -0
 .seg button { font: inherit; font-size: 14px; font-weight: 600; border: 0; background: transparent; color: var(--muted); padding: 7px 14px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 svg { display: block; width: 100%; height: auto; overflow: visible; }
-svg text { fill: var(--muted); font: 12.5px "Libre Franklin", system-ui, sans-serif; }
+svg text { fill: var(--muted); font: 12.5px "Schibsted Grotesk", system-ui, sans-serif; }
 svg .grid line { stroke: var(--line); }
 svg .lbl { fill: var(--ink); font-weight: 600; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); margin-top: 10px; }
@@ -62,8 +62,10 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 44px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
 footer p { margin: 0; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">ESG fund votes</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/fund-proxy-voting" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="wrap">
   <header>
     <h1>Do ESG funds vote like ESG funds?</h1>
@@ -113,6 +115,8 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p><a href="https://github.com/AshokReddy010/fund-proxy-voting">Code, dbt models, tests and full tables on GitHub</a> · Source: SEC EDGAR Form N-PX (public).</p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/data-validation-framework/"><small>Previous project</small><b>Data Validation</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/medicare-cost-analysis/"><small>Next project</small><b>Medicare costs</b></a></nav>
+
 </div>
 <script>
 const BASE = new URLSearchParams(location.search).get("base") || "https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/tables/";

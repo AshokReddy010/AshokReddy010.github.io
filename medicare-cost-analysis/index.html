@@ -7,7 +7,7 @@
 <meta name="description" content="What US hospitals charge Medicare for the same inpatient stay, and what they are actually paid: CMS data for every hospital and diagnosis group, by year.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #f3f5f4; --panel: #ffffff; --ink: #14213d; --muted: #5c6577; --line: #d9dee3; --soft: #e9edef;
@@ -27,17 +27,17 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.6 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 72px; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 72px; }
 .wrap { max-width: 1060px; margin: 0 auto; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .num { font-variant-numeric: tabular-nums; }
 .paid { color: var(--paid); } .billed { color: var(--billed); }
-h1, h2 { font-family: Newsreader, Georgia, "Times New Roman", serif; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+h1, h2 { font-family: "Schibsted Grotesk", Georgia, "Times New Roman", serif; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
 
 header { padding-block: 56px 32px; display: grid; gap: 18px; }
 h1 { font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1.02; margin: 0; max-width: 16ch; }
-.deck { font-family: Newsreader, Georgia, serif; font-size: clamp(1.2rem, 2.4vw, 1.55rem); line-height: 1.4; margin: 0; max-width: 40ch; }
+.deck { font-family: "Schibsted Grotesk", Georgia, serif; font-size: clamp(1.2rem, 2.4vw, 1.55rem); line-height: 1.4; margin: 0; max-width: 40ch; }
 .deck b { font-weight: 700; }
 .byline { color: var(--muted); font-size: 14px; }
 .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--ink); margin-top: 8px; }
@@ -58,9 +58,9 @@ select { min-width: 0; width: min(100%, 640px); }
 .seg button { font: inherit; font-size: 14px; border: 0; background: var(--panel); color: var(--muted); padding: 7px 12px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 
-.strip-note { font-family: Newsreader, Georgia, serif; font-size: 1.25rem; line-height: 1.4; margin: 0 0 12px; max-width: 54ch; }
+.strip-note { font-family: "Schibsted Grotesk", Georgia, serif; font-size: 1.25rem; line-height: 1.4; margin: 0 0 12px; max-width: 54ch; }
 svg { display: block; width: 100%; height: auto; overflow: visible; }
-svg text { fill: var(--muted); font: 12px "Public Sans", system-ui, sans-serif; }
+svg text { fill: var(--muted); font: 12px "Schibsted Grotesk", system-ui, sans-serif; }
 svg .axis line, svg .grid line { stroke: var(--line); }
 svg .lbl { fill: var(--ink); font-weight: 600; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13.5px; color: var(--muted); margin-top: 6px; }
@@ -84,7 +84,7 @@ svg .lbl { fill: var(--ink); font-weight: 600; }
 .results li button:hover, .results li button[aria-current="true"] { background: var(--soft); }
 .results li button:focus-visible { outline: 2px solid var(--focus); }
 .results b { font-weight: 600; font-size: 14.5px; } .results span { color: var(--muted); font-size: 13px; }
-.card h3 { font-family: Newsreader, Georgia, serif; font-size: 1.45rem; margin: 0; line-height: 1.2; }
+.card h3 { font-family: "Schibsted Grotesk", Georgia, serif; font-size: 1.45rem; margin: 0; line-height: 1.2; }
 .card .where { color: var(--muted); margin: 2px 0 16px; }
 .gauge { margin: 14px 0; }
 .gauge .t { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
@@ -99,8 +99,10 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13.5px; border-top: 1
 footer p { margin: 0; }
 .loading { color: var(--muted); padding: 20px 0; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">Medicare costs</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/medicare-cost-analysis" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="wrap">
   <header>
     <h1>Same diagnosis, different bill</h1>
@@ -183,6 +185,8 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p><a href="https://github.com/AshokReddy010/medicare-cost-analysis">Code, dbt models and tests on GitHub</a> · Data: Centers for Medicare &amp; Medicaid Services (public domain). Not medical or financial advice.</p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/fund-proxy-voting/"><small>Previous project</small><b>ESG fund votes</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/olist-analytics-engineering/"><small>Next project</small><b>Olist analytics</b></a></nav>
+
 </div>
 
 <script>

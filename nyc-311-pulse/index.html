@@ -7,7 +7,7 @@
 <meta name="description" content="What New Yorkers reported to 311 yesterday, what was unusual, and how fast city agencies close requests. Refreshed daily from NYC Open Data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root {
@@ -29,7 +29,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.55 Archivo, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
 .wrap { max-width: 1120px; margin: 0 auto; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -76,7 +76,7 @@ h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; font-stretch: 90%;
 .legend i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
 
 svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
-svg.chart text { fill: var(--muted); font: 12px Archivo, system-ui, sans-serif; }
+svg.chart text { fill: var(--muted); font: 12px "Schibsted Grotesk", system-ui, sans-serif; }
 svg.chart .grid line { stroke: var(--line); }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
 @media (max-width: 860px) { .two { grid-template-columns: minmax(0, 1fr); } }
@@ -98,8 +98,10 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 44px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
 footer p { margin: 0; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">NYC 311 Pulse</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/nyc-311-pulse" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="band"><div class="wrap"><h1 class="brand">NYC 311 Pulse</h1><span id="updated">Loading…</span></div></div>
 <div class="wrap">
   <div class="hero">
@@ -169,6 +171,8 @@ footer p { margin: 0; }
     <p id="coverage"></p>
     <p><a href="https://github.com/AshokReddy010/nyc-311-pulse">Code and daily data files on GitHub</a> · Data: NYC Open Data, 311 Service Requests · Map © OpenStreetMap contributors</p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/data-contract-guard/"><small>Previous project</small><b>Data Contract Guard</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/data-validation-framework/"><small>Next project</small><b>Data Validation</b></a></nav>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>

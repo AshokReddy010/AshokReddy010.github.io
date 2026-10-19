@@ -7,7 +7,7 @@
 <meta name="description" content="Live demo of a two-level data reconciliation framework: three simulated systems, random faults injected daily, and dbt checks that must find every one with the right reason.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #f4f6f8; --panel: #ffffff; --ink: #0e1a2b; --muted: #5a6677; --line: #dbe1e8; --soft: #ebeff3;
@@ -27,11 +27,11 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.55 Barlow, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 60px; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 60px; }
 .wrap { max-width: 1100px; margin: 0 auto; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.num, .cond { font-family: "Barlow Semi Condensed", Barlow, sans-serif; font-variant-numeric: tabular-nums; }
+.num, .cond { font-family: "Schibsted Grotesk", sans-serif; font-variant-numeric: tabular-nums; }
 header { padding-block: 40px 22px; display: grid; gap: 12px; }
 h1 { margin: 0; font-size: clamp(1.9rem, 4.5vw, 2.8rem); line-height: 1.08; font-weight: 700; letter-spacing: -0.015em; }
 .lede { margin: 0; color: var(--muted); max-width: 70ch; }
@@ -76,8 +76,10 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 40px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
 footer p { margin: 0; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">Data Validation</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/data-validation-framework" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="wrap">
   <header>
     <h1>Reconciliation Console</h1>
@@ -110,6 +112,8 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p>All data is simulated; no real or employer data is used. <a href="https://github.com/AshokReddy010/data-validation-framework">Code, dbt models and tests on GitHub</a>.</p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/nyc-311-pulse/"><small>Previous project</small><b>NYC 311 Pulse</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/fund-proxy-voting/"><small>Next project</small><b>ESG fund votes</b></a></nav>
+
 </div>
 <script>
 const BASE = new URLSearchParams(location.search).get("base") || "https://raw.githubusercontent.com/AshokReddy010/data-validation-framework/main/site/data/";

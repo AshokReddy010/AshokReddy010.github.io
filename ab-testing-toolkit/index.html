@@ -7,7 +7,7 @@
 <meta name="description" content="Plan an A/B test, read out its results and see why peeking breaks it. Runs the abkit Python toolkit in your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #f7f8fb; --panel: #ffffff; --ink: #161a2b; --muted: #5d6378; --line: #dfe2ea; --soft: #eef0f5;
@@ -30,7 +30,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 15px/1.6 Sora, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 60px; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.6 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 60px; }
 .wrap { max-width: 1080px; margin: 0 auto; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -64,7 +64,7 @@ label.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .facts div { background: var(--soft); border-radius: 8px; padding: 10px 12px; display: grid; }
 .facts b { font-size: 1.1rem; } .facts span { color: var(--muted); font-size: 12.5px; }
 svg { display: block; width: 100%; height: auto; overflow: visible; }
-svg text { fill: var(--muted); font: 12px Sora, system-ui, sans-serif; }
+svg text { fill: var(--muted); font: 12px "Schibsted Grotesk", system-ui, sans-serif; }
 svg .grid line { stroke: var(--line); }
 .verdict { border-radius: 10px; padding: 16px 18px; display: grid; gap: 4px; }
 .verdict b { font-size: 1.35rem; letter-spacing: -0.02em; }
@@ -86,8 +86,10 @@ ul.notes { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; 
 footer { margin-top: 40px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
 footer p { margin: 0; max-width: 80ch; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">A/B testing toolkit</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/ab-testing-toolkit" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="wrap">
   <header>
     <h1>Experiment Desk</h1>
@@ -142,6 +144,8 @@ footer p { margin: 0; max-width: 80ch; }
     <p>abkit covers sample size and power, two-proportion z-tests and Welch t-tests with relative-lift intervals, a bootstrap check, CUPED variance reduction, sample-ratio-mismatch detection, multiple-testing corrections and a rule-based ship decision. Its validation study simulates thousands of experiments to confirm the false positive rate, power and interval coverage match theory.</p>
     <p><a href="https://github.com/AshokReddy010/ab-testing-toolkit">Source, tests and validation study on GitHub</a></p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/olist-analytics-engineering/"><small>Previous project</small><b>Olist analytics</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/text-to-sql-eval/"><small>Next project</small><b>SQL Bench</b></a></nav>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>

@@ -1,0 +1,53 @@
+/* Shared look for every project page on ashokreddy010.github.io: the portfolio's type, neutrals and site bar.
+   Each page keeps its own data colours; only neutrals, type and the frame are shared. */
+:root {
+  --bg: #F4F5F1; --panel: #FBFBF9; --surface: #FBFBF9; --sunk: #EEEFEA; --ink: #16181B; --muted: #686C73;
+  --line: #DCDED7; --soft: #ECEDE8; --faint: #E4E5DF; --none: #E4E5DF; --focus: #2741B0;
+  --accent: #2741B0; --accent-soft: #E6E9F6; --band: #ECEDE8; --band-ink: #16181B;
+  --ds-font: "Schibsted Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --ds-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121416; --panel: #191C1F; --surface: #191C1F; --sunk: #15181A; --ink: #ECEDE9; --muted: #9A9FA5;
+    --line: #2C3034; --soft: #23272A; --faint: #2A2E32; --none: #2A2E32; --focus: #9DAEFF;
+    --accent: #9DAEFF; --accent-soft: #232A44; --band: #1B1E21; --band-ink: #ECEDE9;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121416; --panel: #191C1F; --surface: #191C1F; --sunk: #15181A; --ink: #ECEDE9; --muted: #9A9FA5;
+  --line: #2C3034; --soft: #23272A; --faint: #2A2E32; --none: #2A2E32; --focus: #9DAEFF;
+  --accent: #9DAEFF; --accent-soft: #232A44; --band: #1B1E21; --band-ink: #ECEDE9;
+}
+body { font-family: var(--ds-font); font-feature-settings: "ss01"; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--ds-font); letter-spacing: -.02em; text-wrap: balance; }
+h1 { font-weight: 800; letter-spacing: -.035em; }
+button, input, select, textarea { font-family: inherit; }
+code, pre, kbd, samp, textarea.code, .mono { font-family: var(--ds-mono); }
+
+/* site bar */
+.ds-bar { margin-inline: -16px; padding: env(safe-area-inset-top, 0px) 16px 0; border-bottom: 1px solid var(--line); background: var(--bg); position: relative; z-index: 5; }
+.ds-bar .ds-in { display: flex; align-items: center; gap: 10px 22px; min-height: 56px; flex-wrap: wrap; font-size: 14.5px; }
+.ds-bar a { color: var(--ink); text-decoration: none; }
+.ds-bar .ds-who { font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
+.ds-bar .ds-crumb { color: var(--muted); display: flex; gap: 10px; align-items: center; min-width: 0; }
+.ds-bar .ds-crumb a { color: var(--muted); }
+.ds-bar .ds-crumb a:hover, .ds-bar .ds-links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: .2em; }
+.ds-bar .ds-crumb span[aria-current] { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-bar .ds-links { margin-left: auto; display: flex; gap: 18px; color: var(--ink-2, var(--ink)); }
+.ds-bar .ds-links a { font-weight: 600; }
+.ds-bar .ds-m { display: none; }
+@media (max-width: 640px) { .ds-bar .ds-in { min-height: 52px; flex-wrap: nowrap; } .ds-bar .ds-crumb { display: none; } .ds-bar .ds-m { display: inline; } .ds-bar .ds-links { gap: 14px; } }
+
+/* project footer */
+.ds-foot { margin-top: 64px; border-top: 1px solid var(--ink); padding-top: 22px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 28px; font-size: 15px; }
+.ds-foot a { color: var(--ink); text-decoration: none; display: flex; flex-direction: column; gap: 2px; }
+.ds-foot a small { color: var(--muted); font-size: 13px; }
+.ds-foot a b { font-weight: 650; letter-spacing: -.01em; }
+.ds-foot a:hover b { text-decoration: underline; text-underline-offset: .2em; }
+.ds-foot .ds-mid { text-align: center; align-items: center; }
+.ds-foot .ds-next { text-align: right; align-items: flex-end; }
+@media (max-width: 640px) { .ds-foot { grid-template-columns: 1fr 1fr; } .ds-foot .ds-mid { grid-column: 1 / -1; order: 3; } }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Schibsted Grotesk's tabular figures space out commas; proportional figures read better except in table columns */
+body *:not(td, th, td *, th *, .ds-tnum) { font-variant-numeric: normal !important; }

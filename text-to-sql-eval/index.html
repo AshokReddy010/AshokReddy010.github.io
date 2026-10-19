@@ -7,7 +7,7 @@
 <meta name="description" content="How well do language models answer business questions in SQL? 50 questions over a retail warehouse, scored by whether the query returns the right answer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
   --bg: #fbfbfd; --panel: #ffffff; --ink: #1a1530; --muted: #66617a; --line: #e2e0ea; --soft: #f2f1f7;
@@ -30,12 +30,12 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 15px/1.55 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 16px 64px; }
 .wrap { max-width: 1120px; margin: 0 auto; }
 a { color: var(--accent); text-underline-offset: 3px; }
 button { font: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-code, pre { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; }
+code, pre { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
 .num { font-variant-numeric: tabular-nums; }
 
 header { padding-block: 44px 26px; display: grid; gap: 14px; max-width: 760px; }
@@ -115,8 +115,10 @@ pre.sql { margin: 0; background: var(--soft); border-radius: 6px; padding: 10px 
 footer { margin-top: 48px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; max-width: 80ch; }
 footer p { margin: 0; }
 </style>
+<link rel="stylesheet" href="/assets/ds.css">
 </head>
 <body>
+<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">SQL Bench</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/text-to-sql-eval" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
 <div class="wrap">
   <header>
     <h1>Can a language model answer your business questions in SQL?</h1>
@@ -171,6 +173,8 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p><a href="https://github.com/AshokReddy010/text-to-sql-eval">Benchmark, scorer and raw results on GitHub</a></p>
   </footer>
+<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/ab-testing-toolkit/"><small>Previous project</small><b>A/B testing toolkit</b></a><a class="ds-mid" href="/#work"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/pipeline-observability/"><small>Next project</small><b>Feed Watch</b></a></nav>
+
 </div>
 
 <script>
@@ -238,8 +242,10 @@ function heat() {
     const v = c.by_tag[t];
     if (!v) return `<td class="cell">–</td>`;
     const a = v.accuracy;
-    const bg = `color-mix(in oklab, var(--ok) ${Math.round(a * 70)}%, var(--bad-soft))`;
-    return `<td class="cell num" style="background:${bg};color:${a > 0.55 ? "var(--panel)" : "var(--ink)"}" title="${v.correct} of ${v.n}">${pct(a)}</td>`;
+    // perfect scores stay quiet; colour deepens toward red as accuracy falls, so misses stand out
+    const k = Math.min(90, Math.round((1 - a) * 160));
+    const bg = a >= 0.999 ? "var(--ok-soft)" : `color-mix(in oklab, var(--bad) ${k}%, var(--ok-soft))`;
+    return `<td class="cell num" style="background:${bg};color:${k > 50 ? "#fff" : "var(--ink)"}" title="${v.correct} of ${v.n}">${pct(a)} <small style="font-weight:400;opacity:.75">${v.correct}/${v.n}</small></td>`;
   }).join("")}</tr>`).join("");
 }
 
