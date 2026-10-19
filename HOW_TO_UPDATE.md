@@ -27,13 +27,7 @@ Open `projects.json` and add an entry. Example with two projects:
 - `image` is optional. If you use it, upload that image file to this same folder ("Add file" > "Upload files").
 - Separate entries with a comma, and keep the square brackets at the start and end.
 
-### Fields the home page uses
-
-- `group`: `"analysis"` lists the project under "Analyses and apps"; `"system"` lists it under "Systems that run themselves" and shows when it last ran.
-- `finding`: one or two sentences with the headline result. It is the first thing a visitor reads, so lead with a number.
-- `demo` and `demoLabel`: the live page and its button text. `shots`: screenshots in this folder; the first is shown large.
-
-Project pages share `assets/ds.css` for type, colours, the top bar and the previous/next links at the bottom.
+The "On GitHub" section needs no editing: it lists your public repositories automatically.
 
 ## Replace your resume
 
