@@ -7,7 +7,7 @@
 <meta name="description" content="What US hospitals charge Medicare for the same inpatient stay, and what they are actually paid: CMS data for every hospital and diagnosis group, by year.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
 <style>
 :root {
   --bg: #f3f5f4; --panel: #ffffff; --ink: #14213d; --muted: #5c6577; --line: #d9dee3; --soft: #e9edef;
@@ -99,11 +99,23 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13.5px; border-top: 1
 footer p { margin: 0; }
 .loading { color: var(--muted); padding: 20px 0; }
 </style>
-<link rel="stylesheet" href="/assets/ds.css">
+<link rel="stylesheet" href="/assets/work.css">
 </head>
-<body>
-<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#projects">Work</a><span aria-hidden="true">/</span><span aria-current="page">Medicare costs</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/medicare-cost-analysis" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
-<div class="wrap">
+<body class="wk wk-medicare-cost-analysis wk-dup">
+<!-- wk:top -->
+<div class="wk-bar" role="banner"><div class="wk-wrap"><a class="wk-mark" href="/" aria-label="Ashok Reddy Bhimavarapu, profile"><i aria-hidden="true">AR</i><span>Ashok Reddy Bhimavarapu</span></a><nav class="wk-crumb" aria-label="Breadcrumb"><span class="sep">/</span><a href="/work/">Work</a><span class="sep">/</span><span aria-current="page">Medicare costs</span></nav><nav class="wk-nav" aria-label="Site"><a class="wk-hide-s" href="/work/">All work</a><a class="wk-hide-s" href="/">Profile</a><a class="wk-code" href="https://github.com/AshokReddy010/medicare-cost-analysis" target="_blank" rel="noopener">Code</a></nav></div></div>
+<div class="wk-case" role="region" aria-labelledby="wk-title"><div class="wk-wrap">
+<div>
+<p class="wk-area"><span class="wk-pulse" aria-hidden="true"></span><b>Analytics and research</b></p>
+<h1 class="wk-title" id="wk-title">Same Diagnosis, Different Bill</h1>
+<p class="wk-dek">Every public release of CMS&#x27;s Medicare inpatient data, 2013 to 2024, modelled in dbt and DuckDB to compare what hospitals bill with what they are paid for the same diagnosis. In 2024 hospitals billed $5.03 for every $1 of payment, and for sepsis the 90th-percentile hospital bills 4.4 times what the 10th does while being paid only 1.8 times as much.</p>
+<div class="wk-actions"><a class="wk-btn primary" href="#live">Open the dashboard <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v9.5m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="wk-btn" href="https://github.com/AshokReddy010/medicare-cost-analysis" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Code on GitHub</a></div>
+<ul class="wk-tags" aria-label="Built with"><li>dbt</li><li>DuckDB</li><li>SQL</li><li>Python</li><li>pandas</li><li>GitHub Actions</li><li>Data modelling</li><li>Healthcare</li></ul>
+</div>
+<div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Source</dt><dd>CMS inpatient, by provider and service</dd></div><div><dt>Years</dt><dd>2013–2024</dd></div><div><dt>Rows</dt><dd>2.13 million</dd></div><div><dt>Hospitals</dt><dd>2,906 in 2024</dd></div><div><dt>dbt</dt><dd>11 models, 27 tests</dd></div><div><dt>Method</dt><dd>case-mix-adjusted indices</dd></div><div><dt>Refresh</dt><dd>monthly, GitHub Actions</dd></div></dl></div>
+</div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live dashboard</b><span class="wk-meta">Source: CMS public files</span><span class="wk-meta">Refreshed every month</span><a href="#wk-notes">Case notes</a></div></div>
+<!-- /wk:top --><div class="wrap">
   <header>
     <h1>Same diagnosis, different bill</h1>
     <p class="deck" id="deck">Loading CMS data for every US hospital…</p>
@@ -185,8 +197,6 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p><a href="https://github.com/AshokReddy010/medicare-cost-analysis">Code, dbt models and tests on GitHub</a> · Data: Centers for Medicare &amp; Medicaid Services (public domain). Not medical or financial advice.</p>
   </footer>
-<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/fund-proxy-voting/"><small>Previous project</small><b>ESG fund votes</b></a><a class="ds-mid" href="/#projects"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/olist-analytics-engineering/"><small>Next project</small><b>Olist analytics</b></a></nav>
-
 </div>
 
 <script>
@@ -339,5 +349,14 @@ async function get(name) { const r = await fetch(BASE + name, { cache: "no-store
   $("#gen").textContent = `Built ${new Date(D.meta.generated_at).toISOString().slice(0, 10)} from ${D.meta.source}.`;
 })();
 </script>
-</body>
+<!-- wk:bottom -->
+<div class="wk-notes" id="wk-notes" role="region" aria-labelledby="wk-notes-h"><div class="wk-wrap">
+<div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>List prices for the same hospital stay vary wildly, but payment is set by Medicare&#x27;s formula. Comparing hospitals fairly means removing the effect of what each one treats.</p></div>
+<div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Ingest:</b> file URLs come from the data.gov catalog, so new years load automatically; renamed columns are mapped by alias and an unknown layout fails the job.</li><li><b>Model:</b> staging, a national DRG-year yardstick, and marts for hospitals, states, area types and DRG price spreads.</li><li><b>Adjust:</b> each hospital&#x27;s dollars divided by the yardstick for its own diagnoses and volumes, so 1.00 is the national average.</li><li><b>Test:</b> keys, ranges, relationships, and a reconciliation test that every discharge and dollar reaches every mart.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>data.gov + CMS</b><span>12 yearly CSV releases</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Python ingest</b><span>alias mapping, one Parquet file per year</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>dbt + DuckDB</b><span>staging, yardstick, marts, tests</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Dashboard</b><span>JSON export and a findings section written from the data</span></div></div></div></div></div>
+</div></div>
+<div class="wk-foot" role="contentinfo"><div class="wk-wrap">
+<nav class="wk-pn" aria-label="More projects"><a class="prev" href="/fund-proxy-voting/"><small>Previous project</small><b>ESG fund votes</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/text-to-sql-eval/"><small>Next project</small><b>SQL Bench</b></a></nav>
+<div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
+</div></div>
+<!-- /wk:bottom --></body>
 </html>

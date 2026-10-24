@@ -1,0 +1,26 @@
+name: work pages
+# When projects.json (or the generator) changes, rebuild the project pages' case headers, case notes and the
+# /work/ catalogue (tools/work.py), and commit the result. The tools inside each page are never touched.
+on:
+  push:
+    branches: [main]
+    paths: ["projects.json", "tools/work.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python tools/work.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A ':!*.pyc'
+          if git diff --cached --quiet; then echo "nothing to rebuild"; exit 0; fi
+          git commit -m "Rebuild project pages from projects.json"
+          git push

@@ -7,7 +7,7 @@
 <meta name="description" content="Do funds with ESG in their name vote like it? Explore 73.8 million US fund proxy votes from SEC Form N-PX: support by fund group, ESG-named funds against their sibling funds, and every ESG-named fund's record.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
 <style>
 :root {
   --bg: #ffffff; --ink: #1c1b29; --muted: #5f6070; --line: #e3e3ea; --soft: #f3f3f7;
@@ -62,11 +62,23 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 44px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
 footer p { margin: 0; }
 </style>
-<link rel="stylesheet" href="/assets/ds.css">
+<link rel="stylesheet" href="/assets/work.css">
 </head>
-<body>
-<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#projects">Work</a><span aria-hidden="true">/</span><span aria-current="page">ESG fund votes</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/fund-proxy-voting" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
-<div class="wrap">
+<body class="wk wk-fund-proxy-voting wk-dup">
+<!-- wk:top -->
+<div class="wk-bar" role="banner"><div class="wk-wrap"><a class="wk-mark" href="/" aria-label="Ashok Reddy Bhimavarapu, profile"><i aria-hidden="true">AR</i><span>Ashok Reddy Bhimavarapu</span></a><nav class="wk-crumb" aria-label="Breadcrumb"><span class="sep">/</span><a href="/work/">Work</a><span class="sep">/</span><span aria-current="page">ESG fund votes</span></nav><nav class="wk-nav" aria-label="Site"><a class="wk-hide-s" href="/work/">All work</a><a class="wk-hide-s" href="/">Profile</a><a class="wk-code" href="https://github.com/AshokReddy010/fund-proxy-voting" target="_blank" rel="noopener">Code</a></nav></div></div>
+<div class="wk-case" role="region" aria-labelledby="wk-title"><div class="wk-wrap">
+<div>
+<p class="wk-area"><b>Analytics and research</b></p>
+<h1 class="wk-title" id="wk-title">Do ESG Funds Vote Like ESG Funds?</h1>
+<p class="wk-dek">I collected three years of fund voting records from the SEC, 73.8 million votes from 12,416 funds, to test whether funds with ESG in their name vote differently from ordinary funds. They do, a little: the fund house a fund belongs to predicts its votes better than its label.</p>
+<div class="wk-actions"><a class="wk-btn primary" href="#live">Open the vote explorer <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v9.5m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="wk-btn" href="https://github.com/AshokReddy010/fund-proxy-voting" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Code on GitHub</a></div>
+<ul class="wk-tags" aria-label="Built with"><li>Python</li><li>DuckDB</li><li>dbt</li><li>BigQuery</li><li>SQL</li><li>pandas</li><li>Entity matching</li><li>LLM evaluation</li><li>pytest</li><li>GitHub Actions</li></ul>
+</div>
+<div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Source</dt><dd>SEC Form N-PX filings</dd></div><div><dt>Filings read</dt><dd>33,929</dd></div><div><dt>Votes</dt><dd>73.8 million</dd></div><div><dt>Funds</dt><dd>12,416</dd></div><div><dt>dbt</dt><dd>9 models, 21 tests</dd></div><div><dt>LLM test</dt><dd>91.0% on 578 held-out proposals</dd></div><div><dt>Cloud</dt><dd>BigQuery, public dashboard</dd></div></dl></div>
+</div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Vote explorer</b><span class="wk-meta">Source: SEC Form N-PX</span><span class="wk-meta">Three reporting years</span><a href="#wk-notes">Case notes</a></div></div>
+<!-- /wk:top --><div class="wrap">
   <header>
     <h1>Do ESG funds vote like ESG funds?</h1>
     <p class="dek">Mostly not. Across three years of shareholder votes, the fund house a fund belongs to says more about how it votes than the word "ESG" in its name.</p>
@@ -115,8 +127,6 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p><a href="https://github.com/AshokReddy010/fund-proxy-voting">Code, dbt models, tests and full tables on GitHub</a> · Source: SEC EDGAR Form N-PX (public).</p>
   </footer>
-<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/data-validation-framework/"><small>Previous project</small><b>Data Validation</b></a><a class="ds-mid" href="/#projects"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/medicare-cost-analysis/"><small>Next project</small><b>Medicare costs</b></a></nav>
-
 </div>
 <script>
 const BASE = new URLSearchParams(location.search).get("base") || "https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/tables/";
@@ -208,5 +218,14 @@ Promise.all(["support_by_direction.csv", "sibling_comparison_by_house.csv", "esg
   })
   .catch((e) => { $("#meta").textContent = `Could not load the result tables (${e.message}).`; });
 </script>
-</body>
+<!-- wk:bottom -->
+<div class="wk-notes" id="wk-notes" role="region" aria-labelledby="wk-notes-h"><div class="wk-wrap">
+<div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>Funds marketed as ESG or sustainable are expected to back environmental and social proposals at shareholder meetings. Every US fund must publish its votes, but the records are spread across tens of thousands of inconsistent filings, so the claim is hard to check at scale.</p></div>
+<div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Collect:</b> a restartable downloader read 33,929 SEC filings and saved 73.8 million votes.</li><li><b>Clean:</b> dbt models standardise more than 40 spellings of ten answers and 12 date formats, with 99.97% of votes recognised.</li><li><b>Match:</b> the same proposal is worded differently by each filer, so 8,274 wordings were matched into 3,850 proposals.</li><li><b>Label:</b> each proposal&#x27;s direction comes from how specialist ESG fund houses voted, with keyword rules as a fallback.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>SEC EDGAR</b><span>33,929 Form N-PX filings in XML, three reporting years</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>DuckDB and dbt</b><span>cleaned votes, fund labels and one answer per fund per proposal, with 21 tests</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>BigQuery</b><span>curated tables published with a row-count audit, reporting models built by dbt</span></div><div class="box"><b>Public dashboard</b><span>Data Studio, open to anyone with the link</span></div></div></div></div><div class="wk-note"><h3>What I found</h3><ul><li><b>Label:</b> on proposals that specialist ESG houses backed, ESG-named funds elsewhere voted for 33% in 2026, against 14% for other funds and 92% for the specialists.</li><li><b>Trend:</b> ordinary funds&#x27; support halved in two years, from 28% to 14%.</li><li><b>Siblings:</b> on the same proposal, an ESG-named fund voted the same way as ordinary funds from its own filer 83% to 87% of the time.</li><li><b>Range:</b> of 145 ESG-named funds, 41 backed under 10% of these proposals and 21 backed 75% or more.</li></ul></div><div class="wk-note"><h3>Testing a language model</h3><ul><li><b>Question:</b> could an LLM label a proposal&#x27;s direction from its title alone? I scored it against the specialist houses&#x27; votes on 815 proposals, split into a practice set and a final set that was scored once.</li><li><b>Prompt:</b> the same model rose from 69% to 85% accuracy across three prompts. Asking how specialist funds would vote worked better than asking whether a proposal supports ESG.</li><li><b>Combined:</b> keyword rules first, then the model where the rules gave no answer, reached 91.0% on the 578 final proposals. It still misses about a quarter of opposing proposals.</li></ul></div><div class="wk-note"><h3>What made it hard</h3><ul><li><b>Misleading column:</b> a field named for management&#x27;s recommendation records whether the vote went with or against it. Read correctly, funds vote with management 89.9% of the time.</li><li><b>Misleading titles:</b> proposals such as &quot;Revisit Plastics Packaging Policies&quot; sound pro-ESG but received 0% from specialist houses. Keyword rules alone agreed with those votes 91% of the time.</li><li><b>Limits:</b> voting is one measure of a fund, the ESG label is read from fund names, and the yardstick is a chosen group of ten fund houses.</li></ul></div></div>
+</div></div>
+<div class="wk-foot" role="contentinfo"><div class="wk-wrap">
+<nav class="wk-pn" aria-label="More projects"><a class="prev" href="/ab-testing-toolkit/"><small>Previous project</small><b>A/B testing toolkit</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/medicare-cost-analysis/"><small>Next project</small><b>Medicare costs</b></a></nav>
+<div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
+</div></div>
+<!-- /wk:bottom --></body>
 </html>

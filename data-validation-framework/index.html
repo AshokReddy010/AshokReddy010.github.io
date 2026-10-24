@@ -7,7 +7,7 @@
 <meta name="description" content="Live demo of a two-level data reconciliation framework: three simulated systems, random faults injected daily, and dbt checks that must find every one with the right reason.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
 <style>
 :root {
   --bg: #f4f6f8; --panel: #ffffff; --ink: #0e1a2b; --muted: #5a6677; --line: #dbe1e8; --soft: #ebeff3;
@@ -76,11 +76,23 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 40px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
 footer p { margin: 0; }
 </style>
-<link rel="stylesheet" href="/assets/ds.css">
+<link rel="stylesheet" href="/assets/work.css">
 </head>
-<body>
-<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#projects">Work</a><span aria-hidden="true">/</span><span aria-current="page">Data Validation</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/data-validation-framework" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
-<div class="wrap">
+<body class="wk wk-data-validation-framework">
+<!-- wk:top -->
+<div class="wk-bar" role="banner"><div class="wk-wrap"><a class="wk-mark" href="/" aria-label="Ashok Reddy Bhimavarapu, profile"><i aria-hidden="true">AR</i><span>Ashok Reddy Bhimavarapu</span></a><nav class="wk-crumb" aria-label="Breadcrumb"><span class="sep">/</span><a href="/work/">Work</a><span class="sep">/</span><span aria-current="page">Data Validation</span></nav><nav class="wk-nav" aria-label="Site"><a class="wk-hide-s" href="/work/">All work</a><a class="wk-hide-s" href="/">Profile</a><a class="wk-code" href="https://github.com/AshokReddy010/data-validation-framework" target="_blank" rel="noopener">Code</a></nav></div></div>
+<div class="wk-case" role="region" aria-labelledby="wk-title"><div class="wk-wrap">
+<div>
+<p class="wk-area"><span class="wk-pulse" aria-hidden="true"></span><b>Data quality and reliability</b></p>
+<h1 class="wk-title" id="wk-title">Data Validation Framework</h1>
+<p class="wk-dek">Three systems hold the same transactions and should agree before any report goes out. This framework checks that they do, every day, and names the exact records behind each mismatch. I planted six errors in invented data, and the checks found all six with the right reason, with no false alarms on 113 clean days. A live console rebuilds 60 days of three simulated systems every morning, injects random faults the checks are not told about, and scores whether every one was caught with the right reason.</p>
+<div class="wk-actions"><a class="wk-btn primary" href="#live">Open the live console <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v9.5m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="wk-btn" href="https://github.com/AshokReddy010/data-validation-framework" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Code on GitHub</a></div>
+<ul class="wk-tags" aria-label="Built with"><li>SQL</li><li>dbt</li><li>DuckDB</li><li>Python</li><li>Reconciliation</li><li>pytest</li><li>GitHub Actions</li></ul>
+</div>
+<div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Sources</dt><dd>transactions, client feed, billing</dd></div><div><dt>Data</dt><dd>12,000 invented transactions, 60 days</dd></div><div><dt>Planted errors</dt><dd>6, all found</dd></div><div><dt>False alarms</dt><dd>0 on 113 clean days</dd></div><div><dt>Tests</dt><dd>21 dbt and 10 pytest</dd></div><div><dt>Schedule</dt><dd>daily, on GitHub Actions</dd></div></dl></div>
+</div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live console</b><span class="wk-meta">dbt checks on public data</span><span class="wk-meta">Validated every day</span><a href="#wk-notes">Case notes</a></div></div>
+<!-- /wk:top --><div class="wrap">
   <header>
     <h1>Reconciliation Console</h1>
     <p class="lede">Three systems should hold the same transactions: a transaction system, a client file feed and a billing database. Every morning a simulator rebuilds the last 60 days of all three and quietly breaks a few of them: drops records, bills some twice, changes or blanks amounts, files records a day late. The dbt checks are never told what was broken. This page shows whether they found it.</p>
@@ -112,8 +124,6 @@ footer p { margin: 0; }
     <p id="gen"></p>
     <p>All data is simulated; no real or employer data is used. <a href="https://github.com/AshokReddy010/data-validation-framework">Code, dbt models and tests on GitHub</a>.</p>
   </footer>
-<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/nyc-311-pulse/"><small>Previous project</small><b>NYC 311 Pulse</b></a><a class="ds-mid" href="/#projects"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/fund-proxy-voting/"><small>Next project</small><b>ESG fund votes</b></a></nav>
-
 </div>
 <script>
 const BASE = new URLSearchParams(location.search).get("base") || "https://raw.githubusercontent.com/AshokReddy010/data-validation-framework/main/site/data/";
@@ -173,5 +183,14 @@ fetch(BASE + "status.json?t=" + Math.floor(Date.now() / 600000), { cache: "no-st
   .then((j) => { S = j; render(); })
   .catch((e) => { $("#score").innerHTML = `<div><span>The first daily run has not published results yet (${esc(e.message)}).</span></div>`; });
 </script>
-</body>
+<!-- wk:bottom -->
+<div class="wk-notes" id="wk-notes" role="region" aria-labelledby="wk-notes-h"><div class="wk-wrap">
+<div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>When the same transactions live in several systems, a late file, a double-billed record or a blank amount can reach a client report unnoticed. Checking by hand before every delivery is slow and misses small differences.</p></div>
+<div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Level 1:</b> count the rows and total the amounts per source per day, then compare each source with the transaction system.</li><li><b>Level 2:</b> for the days that differ, find the records behind the difference and name the reason: missing, duplicate, wrong date, blank amount or different amount.</li><li><b>Output:</b> one results table per source per day, a written report, a chart and an optional chat alert.</li><li><b>Proof:</b> the data generator plants six known errors, so the checks can be scored against them.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>Three sources</b><span>invented transaction system, client file feed and billing database</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>dbt and DuckDB</b><span>daily totals, match or break per day, and the records behind each break</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Report and alert</b><span>summary, results table, chart and webhook</span></div><div class="box"><b>Daily schedule</b><span>GitHub Actions run, with the report saved</span></div></div></div></div><div class="wk-note"><h3>What it found</h3><ul><li><b>All six:</b> 37 missing records, 25 duplicates, 12 changed amounts, one missing day, 9 records filed under the wrong day and 5 blank amounts.</li><li><b>Totals matter:</b> on two of the days every record was present, so a row count alone would have passed them.</li><li><b>No noise:</b> none of the 113 clean source-days was flagged.</li></ul></div><div class="wk-note"><h3>What made it hard</h3><ul><li><b>Two days, one cause:</b> a record filed under the wrong day throws off the day it left and the day it landed on. My first drill-down explained only one, and a test I had written for the checks themselves caught it.</li><li><b>Testing the tester:</b> three dbt tests guard the checks, including one that fails if a clean-looking day hides errors that cancel out.</li><li><b>Limits:</b> the data is invented and small, the transaction system is assumed correct, and matching relies on a shared transaction ID.</li></ul></div></div>
+</div></div>
+<div class="wk-foot" role="contentinfo"><div class="wk-wrap">
+<nav class="wk-pn" aria-label="More projects"><a class="prev" href="/nyc-311-pulse/"><small>Previous project</small><b>NYC 311 Pulse</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/olist-analytics-engineering/"><small>Next project</small><b>Olist analytics</b></a></nav>
+<div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
+</div></div>
+<!-- /wk:bottom --></body>
 </html>

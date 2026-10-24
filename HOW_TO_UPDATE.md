@@ -46,3 +46,10 @@ Open `index.html`, press Ctrl+F to find the sentence, and edit it in place.
 1. Sign up free at formspree.io with your Gmail and create a form. It gives you an address like `https://formspree.io/f/abcdwxyz`.
 2. Open `index.html`, find `var FORM_ID = '';` and put the last part between the quotes: `var FORM_ID = 'abcdwxyz';`
 3. Commit. Messages sent from the form now arrive in your Gmail.
+
+## Project pages and the Work catalogue
+
+Each project page (for example `/nyc-311-pulse/`) and the catalogue at `/work/` take their header, key facts and
+case notes from `projects.json`. Edit the project's entry there (title, description, tags, spec, case) and commit:
+a GitHub Action rebuilds the pages within a couple of minutes. The live tool inside each page is not affected.
+The look of every project page lives in `assets/work.css`.

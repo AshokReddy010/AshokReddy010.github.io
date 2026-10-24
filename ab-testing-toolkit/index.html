@@ -7,7 +7,7 @@
 <meta name="description" content="Plan an A/B test, read out its results and see why peeking breaks it. Runs the abkit Python toolkit in your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
 <style>
 :root {
   --bg: #f7f8fb; --panel: #ffffff; --ink: #161a2b; --muted: #5d6378; --line: #dfe2ea; --soft: #eef0f5;
@@ -86,11 +86,23 @@ ul.notes { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; 
 footer { margin-top: 40px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
 footer p { margin: 0; max-width: 80ch; }
 </style>
-<link rel="stylesheet" href="/assets/ds.css">
+<link rel="stylesheet" href="/assets/work.css">
 </head>
-<body>
-<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#projects">Work</a><span aria-hidden="true">/</span><span aria-current="page">A/B testing toolkit</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/ab-testing-toolkit" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
-<div class="wrap">
+<body class="wk wk-ab-testing-toolkit">
+<!-- wk:top -->
+<div class="wk-bar" role="banner"><div class="wk-wrap"><a class="wk-mark" href="/" aria-label="Ashok Reddy Bhimavarapu, profile"><i aria-hidden="true">AR</i><span>Ashok Reddy Bhimavarapu</span></a><nav class="wk-crumb" aria-label="Breadcrumb"><span class="sep">/</span><a href="/work/">Work</a><span class="sep">/</span><span aria-current="page">A/B testing toolkit</span></nav><nav class="wk-nav" aria-label="Site"><a class="wk-hide-s" href="/work/">All work</a><a class="wk-hide-s" href="/">Profile</a><a class="wk-code" href="https://github.com/AshokReddy010/ab-testing-toolkit" target="_blank" rel="noopener">Code</a></nav></div></div>
+<div class="wk-case" role="region" aria-labelledby="wk-title"><div class="wk-wrap">
+<div>
+<p class="wk-area"><b>Experimentation and AI evaluation</b></p>
+<h1 class="wk-title" id="wk-title">A/B Testing Toolkit in Python</h1>
+<p class="wk-dek">A toolkit that takes an experiment from planning to a written decision: how many users the test needs, whether the data can be trusted, whether the change worked, and whether to ship it. Its key formulas are checked against simulation, so the error rates are measured, not assumed.</p>
+<div class="wk-actions"><a class="wk-btn primary" href="#live">Try it in your browser <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v9.5m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="wk-btn" href="https://github.com/AshokReddy010/ab-testing-toolkit" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Code on GitHub</a></div>
+<ul class="wk-tags" aria-label="Built with"><li>Python</li><li>SciPy</li><li>NumPy</li><li>pandas</li><li>Statistics</li><li>pytest</li><li>GitHub Actions</li></ul>
+</div>
+<div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Planning</dt><dd>sample size, power, duration</dd></div><div><dt>Tests</dt><dd>z-test, Welch t-test, bootstrap</dd></div><div><dt>Health check</dt><dd>sample ratio mismatch</dd></div><div><dt>Noise reduction</dt><dd>CUPED</dd></div><div><dt>Verified by</dt><dd>20,000 simulations per check</dd></div><div><dt>Unit tests</dt><dd>30, run on every push</dd></div></dl></div>
+</div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Runs in your browser</b><span class="wk-meta">The abkit Python package</span><span class="wk-meta">Nothing is sent anywhere</span><a href="#wk-notes">Case notes</a></div></div>
+<!-- /wk:top --><div class="wrap">
   <header>
     <h1>Experiment Desk</h1>
     <p class="lede">Plan an A/B test, read out the results with the checks a careful analyst runs, and see for yourself why peeking at a running test inflates false wins. Every number comes from the <a href="https://github.com/AshokReddy010/ab-testing-toolkit">abkit</a> Python package, running in your browser.</p>
@@ -144,8 +156,6 @@ footer p { margin: 0; max-width: 80ch; }
     <p>abkit covers sample size and power, two-proportion z-tests and Welch t-tests with relative-lift intervals, a bootstrap check, CUPED variance reduction, sample-ratio-mismatch detection, multiple-testing corrections and a rule-based ship decision. Its validation study simulates thousands of experiments to confirm the false positive rate, power and interval coverage match theory.</p>
     <p><a href="https://github.com/AshokReddy010/ab-testing-toolkit">Source, tests and validation study on GitHub</a></p>
   </footer>
-<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/olist-analytics-engineering/"><small>Previous project</small><b>Olist analytics</b></a><a class="ds-mid" href="/#projects"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/text-to-sql-eval/"><small>Next project</small><b>SQL Bench</b></a></nav>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
@@ -320,5 +330,14 @@ $("#csv").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const
   }
 })();
 </script>
-</body>
+<!-- wk:bottom -->
+<div class="wk-notes" id="wk-notes" role="region" aria-labelledby="wk-notes-h"><div class="wk-wrap">
+<div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>A/B tests go wrong in a few well-known ways: the test is stopped at the first good-looking result, users are not split as designed, too many metrics are checked, or the data is too noisy to see the effect. Each of these can turn a change that does nothing into a reported win.</p></div>
+<div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Plan:</b> sample size, power and test length for a given baseline and smallest lift worth detecting.</li><li><b>Check:</b> a sample ratio mismatch test that blocks the analysis when assignment looks broken.</li><li><b>Analyse:</b> tests for rates and averages with confidence intervals, a bootstrap second opinion for revenue, and CUPED to reduce noise.</li><li><b>Decide:</b> fixed rules that return ship, do not ship, inconclusive or do not trust, with a written readout.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>Experiment data</b><span>one row per user: group, converted, revenue, refunds, past spending</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>abkit</b><span>health check, tests, noise reduction and corrections, covered by 30 unit tests</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Readout</b><span>decision and results table in markdown</span></div><div class="box"><b>Validation study</b><span>simulations that check every formula</span></div></div></div></div><div class="wk-note"><h3>What the simulations showed</h3><ul><li><b>Accuracy:</b> with no real effect the toolkit calls a false win 4.85% of the time against a 5% target, and its 95% intervals contain the truth 94.98% of the time.</li><li><b>Power:</b> at the planned 17,169 users per group it detects the planned lift 80.3% of the time, against an 80% target.</li><li><b>Peeking:</b> checking a test 10 times and stopping at the first win raises false wins from 5% to 19.4%.</li></ul></div><div class="wk-note"><h3>Example experiment</h3><ul><li><b>Result:</b> on simulated data with a true lift of 1.0 point, the readout says ship, with conversion up 1.25 points (interval 0.55 to 1.95).</li><li><b>Caution:</b> revenue per user looks significant alone (p = 0.035) but not after correcting for extra metrics (p = 0.069), so it is not reported as a win.</li><li><b>Broken test:</b> a 51/49 split across 33,632 users is flagged as a fault, and the metrics are not read.</li></ul></div></div>
+</div></div>
+<div class="wk-foot" role="contentinfo"><div class="wk-wrap">
+<nav class="wk-pn" aria-label="More projects"><a class="prev" href="/olist-analytics-engineering/"><small>Previous project</small><b>Olist analytics</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/fund-proxy-voting/"><small>Next project</small><b>ESG fund votes</b></a></nav>
+<div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
+</div></div>
+<!-- /wk:bottom --></body>
 </html>

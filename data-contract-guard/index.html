@@ -7,7 +7,7 @@
 <meta name="description" content="Validate a CSV against a YAML data contract, draft a contract from data, and find breaking contract changes. Runs the real contract-guard package in your browser with Pyodide; nothing is uploaded.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
 <style>
 :root {
   --bg: #eef1f0; --surface: #ffffff; --sunk: #f6f8f7; --ink: #15211d; --muted: #56665f; --line: #d3dbd8;
@@ -111,11 +111,23 @@ pre.out { margin: 0; padding: 16px 20px; overflow: auto; font-size: 12.5px; line
 footer { margin-top: 36px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
 footer p { margin: 0; max-width: 80ch; }
 </style>
-<link rel="stylesheet" href="/assets/ds.css">
+<link rel="stylesheet" href="/assets/work.css">
 </head>
-<body>
-<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#projects">Work</a><span aria-hidden="true">/</span><span aria-current="page">Data Contract Guard</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/data-contract-guard" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
-<div class="wrap">
+<body class="wk wk-data-contract-guard wk-dup">
+<!-- wk:top -->
+<div class="wk-bar" role="banner"><div class="wk-wrap"><a class="wk-mark" href="/" aria-label="Ashok Reddy Bhimavarapu, profile"><i aria-hidden="true">AR</i><span>Ashok Reddy Bhimavarapu</span></a><nav class="wk-crumb" aria-label="Breadcrumb"><span class="sep">/</span><a href="/work/">Work</a><span class="sep">/</span><span aria-current="page">Data Contract Guard</span></nav><nav class="wk-nav" aria-label="Site"><a class="wk-hide-s" href="/work/">All work</a><a class="wk-hide-s" href="/">Profile</a><a class="wk-code" href="https://github.com/AshokReddy010/data-contract-guard" target="_blank" rel="noopener">Code</a></nav></div></div>
+<div class="wk-case" role="region" aria-labelledby="wk-title"><div class="wk-wrap">
+<div>
+<p class="wk-area"><b>Data quality and reliability</b></p>
+<h1 class="wk-title" id="wk-title">Data Contract Guard</h1>
+<p class="wk-dek">A Python tool and GitHub Action that enforces data contracts written in YAML: it validates CSV, Parquet and JSON files against column, key, range and business-rule promises, drafts a contract from sample data, and classifies contract changes as breaking or safe with the version bump each needs. A browser playground runs the real package with Pyodide.</p>
+<div class="wk-actions"><a class="wk-btn primary" href="#live">Try it in your browser <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v9.5m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="wk-btn" href="https://github.com/AshokReddy010/data-contract-guard" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Code on GitHub</a></div>
+<ul class="wk-tags" aria-label="Built with"><li>Python</li><li>pandas</li><li>YAML</li><li>GitHub Actions</li><li>Pyodide</li><li>pytest</li><li>mypy</li><li>ruff</li></ul>
+</div>
+<div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Commands</dt><dd>validate, infer, diff</dd></div><div><dt>Formats</dt><dd>CSV, Parquet, JSON Lines</dd></div><div><dt>Reports</dt><dd>text, JSON, Markdown, JUnit</dd></div><div><dt>CI</dt><dd>composite GitHub Action</dd></div><div><dt>Tests</dt><dd>75, 95% coverage</dd></div><div><dt>Python</dt><dd>3.10 to 3.13</dd></div></dl></div>
+</div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Runs in your browser</b><span class="wk-meta">The real validator, in Python</span><span class="wk-meta">Nothing is sent anywhere</span><a href="#wk-notes">Case notes</a></div></div>
+<!-- /wk:top --><div class="wrap">
   <header>
     <h1>Data Contract Guard</h1>
     <p class="lede">A data contract is a YAML file that says what a dataset promises: its columns, types, keys, ranges and business rules. Paste a contract and a CSV, and the real <a href="https://github.com/AshokReddy010/data-contract-guard"><code>contract-guard</code></a> package checks every promise, right here in your browser. Your data never leaves this page.</p>
@@ -186,8 +198,6 @@ footer p { margin: 0; max-width: 80ch; }
     <p>The same checks run from the command line (<code>contract-guard validate -c orders.yml orders.csv</code>) and as a GitHub Action that writes this report to the pull request's job summary and fails the build on errors.</p>
     <p><a href="https://github.com/AshokReddy010/data-contract-guard">Source, tests and docs on GitHub</a> · MIT licensed</p>
   </footer>
-<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/pipeline-observability/"><small>Previous project</small><b>Feed Watch</b></a><a class="ds-mid" href="/#projects"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/nyc-311-pulse/"><small>Next project</small><b>NYC 311 Pulse</b></a></nav>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
@@ -366,5 +376,14 @@ document.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.
   }
 })();
 </script>
-</body>
+<!-- wk:bottom -->
+<div class="wk-notes" id="wk-notes" role="region" aria-labelledby="wk-notes-h"><div class="wk-wrap">
+<div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>Upstream teams change data without warning: an enum gains a value, a column is renamed, negative quantities slip in. A contract makes the boundary between teams explicit and testable.</p></div>
+<div class="wk-grid solo"><div class="wk-note"><h3>Approach</h3><ul><li>CSV is read as text so a value like 12a in an integer column is caught, not silently converted.</li><li><b>A broken contract never passes data:</b> every contract mistake is reported before any row is read.</li><li>Breaking is defined from the consumer&#x27;s side, and diff enforces the semantic-version bump.</li><li>The action writes a Markdown report to the pull request&#x27;s job summary and can emit JUnit XML.</li></ul></div></div>
+</div></div>
+<div class="wk-foot" role="contentinfo"><div class="wk-wrap">
+<nav class="wk-pn" aria-label="More projects"><a class="prev" href="/pipeline-observability/"><small>Previous project</small><b>Feed Watch</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/nyc-311-pulse/"><small>Next project</small><b>NYC 311 Pulse</b></a></nav>
+<div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
+</div></div>
+<!-- /wk:bottom --></body>
 </html>

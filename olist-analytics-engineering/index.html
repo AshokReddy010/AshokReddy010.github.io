@@ -7,7 +7,7 @@
 <meta name="description" content="Brazilian e-commerce marketplace, 2017-2018: how late deliveries drive bad reviews, where customers and sellers come from, and which leads to call first. Built from dbt marts in DuckDB.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
 <style>
 :root {
   --bg: #f6f7f9; --panel: #ffffff; --ink: #0b2a3c; --muted: #5b6b78; --line: #dde3e8; --soft: #edf1f4;
@@ -65,11 +65,23 @@ td.r, th.r { text-align: right; }
 footer { margin-top: 44px; color: var(--muted); font-size: 13.5px; display: grid; gap: 4px; }
 footer p { margin: 0; max-width: 85ch; }
 </style>
-<link rel="stylesheet" href="/assets/ds.css">
+<link rel="stylesheet" href="/assets/work.css">
 </head>
-<body>
-<div class="ds-bar"><div class="wrap ds-in"><a class="ds-who" href="/">Ashok Reddy Bhimavarapu</a><span class="ds-crumb"><span aria-hidden="true">/</span><a href="/#projects">Work</a><span aria-hidden="true">/</span><span aria-current="page">Olist analytics</span></span><span class="ds-links"><a href="https://github.com/AshokReddy010/olist-analytics-engineering" target="_blank" rel="noopener">Code on GitHub</a></span></div></div>
-<div class="wrap">
+<body class="wk wk-olist-analytics-engineering">
+<!-- wk:top -->
+<div class="wk-bar" role="banner"><div class="wk-wrap"><a class="wk-mark" href="/" aria-label="Ashok Reddy Bhimavarapu, profile"><i aria-hidden="true">AR</i><span>Ashok Reddy Bhimavarapu</span></a><nav class="wk-crumb" aria-label="Breadcrumb"><span class="sep">/</span><a href="/work/">Work</a><span class="sep">/</span><span aria-current="page">Olist analytics</span></nav><nav class="wk-nav" aria-label="Site"><a class="wk-hide-s" href="/work/">All work</a><a class="wk-hide-s" href="/">Profile</a><a class="wk-code" href="https://github.com/AshokReddy010/olist-analytics-engineering" target="_blank" rel="noopener">Code</a></nav></div></div>
+<div class="wk-case" role="region" aria-labelledby="wk-title"><div class="wk-wrap">
+<div>
+<p class="wk-area"><b>Analytics and research</b></p>
+<h1 class="wk-title" id="wk-title">Olist Analytics Engineering with dbt and DuckDB</h1>
+<p class="wk-dek">An end-to-end analytics engineering project on a public e-commerce and marketing dataset. Raw files are modelled into tested, documented tables with dbt, checked automatically on every push, and then used for a Power BI dashboard and a model that ranks sales leads by how likely they are to sign.</p>
+<div class="wk-actions"><a class="wk-btn primary" href="#live">Open the dashboard <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v9.5m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="wk-btn" href="https://github.com/AshokReddy010/olist-analytics-engineering" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Code on GitHub</a></div>
+<ul class="wk-tags" aria-label="Built with"><li>dbt</li><li>DuckDB</li><li>SQL</li><li>Python</li><li>scikit-learn</li><li>Power BI</li><li>DAX</li><li>GitHub Actions</li></ul>
+</div>
+<div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Models</dt><dd>24 (staging, intermediate, marts)</dd></div><div><dt>Tests</dt><dd>80, run on every push</dd></div><div><dt>Orders</dt><dd>99,441</dd></div><div><dt>Leads</dt><dd>8,000</dd></div><div><dt>Dashboard</dt><dd>Power BI, 2 pages</dd></div><div><dt>ML</dt><dd>lead scoring, AUC 0.69</dd></div></dl></div>
+</div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Dashboard</b><span class="wk-meta">Built from dbt models</span><span class="wk-meta">Tested on every change</span><a href="#wk-notes">Case notes</a></div></div>
+<!-- /wk:top --><div class="wrap">
   <header>
     <h1>One late parcel undoes a five-star marketplace</h1>
     <p class="lede">Olist connects small Brazilian sellers to large online stores. This dashboard covers its public data for January 2017 to August 2018: about 100,000 orders, their deliveries and reviews, plus 8,000 seller-acquisition leads. Every figure comes from dbt models built and tested in DuckDB.</p>
@@ -132,8 +144,6 @@ footer p { margin: 0; max-width: 85ch; }
     <p>Data: Olist Brazilian E-Commerce and Marketing Funnel datasets (public, CC BY-NC-SA 4.0). Models: 24 dbt models with 80+ tests in DuckDB.</p>
     <p><a href="https://github.com/AshokReddy010/olist-analytics-engineering">Code and findings on GitHub</a> · <a href="dbt-docs.html">dbt documentation and lineage</a></p>
   </footer>
-<nav class="ds-foot" aria-label="More projects"><a class="ds-prev" href="/medicare-cost-analysis/"><small>Previous project</small><b>Medicare costs</b></a><a class="ds-mid" href="/#projects"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="ds-next" href="/ab-testing-toolkit/"><small>Next project</small><b>A/B testing toolkit</b></a></nav>
-
 </div>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -216,5 +226,14 @@ fetch("data/olist.json").then((r) => r.json()).then((d) => {
     { k: "freight_share", t: "Freight", r: 1, f: (v) => pct(v, 0) }, { k: "avg_review", t: "Review", r: 1, f: (v) => v.toFixed(2) }], "revenue");
 });
 </script>
-</body>
+<!-- wk:bottom -->
+<div class="wk-notes" id="wk-notes" role="region" aria-labelledby="wk-notes-h"><div class="wk-wrap">
+<div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>A marketplace needs to know which marketing channels bring sellers who actually sign, whether customers come back after their first order, and which new leads the sales team should call first. The raw data is ten separate files that cannot answer any of that until it is cleaned, joined and tested.</p></div>
+<div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Staging:</b> one model per raw file to rename columns, fix types and clean keys.</li><li><b>Intermediate:</b> order items and payments summed per order, the latest review kept, products translated.</li><li><b>Marts:</b> fact and dimension tables plus reporting tables for the funnel and cohort retention. The orders table loads incrementally.</li><li><b>Quality:</b> 80 tests, including a custom check that payments reconcile to order value, run by GitHub Actions on every push.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>Raw CSV files</b><span>10 tables: orders, items, payments, reviews, products, sellers, leads, deals</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>dbt on DuckDB</b><span>staging, intermediate and marts, with 80 tests and CI</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Power BI</b><span>funnel and retention pages</span></div><div class="box"><b>Lead scoring</b><span>logistic regression in Python</span></div></div></div></div><div class="wk-note"><h3>What I found</h3><ul><li><b>Funnel:</b> 8,000 leads became 842 signed sellers (10.5%), and 379 of those went on to make a sale.</li><li><b>Channels:</b> paid search closes at 12.3%, social at 5.6%. Leads with an untracked origin close best at 16.6%, so fixing the tracking is the first recommendation.</li><li><b>Retention:</b> only 3.04% of 94,990 customers ever placed a second order, so sales depend on new customers.</li><li><b>Lead scoring:</b> tested on the 2,000 most recent leads, the top 10% of scores close at 23.0% against a 10.5% average (2.18x).</li></ul></div><div class="wk-note"><h3>What the tests caught</h3><ul><li><b>Payments:</b> 249 of 98,665 orders (0.25%) do not match their order value by more than 1.00.</li><li><b>Translations:</b> 2 product categories are missing an English name.</li><li><b>Dates:</b> 1 signed lead has a close date before its first contact date.</li></ul></div></div>
+</div></div>
+<div class="wk-foot" role="contentinfo"><div class="wk-wrap">
+<nav class="wk-pn" aria-label="More projects"><a class="prev" href="/data-validation-framework/"><small>Previous project</small><b>Data Validation</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/ab-testing-toolkit/"><small>Next project</small><b>A/B testing toolkit</b></a></nav>
+<div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
+</div></div>
+<!-- /wk:bottom --></body>
 </html>
