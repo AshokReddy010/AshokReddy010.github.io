@@ -77,7 +77,7 @@ footer p { margin: 0; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Source</dt><dd>SEC Form N-PX filings</dd></div><div><dt>Filings read</dt><dd>33,929</dd></div><div><dt>Votes</dt><dd>73.8 million</dd></div><div><dt>Funds</dt><dd>12,416</dd></div><div><dt>dbt</dt><dd>9 models, 21 tests</dd></div><div><dt>LLM test</dt><dd>91.0% on 578 held-out proposals</dd></div><div><dt>Cloud</dt><dd>BigQuery, public dashboard</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b>Vote explorer</b><span class="wk-meta">Source: SEC Form N-PX</span><span class="wk-meta">Three reporting years</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Vote explorer</b><span class="wk-meta">Source: SEC Form N-PX</span><span class="wk-meta">Three reporting years</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="wrap">
   <header>
     <h1>Do ESG funds vote like ESG funds?</h1>
@@ -223,6 +223,340 @@ Promise.all(["support_by_direction.csv", "sibling_comparison_by_house.csv", "esg
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>Funds marketed as ESG or sustainable are expected to back environmental and social proposals at shareholder meetings. Every US fund must publish its votes, but the records are spread across tens of thousands of inconsistent filings, so the claim is hard to check at scale.</p></div>
 <div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Collect:</b> a restartable downloader read 33,929 SEC filings and saved 73.8 million votes.</li><li><b>Clean:</b> dbt models standardise more than 40 spellings of ten answers and 12 date formats, with 99.97% of votes recognised.</li><li><b>Match:</b> the same proposal is worded differently by each filer, so 8,274 wordings were matched into 3,850 proposals.</li><li><b>Label:</b> each proposal&#x27;s direction comes from how specialist ESG fund houses voted, with keyword rules as a fallback.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>SEC EDGAR</b><span>33,929 Form N-PX filings in XML, three reporting years</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>DuckDB and dbt</b><span>cleaned votes, fund labels and one answer per fund per proposal, with 21 tests</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>BigQuery</b><span>curated tables published with a row-count audit, reporting models built by dbt</span></div><div class="box"><b>Public dashboard</b><span>Data Studio, open to anyone with the link</span></div></div></div></div><div class="wk-note"><h3>What I found</h3><ul><li><b>Label:</b> on proposals that specialist ESG houses backed, ESG-named funds elsewhere voted for 33% in 2026, against 14% for other funds and 92% for the specialists.</li><li><b>Trend:</b> ordinary funds&#x27; support halved in two years, from 28% to 14%.</li><li><b>Siblings:</b> on the same proposal, an ESG-named fund voted the same way as ordinary funds from its own filer 83% to 87% of the time.</li><li><b>Range:</b> of 145 ESG-named funds, 41 backed under 10% of these proposals and 21 backed 75% or more.</li></ul></div><div class="wk-note"><h3>Testing a language model</h3><ul><li><b>Question:</b> could an LLM label a proposal&#x27;s direction from its title alone? I scored it against the specialist houses&#x27; votes on 815 proposals, split into a practice set and a final set that was scored once.</li><li><b>Prompt:</b> the same model rose from 69% to 85% accuracy across three prompts. Asking how specialist funds would vote worked better than asking whether a proposal supports ESG.</li><li><b>Combined:</b> keyword rules first, then the model where the rules gave no answer, reached 91.0% on the 578 final proposals. It still misses about a quarter of opposing proposals.</li></ul></div><div class="wk-note"><h3>What made it hard</h3><ul><li><b>Misleading column:</b> a field named for management&#x27;s recommendation records whether the vote went with or against it. Read correctly, funds vote with management 89.9% of the time.</li><li><b>Misleading titles:</b> proposals such as &quot;Revisit Plastics Packaging Policies&quot; sound pro-ESG but received 0% from specialist houses. Keyword rules alone agreed with those votes 91% of the time.</li><li><b>Limits:</b> voting is one measure of a fund, the ESG label is read from fund names, and the yardstick is a chosen group of ten fund houses.</li></ul></div></div>
 </div></div>
+<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2><p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n3"><figure><a href="/fv-support.png" target="_blank" rel="noopener"><img src="/fv-support.png" alt="Support by fund group" loading="lazy"></a><figcaption>Support by fund group</figcaption></figure><figure><a href="/fv-houses.png" target="_blank" rel="noopener"><img src="/fv-houses.png" alt="ESG funds against siblings" loading="lazy"></a><figcaption>ESG funds against siblings</figcaption></figure><figure><a href="/fv-spread.png" target="_blank" rel="noopener"><img src="/fv-spread.png" alt="Spread of ESG-named funds" loading="lazy"></a><figcaption>Spread of ESG-named funds</figcaption></figure></div></div></div>
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-findings">Findings</a></li><li><a href="#wk-how-to-read-these-results">How to read these results</a></li><li><a href="#wk-the-data">The data</a></li><li><a href="#wk-what-made-this-hard">What made this hard</a></li><li><a href="#wk-can-a-language-model-label-the-proposals">Can a language model label the proposals?</a></li><li><a href="#wk-in-the-cloud">In the cloud</a></li><li><a href="#wk-how-it-is-built">How it is built</a></li><li><a href="#wk-run-it-yourself">Run it yourself</a></li><li><a href="#wk-limitations">Limitations</a></li><li><a href="#wk-related-work">Related work</a></li><li><a href="#wk-tools">Tools</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/fund-proxy-voting" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p>Every US fund must publish how it voted at company shareholder meetings. This project collects three years of those records from the SEC, 73.8 million votes from 12,416 funds, and asks one question:</p>
+<p><strong>When a fund has "ESG" or "sustainable" in its name, does it vote differently from an ordinary fund?</strong></p>
+<p>The short answer: a little, and far less than the name suggests. The fund house a fund belongs to tells you more about its votes than its label does.</p>
+<p><strong>▶ <a href="https://ashokreddy010.github.io/fund-proxy-voting/">Interactive explorer</a></strong>: support by fund group, ESG-named funds against their siblings at every fund house, and a searchable list of all ESG-named funds. It reads the result tables in <a href="https://github.com/AshokReddy010/fund-proxy-voting/blob/main/reports/tables/"><code>reports/tables/</code></a> directly, so it updates whenever the data is refreshed.</p>
+<h3 id="wk-findings">Findings</h3>
+<p>All figures are for shareholder proposals on environmental and social topics, in the reporting years ending June 2024, 2025 and 2026.</p>
+<h4 id="wk-1-an-esg-name-predicts-only-modest-support">1. An ESG name predicts only modest support</h4>
+<figure><img loading="lazy" alt="Support by fund group" src="https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/figures/support_by_fund_group.png" /></figure>
+<p>Share of votes cast FOR proposals that specialist ESG fund houses backed:</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Fund group</th>
+<th style="text-align: right;">2024</th>
+<th style="text-align: right;">2025</th>
+<th style="text-align: right;">2026</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Specialist ESG houses (the yardstick)</td>
+<td style="text-align: right;">98.5%</td>
+<td style="text-align: right;">97.1%</td>
+<td style="text-align: right;">91.7%</td>
+</tr>
+<tr>
+<td style="text-align: left;">ESG-named funds at other houses</td>
+<td style="text-align: right;">38.9%</td>
+<td style="text-align: right;">37.2%</td>
+<td style="text-align: right;">32.7%</td>
+</tr>
+<tr>
+<td style="text-align: left;">All other funds</td>
+<td style="text-align: right;">28.1%</td>
+<td style="text-align: right;">16.4%</td>
+<td style="text-align: right;">13.9%</td>
+</tr>
+</tbody>
+</table></div>
+<p>ESG-named funds outside the specialist houses backed these proposals about a third of the time. That is more than ordinary funds, and well short of the specialists.</p>
+<h4 id="wk-2-ordinary-funds-support-halved-in-two-years">2. Ordinary funds' support halved in two years</h4>
+<p>Support from funds without an ESG name fell from 28.1% to 13.9% on the same kind of proposal. ESG-named funds slipped much less, from 38.9% to 32.7%.</p>
+<h4 id="wk-3-proposals-that-push-the-other-way-get-almost-no-support-from-anyone">3. Proposals that push the other way get almost no support from anyone</h4>
+<p>Many recent proposals ask companies to drop diversity programmes or climate targets. Every group voted for those about 1% to 2% of the time, ESG-named or not.</p>
+<h4 id="wk-4-most-esg-named-funds-vote-exactly-like-their-siblings">4. Most ESG-named funds vote exactly like their siblings</h4>
+<p>The fairest comparison is an ESG-named fund against ordinary funds from the same filer, voting on the same proposal. On proposals the specialists backed:</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">2024</th>
+<th style="text-align: right;">2025</th>
+<th style="text-align: right;">2026</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Proposals compared</td>
+<td style="text-align: right;">5,139</td>
+<td style="text-align: right;">3,612</td>
+<td style="text-align: right;">2,173</td>
+</tr>
+<tr>
+<td style="text-align: left;">ESG-named fund voted the same as its siblings</td>
+<td style="text-align: right;">86.6%</td>
+<td style="text-align: right;">82.6%</td>
+<td style="text-align: right;">83.3%</td>
+</tr>
+<tr>
+<td style="text-align: left;">ESG-named fund was more supportive</td>
+<td style="text-align: right;">11.8%</td>
+<td style="text-align: right;">16.3%</td>
+<td style="text-align: right;">16.1%</td>
+</tr>
+<tr>
+<td style="text-align: left;">ESG-named fund was less supportive</td>
+<td style="text-align: right;">1.6%</td>
+<td style="text-align: right;">1.1%</td>
+<td style="text-align: right;">0.6%</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="wk-5-the-fund-house-matters-more-than-the-label">5. The fund house matters more than the label</h4>
+<figure><img loading="lazy" alt="ESG-named funds against siblings by fund house" src="https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/figures/siblings_by_house.png" /></figure>
+<p>At some filers the ESG-named funds vote very differently from their siblings: FlexShares Trust 99.7% against 25.4%, Northern Funds 99.4% against 42.6%. At others there is no difference at all: at SPDR Index Shares Funds, Russell Investment Company, TIAA-CREF Funds and Thrivent Series Fund, ESG-named funds matched their siblings on every proposal compared.</p>
+<h4 id="wk-6-esg-named-funds-are-spread-across-the-whole-range">6. ESG-named funds are spread across the whole range</h4>
+<figure><img loading="lazy" alt="Spread of ESG-named funds" src="https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/figures/esg_fund_spread.png" /></figure>
+<p>Of 145 ESG-named funds outside the specialist houses with at least 20 votes, 41 backed fewer than 10% of these proposals and 21 backed 75% or more. The full list is in <a href="https://github.com/AshokReddy010/fund-proxy-voting/blob/main/reports/tables/esg_named_fund_support.csv"><code>reports/tables/esg_named_fund_support.csv</code></a>.</p>
+<h3 id="wk-how-to-read-these-results">How to read these results</h3>
+<ul>
+<li><strong>Voting is one measure of a fund, not the whole of it.</strong> A fund can pursue ESG aims through which shares it holds or through private talks with companies. Low support here describes how a fund voted on these proposals. It is not evidence that a fund's label is misleading.</li>
+<li><strong>"Backed by specialists" is a chosen yardstick.</strong> A proposal counts as pro-ESG when ten specialist ESG fund houses mostly voted for it. Their own 98% is therefore close to true by construction.</li>
+<li><strong>The ESG label is read from fund names.</strong> 413 funds are labelled this way. Funds that follow ESG rules without saying so in their name are counted as ordinary funds.</li>
+<li>Everything here comes from public SEC filings, reported as filed.</li>
+</ul>
+<h3 id="wk-the-data">The data</h3>
+<p>Form N-PX filings from SEC EDGAR, in the structured XML format the SEC introduced for filings from mid-2024.</p>
+<div class="wk-table"><table>
+
+<tbody>
+<tr>
+<td style="text-align: left;">Filings read</td>
+<td style="text-align: right;">33,929</td>
+</tr>
+<tr>
+<td style="text-align: left;">Filings containing votes</td>
+<td style="text-align: right;">16,251</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vote records</td>
+<td style="text-align: right;">73,755,572</td>
+</tr>
+<tr>
+<td style="text-align: left;">From funds (all topics)</td>
+<td style="text-align: right;">67,094,632</td>
+</tr>
+<tr>
+<td style="text-align: left;">From investment managers (executive pay votes only)</td>
+<td style="text-align: right;">6,660,940</td>
+</tr>
+<tr>
+<td style="text-align: left;">Distinct funds</td>
+<td style="text-align: right;">12,416</td>
+</tr>
+<tr>
+<td style="text-align: left;">Files that could not be read</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table></div>
+<p>The raw data is not in this repository. <code>download_votes.py</code> rebuilds it from the SEC in about nine hours, at the SEC's permitted request rate.</p>
+<h3 id="wk-what-made-this-hard">What made this hard</h3>
+<p><strong>1. Filers write the same answer many ways.</strong> "For" appears as FOR, For, F and Yes; a one-year vote as ONE YEAR, 1 Year, 1-YEAR, 1YR and 1.0. There were more than 40 spellings across ten real answers, and meeting dates in 12 formats. After cleaning, 99.97% of votes map to a standard value. A dbt test fails if unrecognised votes ever pass 1%.</p>
+<p><strong>2. One column does not mean what its name says.</strong> The field <code>managementRecommendation</code> does not hold management's recommendation. It records whether the vote was cast for or against that recommendation. Read literally, it makes almost every shareholder proposal look management-backed. Read correctly, funds vote with management 89.9% of the time.</p>
+<p><strong>3. The same proposal is worded differently by every filer.</strong> A single Microsoft proposal appears in 16 wordings. <code>scripts/label_proposals.py</code> matches them within each company meeting, turning 8,274 wordings into 3,850 proposals.</p>
+<p><strong>4. A proposal's title does not tell you which side it is on.</strong> "Revisit Plastics Packaging Policies" and "Report on Net Zero Business Performance Risks" sound pro-ESG, and both received 0% support from specialist ESG houses. So direction is decided by two independent signals:</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Signal</th>
+<th style="text-align: left;">How it works</th>
+<th style="text-align: left;">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Reference votes</td>
+<td style="text-align: left;">How ten specialist ESG fund houses voted on the proposal</td>
+<td style="text-align: left;">857 proposals, 84% of all fund votes</td>
+</tr>
+<tr>
+<td style="text-align: left;">Wording</td>
+<td style="text-align: left;">Keyword rules, with rules for opposing proposals checked first</td>
+<td style="text-align: left;">Fallback for the rest</td>
+</tr>
+</tbody>
+</table></div>
+<p>Where both signals gave an answer, the first version of the wording rules agreed with the reference votes 91.2% of the time. Nearly every disagreement was an opposing proposal written in ESG vocabulary. Refining the rules raised agreement to 94.7% on 664 proposals, but they were refined on those same cases, so that figure is optimistic. The published results therefore use reference votes wherever they exist, and report wording-only labels separately.</p>
+<h3 id="wk-can-a-language-model-label-the-proposals">Can a language model label the proposals?</h3>
+<p>Reference votes exist for 84% of fund votes. The rest depend on keyword rules, which are the weakest part of the pipeline. So I tested whether a language model could label a proposal's direction from its company name and title alone, and measured it against the reference votes.</p>
+<p><strong>Setup</strong></p>
+<ul>
+<li><strong>Answer key:</strong> 815 proposals where the specialist ESG houses gave a clear answer, 579 supporting and 236 opposing.</li>
+<li><strong>Split:</strong> a fixed 237 for practice and 578 for the final test, assigned by a hash of the proposal ID.</li>
+<li><strong>Prompts:</strong> three versions, written and revised using only the practice set. The final set was scored once, after the prompts were frozen.</li>
+<li><strong>Model:</strong> <code>openai/gpt-oss-120b</code> through the Groq API, at temperature 0, with every answer cached in <a href="https://github.com/AshokReddy010/fund-proxy-voting/blob/main/llm_eval/runs"><code>llm_eval/runs</code></a>.</li>
+</ul>
+<p><strong>Results on the final set (578 proposals)</strong></p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Method</th>
+<th style="text-align: right;">Accuracy</th>
+<th style="text-align: right;">Opposing proposals caught</th>
+<th style="text-align: right;">No clear answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Keyword rules</td>
+<td style="text-align: right;">76.6%</td>
+<td style="text-align: right;">68.9%</td>
+<td style="text-align: right;">18.5%</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM, plain prompt</td>
+<td style="text-align: right;">69.2%</td>
+<td style="text-align: right;">7.9%</td>
+<td style="text-align: right;">6.4%</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM, prompt with written guidance</td>
+<td style="text-align: right;">76.5%</td>
+<td style="text-align: right;">36.0%</td>
+<td style="text-align: right;">6.1%</td>
+</tr>
+<tr>
+<td style="text-align: left;">LLM, prompt with examples and a reframed task</td>
+<td style="text-align: right;">84.9%</td>
+<td style="text-align: right;">65.2%</td>
+<td style="text-align: right;">5.4%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rules first, LLM where the rules give no answer</td>
+<td style="text-align: right;">91.0%</td>
+<td style="text-align: right;">76.2%</td>
+<td style="text-align: right;">2.9%</td>
+</tr>
+</tbody>
+</table></div>
+<p>Full tables, with precision and recall for both classes, are in <a href="https://github.com/AshokReddy010/fund-proxy-voting/blob/main/llm_eval/results_test.md"><code>llm_eval/results_test.md</code></a>. Every proposal a method got wrong is in <a href="https://github.com/AshokReddy010/fund-proxy-voting/blob/main/llm_eval/errors_test.csv"><code>llm_eval/errors_test.csv</code></a>.</p>
+<p><strong>What this shows</strong></p>
+<ul>
+<li><strong>The prompt mattered more than anything else.</strong> The same model went from 69.2% to 84.9%. With a plain prompt it labelled almost every proposal as supporting ESG, and caught 8% of the opposing ones.</li>
+<li><strong>The largest gain came from changing the question.</strong> Asking "how would specialist responsible-investment funds vote on this?" worked better than asking whether a proposal "supports ESG", because opposing proposals are written in ESG vocabulary.</li>
+<li><strong>Rules and model fail in different places.</strong> The rules are precise but silent on 18.5% of proposals. The model answers nearly all of them. Using the rules first and the model for the remainder beat both.</li>
+<li><strong>Practice scores were higher.</strong> The combined method scored 93.7% on the practice set and 91.0% on the final set, which is the figure to quote.</li>
+</ul>
+<p><strong>Limits of this test</strong></p>
+<ul>
+<li>The keyword rules were refined earlier against reference votes on many of these same proposals, so their 76.6%, and the combined 91.0% that builds on them, are optimistic. The LLM-only rows are a clean test.</li>
+<li>Even the best method misses about a quarter of opposing proposals.</li>
+<li>The answer key is the specialists' votes, which is a chosen yardstick and not ground truth.</li>
+<li>One model was tested. The published fund results do not use these LLM labels.</li>
+</ul>
+<p>To rerun it, set a <code>GROQ_API_KEY</code> environment variable, then run <code>python llm_eval\run_llm.py --prompt v3_examples_and_reframing --split test</code> and <code>python llm_eval\score.py --split test</code>.</p>
+<h3 id="wk-in-the-cloud">In the cloud</h3>
+<p><strong><a href="https://datastudio.google.com/reporting/018f69c4-a00a-4e0b-80dc-5e1085eabdd0">Open the live dashboard</a></strong>, built on BigQuery and open to anyone with the link.</p>
+<figure><img loading="lazy" alt="Pipeline from SEC filings to the public dashboard" src="https://raw.githubusercontent.com/AshokReddy010/fund-proxy-voting/main/reports/figures/pipeline.gif" /></figure>
+<p>The 73.8 million raw votes stay in DuckDB on a laptop. The curated tables go to BigQuery, where a second dbt project builds the reporting tables the dashboard reads.</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Layer</th>
+<th style="text-align: left;">Where</th>
+<th style="text-align: left;">What</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Raw and modelled votes</td>
+<td style="text-align: left;">DuckDB, local</td>
+<td style="text-align: left;">73.8 million rows, 9 dbt models, 21 tests</td>
+</tr>
+<tr>
+<td style="text-align: left;">Curated tables</td>
+<td style="text-align: left;">BigQuery</td>
+<td style="text-align: left;">7 tables, about 1.1 million rows, including a summary of every fund vote by fund, year and topic</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reporting models</td>
+<td style="text-align: left;">BigQuery, built by dbt</td>
+<td style="text-align: left;">4 tables and 11 tests, including a reconciliation of the fund scorecard against its source</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dashboard</td>
+<td style="text-align: left;">Data Studio</td>
+<td style="text-align: left;">Public, read-only</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Why not put everything in the cloud?</strong> The project runs on BigQuery's free sandbox, which allows 10 GB of storage over the project's lifetime, deletes tables after 60 days, and has no INSERT or MERGE statements. So the heavy layer stays local, and the curated layer, about 340 MB in BigQuery, is re-sent whole on each refresh. Each refresh also resets the 60-day clock, and the allowance covers roughly 29 refreshes.</p>
+<p><strong>Every publish is checked.</strong> <code>cloud/publish_to_bigquery.py</code> compares each table's row count in BigQuery with the local count and records the result in a <code>load_audit</code> table and in <code>cloud/publish_log.csv</code>. A dbt test fails if the curated tables are more than 45 days old, before the sandbox would delete them.</p>
+<p><strong>Monthly refresh.</strong> <code>cloud/refresh.py</code> runs the whole chain in one command: it fetches only SEC filings it has not seen before, appends their votes without re-reading the 73.8 million already loaded, rebuilds and tests the local models, re-publishes to BigQuery with the row-count audit, and rebuilds and tests the cloud models. Each run is logged in <code>cloud/refresh_log.csv</code>. Proposals first seen in new filings stay labelled "unclear" until the labelling step is re-run.</p>
+<pre><code>python cloud\refresh.py
+</code></pre>
+<p>To publish and rebuild the cloud layer on its own:</p>
+<pre><code>gcloud auth application-default login
+python cloud\publish_to_bigquery.py --dry-run
+python cloud\publish_to_bigquery.py
+cd cloud\dbt_bigquery
+dbt build --profiles-dir .
+</code></pre>
+<h3 id="wk-how-it-is-built">How it is built</h3>
+<pre><code>SEC EDGAR (33,929 filings)
+   └─ download_votes.py     read each filing, save votes as compact files
+       └─ load_raw.py           load into DuckDB (73.8 million rows)
+           └─ dbt
+               ├─ staging       clean votes, dates, topics, filer types
+               ├─ fct_votes     every cleaned vote
+               ├─ dim_funds     one row per fund, with the ESG-name label
+               ├─ fct_fund_es_votes   one answer per fund per proposal
+               └─ marts         support by direction, sibling comparison
+scripts/label_proposals.py      match wordings, label direction  → seeds/proposal_labels.csv
+scripts/make_charts.py          charts from reports/tables
+llm_eval/                       LLM labelling test: answer key, prompts, cached runs, scores
+</code></pre>
+<ul>
+<li><strong>dbt:</strong> 9 models, 1 seed and 21 data tests, including a custom test that no fund has two answers for the same proposal.</li>
+<li><strong>Unit tests:</strong> 8 pytest checks on the SEC file reader, the wording matcher and the direction rules, run by GitHub Actions on every push.</li>
+<li><strong>Runs on a laptop:</strong> DuckDB with a 2 GB memory limit rebuilds every table from the 73.8 million rows in about ten minutes.</li>
+</ul>
+<h3 id="wk-run-it-yourself">Run it yourself</h3>
+<p>Needs Python 3.10 or newer and about 10 GB of free disk. Commands are for Windows CMD.</p>
+<pre><code>git clone https://github.com/AshokReddy010/fund-proxy-voting.git
+cd fund-proxy-voting
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+python download_votes.py --test
+python download_votes.py
+python load_raw.py
+dbt build --profiles-dir .
+python scripts\export_results.py
+python scripts\make_charts.py
+</code></pre>
+<p><code>download_votes.py --test</code> is a ten-minute trial on a sample of filings. The full download can be stopped and restarted. To rebuild the proposal labels from scratch, run <code>scripts\export_proposals.py</code> and then <code>scripts\label_proposals.py</code>, and copy <code>proposal_labels.csv</code> into <code>seeds</code>.</p>
+<h3 id="wk-limitations">Limitations</h3>
+<ul>
+<li>Reference votes cover 84% of fund votes. The other 16%, mostly smaller and non-US companies, rely on wording rules, which are less reliable.</li>
+<li>Wordings are matched within a company meeting by word overlap. Very differently worded copies of one proposal can stay separate, and two similar proposals at one meeting can merge.</li>
+<li>Where a filer sent a corrected filing for the same fund and year, the latest one is used. Corrections that cover only part of the original are not handled separately.</li>
+<li>A few filings report exactly 500,000 votes, which suggests a cap in how they were filed. This was not investigated.</li>
+<li>The comparison between an ESG-named fund and its siblings is made within one filer. Fund families that file through several legal entities are not joined together.</li>
+</ul>
+<h3 id="wk-related-work">Related work</h3>
+<p><a href="https://github.com/slriggss/proxy-voting-panel">proxy-voting-panel</a> studies the same filings for 22 selected funds and labels proposal direction with keyword rules. This project covers all 12,416 funds, adds the within-filer sibling comparison, and checks keyword labels against an independent signal.</p>
+<h3 id="wk-tools">Tools</h3>
+<p>Python, DuckDB, dbt, BigQuery, Data Studio, pandas, Matplotlib, pytest, GitHub Actions, Groq API (open-weight LLM).</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/ab-testing-toolkit/"><small>Previous project</small><b>A/B testing toolkit</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/medicare-cost-analysis/"><small>Next project</small><b>Medicare costs</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>

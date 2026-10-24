@@ -101,7 +101,7 @@ footer p { margin: 0; max-width: 80ch; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Planning</dt><dd>sample size, power, duration</dd></div><div><dt>Tests</dt><dd>z-test, Welch t-test, bootstrap</dd></div><div><dt>Health check</dt><dd>sample ratio mismatch</dd></div><div><dt>Noise reduction</dt><dd>CUPED</dd></div><div><dt>Verified by</dt><dd>20,000 simulations per check</dd></div><div><dt>Unit tests</dt><dd>30, run on every push</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b>Runs in your browser</b><span class="wk-meta">The abkit Python package</span><span class="wk-meta">Nothing is sent anywhere</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Runs in your browser</b><span class="wk-meta">The abkit Python package</span><span class="wk-meta">Nothing is sent anywhere</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="wrap">
   <header>
     <h1>Experiment Desk</h1>
@@ -335,6 +335,210 @@ $("#csv").onchange = (e) => { const f = e.target.files[0]; if (!f) return; const
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>A/B tests go wrong in a few well-known ways: the test is stopped at the first good-looking result, users are not split as designed, too many metrics are checked, or the data is too noisy to see the effect. Each of these can turn a change that does nothing into a reported win.</p></div>
 <div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Plan:</b> sample size, power and test length for a given baseline and smallest lift worth detecting.</li><li><b>Check:</b> a sample ratio mismatch test that blocks the analysis when assignment looks broken.</li><li><b>Analyse:</b> tests for rates and averages with confidence intervals, a bootstrap second opinion for revenue, and CUPED to reduce noise.</li><li><b>Decide:</b> fixed rules that return ship, do not ship, inconclusive or do not trust, with a written readout.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>Experiment data</b><span>one row per user: group, converted, revenue, refunds, past spending</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>abkit</b><span>health check, tests, noise reduction and corrections, covered by 30 unit tests</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Readout</b><span>decision and results table in markdown</span></div><div class="box"><b>Validation study</b><span>simulations that check every formula</span></div></div></div></div><div class="wk-note"><h3>What the simulations showed</h3><ul><li><b>Accuracy:</b> with no real effect the toolkit calls a false win 4.85% of the time against a 5% target, and its 95% intervals contain the truth 94.98% of the time.</li><li><b>Power:</b> at the planned 17,169 users per group it detects the planned lift 80.3% of the time, against an 80% target.</li><li><b>Peeking:</b> checking a test 10 times and stopping at the first win raises false wins from 5% to 19.4%.</li></ul></div><div class="wk-note"><h3>Example experiment</h3><ul><li><b>Result:</b> on simulated data with a true lift of 1.0 point, the readout says ship, with conversion up 1.25 points (interval 0.55 to 1.95).</li><li><b>Caution:</b> revenue per user looks significant alone (p = 0.035) but not after correcting for extra metrics (p = 0.069), so it is not reported as a win.</li><li><b>Broken test:</b> a 51/49 split across 33,632 users is flagged as a fault, and the metrics are not read.</li></ul></div></div>
 </div></div>
+<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2><p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n3"><figure><a href="/ab-desk.jpg" target="_blank" rel="noopener"><img src="/ab-desk.jpg" alt="Experiment Desk running abkit in the browser" loading="lazy"></a><figcaption>Experiment Desk running abkit in the browser</figcaption></figure><figure><a href="/ab-peeking.png" target="_blank" rel="noopener"><img src="/ab-peeking.png" alt="Why stopping early is wrong" loading="lazy"></a><figcaption>Why stopping early is wrong</figcaption></figure><figure><a href="/ab-results.png" target="_blank" rel="noopener"><img src="/ab-results.png" alt="Example experiment results" loading="lazy"></a><figcaption>Example experiment results</figcaption></figure></div></div></div>
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-what-it-does">What it does</a></li><li><a href="#wk-example-a-checkout-redesign">Example: a checkout redesign</a></li><li><a href="#wk-does-the-toolkit-give-the-right-answers">Does the toolkit give the right answers?</a></li><li><a href="#wk-use-it">Use it</a></li><li><a href="#wk-run-it-yourself">Run it yourself</a></li><li><a href="#wk-decision-rules">Decision rules</a></li><li><a href="#wk-limitations">Limitations</a></li><li><a href="#wk-tools">Tools</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/ab-testing-toolkit" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p><strong>▶ <a href="https://ashokreddy010.github.io/ab-testing-toolkit/">Experiment Desk: try it in your browser</a></strong>. Plan a test, read out the example experiment (or your own CSV) and run the peeking simulation. The page runs this package itself in Pyodide; your data never leaves the browser.</p>
+<p>A small Python toolkit that takes an experiment from planning to a written decision: how many users the test needs, whether the data can be trusted, whether the change worked, and what to do about it.</p>
+<p>It is built around the mistakes that most often make A/B test results wrong: stopping early, broken assignment, too many metrics, and noisy data. Each one has a check in the toolkit, and each check is verified against simulation.</p>
+<h3 id="wk-what-it-does">What it does</h3>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Step</th>
+<th style="text-align: left;">Question it answers</th>
+<th style="text-align: left;">Module</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Plan</td>
+<td style="text-align: left;">How many users do I need, and how many days will that take?</td>
+<td style="text-align: left;"><code>abkit/power.py</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Health check</td>
+<td style="text-align: left;">Did users split between the groups as designed?</td>
+<td style="text-align: left;"><code>abkit/checks.py</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Analyse</td>
+<td style="text-align: left;">Did the rate or the average change, and by how much?</td>
+<td style="text-align: left;"><code>abkit/stats.py</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Reduce noise</td>
+<td style="text-align: left;">Can pre-experiment data narrow the interval? (CUPED)</td>
+<td style="text-align: left;"><code>abkit/cuped.py</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Correct</td>
+<td style="text-align: left;">Am I testing so many metrics that one wins by luck?</td>
+<td style="text-align: left;"><code>abkit/corrections.py</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Decide</td>
+<td style="text-align: left;">Ship, do not ship, inconclusive, or do not trust?</td>
+<td style="text-align: left;"><code>abkit/readout.py</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Verify</td>
+<td style="text-align: left;">Do the formulas behave as statistics says they should?</td>
+<td style="text-align: left;"><code>abkit/simulate.py</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="wk-example-a-checkout-redesign">Example: a checkout redesign</h3>
+<p>The example data is <strong>simulated</strong>, with a known true effect (conversion +1.0 point, refunds unchanged), so the analysis can be compared with the right answer.</p>
+<p><strong>Planning.</strong> With a 12% baseline, detecting a 1-point lift at 5% significance and 80% power needs <strong>17,169 users per group</strong>. At 2,500 eligible users a day that is a 14-day test.</p>
+<p><strong>Result.</strong> One command produces the <a href="https://github.com/AshokReddy010/ab-testing-toolkit/blob/main/reports/checkout_experiment_readout.md">full readout</a>:</p>
+<blockquote>
+<p><strong>Decision: Ship.</strong> Conversion rose by +1.25% points (95% interval +0.55% to +1.95%), with no guardrail harmed.</p>
+</blockquote>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Metric</th>
+<th style="text-align: left;">Control</th>
+<th style="text-align: left;">Treatment</th>
+<th style="text-align: left;">Difference</th>
+<th style="text-align: left;">95% interval</th>
+<th style="text-align: right;">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Conversion rate</td>
+<td style="text-align: left;">11.85%</td>
+<td style="text-align: left;">13.10%</td>
+<td style="text-align: left;">+1.25 pts</td>
+<td style="text-align: left;">+0.55 to +1.95 pts</td>
+<td style="text-align: right;">0.0005</td>
+</tr>
+<tr>
+<td style="text-align: left;">Revenue per user</td>
+<td style="text-align: left;">8.612</td>
+<td style="text-align: left;">9.253</td>
+<td style="text-align: left;">+0.641</td>
+<td style="text-align: left;">+0.046 to +1.237</td>
+<td style="text-align: right;">0.0346</td>
+</tr>
+<tr>
+<td style="text-align: left;">Refund rate</td>
+<td style="text-align: left;">0.58%</td>
+<td style="text-align: left;">0.60%</td>
+<td style="text-align: left;">+0.02 pts</td>
+<td style="text-align: left;">-0.14 to +0.19 pts</td>
+<td style="text-align: right;">0.7777</td>
+</tr>
+</tbody>
+</table></div>
+<figure><img loading="lazy" alt="Relative change per metric with 95% intervals" src="https://raw.githubusercontent.com/AshokReddy010/ab-testing-toolkit/main/reports/figures/results.png" /></figure>
+<p>Three things worth noticing:</p>
+<ul>
+<li><strong>The interval contains the true effect.</strong> The data was built with a +1.0 point lift, and the interval of +0.55 to +1.95 covers it. The point estimate of +1.25 is higher than the truth, which is normal sampling noise and a reminder not to quote a single number without its interval.</li>
+<li><strong>Revenue is not a confirmed win.</strong> Its p-value is 0.035 on its own, but 0.069 after correcting for looking at more than one extra metric. The readout reports the corrected value so a secondary metric is not oversold.</li>
+<li><strong>CUPED helped a little.</strong> Using each user's pre-experiment spending removed 11.1% of the variance in revenue per user and made the interval 5.7% narrower. The gain is modest here because most users buy nothing, so past spending explains only part of the outcome.</li>
+</ul>
+<p><strong>A broken experiment.</strong> The second example file loses 4% of treatment users before they are logged. The same command returns:</p>
+<blockquote>
+<p><strong>Decision: Do not trust.</strong> Sample ratio mismatch: expected 50% of users in control, observed 51.05% (p = 0.00012).</p>
+</blockquote>
+<p>A 51/49 split looks harmless, but with 33,632 users it is far outside what chance allows, and the toolkit refuses to read the metrics until it is explained.</p>
+<h3 id="wk-does-the-toolkit-give-the-right-answers">Does the toolkit give the right answers?</h3>
+<p>Each check below has a known correct value. <a href="https://github.com/AshokReddy010/ab-testing-toolkit/blob/main/reports/validation_results.md">Simulating 20,000 experiments</a> per check gives:</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Check</th>
+<th style="text-align: right;">Theory</th>
+<th style="text-align: right;">Simulated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">False positive rate when there is no real effect</td>
+<td style="text-align: right;">5.0%</td>
+<td style="text-align: right;">4.85%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Power at the planned sample size and effect</td>
+<td style="text-align: right;">80.0%</td>
+<td style="text-align: right;">80.33%</td>
+</tr>
+<tr>
+<td style="text-align: left;">95% intervals that contain the true effect</td>
+<td style="text-align: right;">95.0%</td>
+<td style="text-align: right;">94.98%</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="wk-why-you-should-not-stop-at-the-first-significant-result">Why you should not stop at the first significant result</h4>
+<figure><img loading="lazy" alt="False positive rate against the number of times a test is checked" src="https://raw.githubusercontent.com/AshokReddy010/ab-testing-toolkit/main/reports/figures/peeking.png" /></figure>
+<p>With no real effect at all, checking a test 10 times and stopping at the first "win" calls a winner <strong>19.4%</strong> of the time instead of 5%. Checking 20 times raises that to 25.1%. Testing each look at a stricter threshold brings it back under 5% (2.5% at 10 looks), at the cost of being more conservative than necessary.</p>
+<h4 id="wk-why-small-effects-are-expensive">Why small effects are expensive</h4>
+<figure><img loading="lazy" alt="Users needed per group against the smallest lift worth detecting" src="https://raw.githubusercontent.com/AshokReddy010/ab-testing-toolkit/main/reports/figures/sample_size.png" /></figure>
+<p>Detecting a 0.5-point lift instead of a 1-point lift takes 67,496 users per group instead of 17,169. Halving the effect roughly quadruples the sample.</p>
+<h3 id="wk-use-it">Use it</h3>
+<pre><code class="language-python">from abkit import sample_size_proportions, duration_days, proportion_test, srm_check
+
+n = sample_size_proportions(baseline=0.12, mde=0.01)      # 17169 per group
+duration_days(n, daily_users=2500)                         # 14 days
+
+srm_check(n_control=17169, n_treatment=17169).passed       # True
+result = proportion_test(2035, 17169, 2249, 17169)
+result.abs_diff, result.ci_low, result.ci_high, result.p_value
+</code></pre>
+<p>For a whole experiment, one row per user with <code>group</code>, <code>converted</code>, <code>revenue</code>, <code>pre_revenue</code> and <code>refunded</code> columns:</p>
+<pre><code class="language-python">import pandas as pd
+from abkit import analyse_experiment, render_readout
+
+readout = analyse_experiment(pd.read_csv(&quot;data/checkout_experiment.csv&quot;), name=&quot;Checkout redesign&quot;)
+print(readout.decision)          # Ship
+print(render_readout(readout))   # the full written readout
+</code></pre>
+<h3 id="wk-run-it-yourself">Run it yourself</h3>
+<p>Needs Python 3.10 or newer. Commands are for Windows CMD.</p>
+<pre><code>git clone https://github.com/AshokReddy010/ab-testing-toolkit.git
+cd ab-testing-toolkit
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+pytest -q
+python scripts\make_example_data.py
+python scripts\run_readout.py
+python scripts\validation_study.py
+</code></pre>
+<p><code>pytest</code> runs 30 tests. They compare the formulas with textbook values and with SciPy, and check the decision rules on five scenarios: clear win, clear loss, no effect, guardrail harmed and broken assignment. GitHub Actions runs them on every push.</p>
+<h3 id="wk-decision-rules">Decision rules</h3>
+<p>The readout applies these in order, and stops at the first that matches:</p>
+<ol>
+<li>Sample ratio mismatch fails (p &lt; 0.001): <strong>do not trust</strong>.</li>
+<li>A guardrail metric is significantly worse: <strong>do not ship</strong>.</li>
+<li>The interval for the primary metric is entirely above zero: <strong>ship</strong>.</li>
+<li>The interval is entirely below zero: <strong>do not ship</strong>.</li>
+<li>Otherwise: <strong>inconclusive</strong>, with the smallest lift the test could have detected.</li>
+</ol>
+<h3 id="wk-limitations">Limitations</h3>
+<ul>
+<li>The example data is simulated. It shows that the method works, not what a real checkout change would do.</li>
+<li>The peeking correction is the simple one (divide the threshold by the number of looks). It is safe but conservative; a group sequential design such as O'Brien-Fleming would give up less power.</li>
+<li>It handles two groups and per-user metrics. Ratio metrics such as revenue per session, and tests with several variants, would need the delta method and a multi-arm comparison.</li>
+</ul>
+<h3 id="wk-tools">Tools</h3>
+<p>Python, NumPy, pandas, SciPy, Matplotlib, pytest, GitHub Actions.</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/olist-analytics-engineering/"><small>Previous project</small><b>Olist analytics</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/fund-proxy-voting/"><small>Next project</small><b>ESG fund votes</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>

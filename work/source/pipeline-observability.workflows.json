@@ -1,0 +1,12 @@
+[
+ [
+  "CI",
+  "Runs every test on every push and pull request.",
+  "On every push"
+ ],
+ [
+  "Monitor",
+  "Every 3 hours: fetch each feed, run the monitors, commit the history and status, and sync incident issues.",
+  "Every 3 hours"
+ ]
+]

@@ -1,0 +1,7 @@
+[
+ [
+  "CI",
+  "Runs every test on every push and pull request.",
+  "On every push"
+ ]
+]

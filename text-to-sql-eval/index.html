@@ -130,7 +130,7 @@ footer p { margin: 0; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Questions</dt><dd>50, hand-written gold SQL</dd></div><div><dt>Warehouse</dt><dd>6 tables, 32k orders</dd></div><div><dt>Scoring</dt><dd>result equivalence</dd></div><div><dt>Safety</dt><dd>read-only sandbox, timeouts</dd></div><div><dt>Stats</dt><dd>Wilson 95% intervals</dd></div><div><dt>Ablation</dt><dd>schema vs business context</dd></div><div><dt>Refresh</dt><dd>daily, free hosted models</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live leaderboard</b><span class="wk-meta">Scored by answers, not SQL text</span><span class="wk-meta">Re-run every day</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live leaderboard</b><span class="wk-meta">Scored by answers, not SQL text</span><span class="wk-meta">Re-run every day</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="wrap">
   <header>
     <h1>Can a language model answer your business questions in SQL?</h1>
@@ -323,6 +323,109 @@ load();
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>Text-to-SQL demos look good on simple counts. Real questions hide definitions (what counts as revenue, who is an active customer), and a query can look right while returning the wrong number.</p></div>
 <div class="wk-grid solo"><div class="wk-note"><h3>Approach</h3><ul><li><b>Warehouse:</b> generated from a fixed seed so the benchmark is reproducible, with cancellations, refunds and split payments.</li><li><b>Scoring:</b> results are compared, not SQL text, allowing column order, row order (unless asked) and the precision the question requested.</li><li><b>Safety:</b> one read-only statement, no file access, a 20-second timeout and a row cap.</li><li><b>Honesty:</b> a gold-query self-check gates every run, and every miss is classified by running the query.</li></ul></div></div>
 </div></div>
+
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-what-is-in-it">What is in it</a></li><li><a href="#wk-results-so-far">Results so far</a></li><li><a href="#wk-how-answers-are-scored">How answers are scored</a></li><li><a href="#wk-running-it">Running it</a></li><li><a href="#wk-layout">Layout</a></li><li><a href="#wk-limits">Limits</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li><li><b>Eval</b><span class="when">Daily, 06:23 UTC</span><span>Daily: run every available GitHub Models model on the benchmark (resumable, so free-tier daily quotas are fine: unfinished questions are picked up the next day), rebuild the report and commit it.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/text-to-sql-eval" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p><strong>▶ <a href="https://ashokreddy010.github.io/text-to-sql-eval/">Live leaderboard</a></strong>: refreshed daily from the results committed in <a href="https://github.com/AshokReddy010/text-to-sql-eval/blob/main/results/"><code>results/</code></a>.</p>
+<p>"Ask your data in plain English" demos look great on <code>SELECT count(*)</code>. Real analyst questions have definitions hidden in them: revenue excludes cancelled orders, an active customer means something specific, a growth rate needs last month's number. This benchmark asks models 50 such questions over a realistic warehouse and counts an answer as correct only if the query <strong>returns the right result</strong>.</p>
+<h3 id="wk-what-is-in-it">What is in it</h3>
+<div class="wk-table"><table>
+
+<tbody>
+<tr>
+<td><strong>Warehouse</strong></td>
+<td>A retail business in DuckDB: <code>customers</code>, <code>products</code>, <code>orders</code>, <code>order_items</code>, <code>payments</code>, <code>returns</code> (~32k orders, 63k lines). Generated from a fixed seed, so it is reproducible and free to share. It has the traps real warehouses have: 6% cancelled orders, partial refunds, split-tender payments, customers who never ordered, nullable referral and promo columns, weekend and holiday seasonality.</td>
+</tr>
+<tr>
+<td><strong>Questions</strong></td>
+<td><a href="https://github.com/AshokReddy010/text-to-sql-eval/blob/main/benchmark/questions.yaml">50 business questions</a>, each with a hand-written gold query and tags: basic, aggregation, joins, missing rows (anti-joins), window functions, dates, NULLs, top-N, and business rules that need the <a href="https://github.com/AshokReddy010/text-to-sql-eval/blob/main/benchmark/glossary.md">glossary</a>. Thirteen require a specific row order.</td>
+</tr>
+<tr>
+<td><strong>Prompts</strong></td>
+<td><code>schema</code> (table definitions only) and <code>context</code> (plus three sample rows per table and the business glossary), to measure what context is worth.</td>
+</tr>
+<tr>
+<td><strong>Models</strong></td>
+<td>Any OpenAI-compatible endpoint, Anthropic, Groq and GitHub Models. The daily workflow uses Groq's free tier through a <code>GROQ_API_KEY</code> repository secret. <code>groq/auto:5</code> asks Groq which chat models it serves that day and picks the five best families, so retired models drop out on their own. Without the secret it falls back to GitHub Models where that is enabled. Keys only ever come from the environment.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="wk-results-so-far">Results so far</h3>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th>Model (Groq free tier)</th>
+<th>With business context</th>
+<th>Schema only</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-OSS 120B</td>
+<td><strong>96%</strong> (48/50)</td>
+<td>48% (24/50)</td>
+</tr>
+<tr>
+<td>Qwen3.8 27B</td>
+<td><strong>94%</strong> (47/50)</td>
+<td>42% (21/50)</td>
+</tr>
+<tr>
+<td>GPT-OSS 20B</td>
+<td><strong>92%</strong> (46/50)</td>
+<td>not run</td>
+</tr>
+</tbody>
+</table></div>
+<p>Business context roughly doubles accuracy. For GPT-OSS 120B, 25 of the 26 schema-only misses are business-rule questions, whose answer depends on a definition (a valid order excludes cancellations, revenue is net of refunds) that the table definitions do not state. The three models with context are within each other's 95% intervals, so they are not reliably different. Live numbers: the <a href="https://ashokreddy010.github.io/text-to-sql-eval/">leaderboard</a>.</p>
+<h3 id="wk-how-answers-are-scored">How answers are scored</h3>
+<p><code>sqleval.scoring</code> runs both queries and compares results, allowing what does not change the answer and nothing else:</p>
+<ul>
+<li>column names and column order may differ; row order may differ unless the question asks for one;</li>
+<li>each predicted number is rounded to the precision the gold answer used ("rounded to 1 decimal" accepts 12.3456 for 12.3), integers must match exactly, and Decimal/float/int/strings of digits compare as numbers;</li>
+<li>dates match ISO strings.</li>
+</ul>
+<p>A <em>lenient</em> score also accepts correct answers with extra columns. Every miss is classified by running the query: wrong values, wrong shape, wrong order, empty result, made-up table or column, invalid SQL, runtime error, timeout, refused as unsafe, or no SQL at all.</p>
+<p><strong>Safety.</strong> Generated SQL is untrusted. It must parse (sqlglot) as exactly one read-only query; data-changing statements and file-reading functions are refused before execution; the warehouse is opened read-only with DuckDB's external access disabled; every query has a 20-second timeout and a 10,000-row cap.</p>
+<p><strong>Honest numbers.</strong> Accuracy is shown with a 95% Wilson interval. With 50 questions an interval is roughly ±12 points, so the leaderboard says when two models are not distinguishable instead of ranking noise.</p>
+<p><strong>Harness check.</strong> Every run first feeds the gold queries through the full pipeline (prompt → extraction → safety → execution → comparison); anything below 50/50 fails the job.</p>
+<h3 id="wk-running-it">Running it</h3>
+<pre><code class="language-bash">pip install -e &quot;.[dev]&quot;
+sqleval build                                            # build/warehouse.duckdb in ~2 s
+sqleval run --model gold                                 # harness self-check: 50/50
+export GROQ_API_KEY=...                                  # keys only ever come from the environment
+sqleval run --model groq/llama-3.3-70b-versatile --variant context --variant schema
+sqleval report                                           # results/report.json
+sqleval ask &quot;Which region had the most revenue last year?&quot; --model groq/llama-3.3-70b-versatile
+</code></pre>
+<p>Runs are resumable: each answer is saved as it is scored and keyed by a hash of the question, gold query and prompt variant. A run cut short by a rate limit continues where it stopped, and editing one question re-runs only that question. This is what makes free-tier daily quotas workable: the workflow just picks up the rest the next day.</p>
+<h3 id="wk-layout">Layout</h3>
+<pre><code>benchmark/questions.yaml   50 questions, gold SQL, tags, order flags
+benchmark/glossary.md      the business definitions the context prompt includes
+src/sqleval/
+  warehouse.py   deterministic warehouse generator
+  prompts.py     schema and context prompt variants
+  providers.py   GitHub Models, OpenAI, Groq, Anthropic, gold; retries and pacing
+  scoring.py     extraction, safety, sandboxed execution, result comparison, error classes
+  runner.py      resumable runs -&gt; results/runs/&lt;model@variant&gt;.jsonl
+  report.py      accuracy, Wilson intervals, per-tag accuracy, failure mix, ablation
+.github/workflows/eval.yml   daily run (Groq free tier or GitHub Models), commits results
+site/index.html              the leaderboard
+tests/                       scorer edge cases, gold self-check, resumability, provider retries
+</code></pre>
+<h3 id="wk-limits">Limits</h3>
+<p>Fifty questions over one schema is a focused benchmark, not a general ranking of models: it measures business-analytics SQL in DuckDB's dialect with the context given here. The warehouse is synthetic. Free-tier models have daily token limits: a model that hits its quota shows as partially answered until a later run finishes it.</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/medicare-cost-analysis/"><small>Previous project</small><b>Medicare costs</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/pipeline-observability/"><small>Next project</small><b>Feed Watch</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>

@@ -113,7 +113,7 @@ footer p { margin: 0; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Source</dt><dd>NYC Open Data, 311 requests</dd></div><div><dt>History</dt><dd>two years, 7.5M requests</dd></div><div><dt>Refresh</dt><dd>daily</dd></div><div><dt>Anomalies</dt><dd>same-weekday robust z</dd></div><div><dt>Closure</dt><dd>1, 3 and 7-day rates by agency</dd></div><div><dt>Storage</dt><dd>monthly CSVs upserted by day</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live dashboard</b><span class="wk-meta">Source: NYC Open Data</span><span class="wk-meta">Refreshed every morning</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live dashboard</b><span class="wk-meta">Source: NYC Open Data</span><span class="wk-meta">Refreshed every morning</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="band"><div class="wrap"><h1 class="brand">NYC 311 Pulse</h1><span id="updated">Loading…</span></div></div>
 <div class="wrap">
   <div class="hero">
@@ -284,6 +284,57 @@ async function get(name) { const r = await fetch(BASE + name + "?t=" + Math.floo
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>311 has a strong weekly rhythm and records keep arriving for days, so naive day-over-day comparisons cry wolf.</p></div>
 <div class="wk-grid solo"><div class="wk-note"><h3>Approach</h3><ul><li><b>Aggregate at the source:</b> daily counts come from the Socrata API&#x27;s group-by, so two years arrive as small tables.</li><li>Re-pull the last ten days on every run, and skip a headline day that is still filling in.</li><li>Compare each day with the same weekday over eight weeks; rank only rises, since recent drops are usually late data.</li><li>Measure closure only on requests at least eight days old, treating impossible closed dates as unknown.</li></ul></div></div>
 </div></div>
+<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2><p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n2"><figure><a href="/nyc-pulse.jpg" target="_blank" rel="noopener"><img src="/nyc-pulse.jpg" alt="Yesterday in 311 and what was unusual" loading="lazy"></a><figcaption>Yesterday in 311 and what was unusual</figcaption></figure><figure><a href="/nyc-closure.jpg" target="_blank" rel="noopener"><img src="/nyc-closure.jpg" alt="Closure speed and the 311 calendar" loading="lazy"></a><figcaption>Closure speed and the 311 calendar</figcaption></figure></div></div></div>
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-how-it-works">How it works</a></li><li><a href="#wk-run-it">Run it</a></li><li><a href="#wk-limits">Limits</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li><li><b>Daily</b><span class="when">Daily, 13:17 UTC</span><span>Every morning (New York time): pull the newest 311 data, rebuild the dashboard files, commit them.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/nyc-311-pulse" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p><strong>▶ <a href="https://ashokreddy010.github.io/nyc-311-pulse/">Live dashboard</a></strong>, refreshed every morning.</p>
+<p>New York's 311 line takes about 3.5 million service requests a year: noise, heat and hot water, illegal parking, potholes, rodents. This project turns the city's open data into a daily briefing:</p>
+<ul>
+<li><strong>The pulse.</strong> How many requests came in yesterday, against a typical day of the same weekday, by borough.</li>
+<li><strong>What was unusual.</strong> The complaint types furthest from their normal level for that weekday (a cold snap shows up as a heat/hot water spike before anyone writes about it).</li>
+<li><strong>The map.</strong> Every located request from the day, by type.</li>
+<li><strong>Week by week and the 311 calendar.</strong> Two years of weekly volumes by borough, and each type's seasonal shape.</li>
+<li><strong>Closure speed.</strong> For each agency and complaint type, the share of requests closed within a day, three days and a week, and the median time to close.</li>
+</ul>
+<h3 id="wk-how-it-works">How it works</h3>
+<pre><code>NYC Open Data (Socrata SODA)
+   │  server-side aggregation: count(*) per day × complaint type × borough
+   │  raw rows only for single days (closure times, map)
+   ▼
+pulse update ── data/counts/YYYY-MM.csv ──┐
+             ── data/resolution/YYYY-MM.csv ├─&gt; pulse build ─&gt; site/data/pulse.json ─&gt; dashboard
+             ── site/data/points.json ─────┘
+</code></pre>
+<p>A scheduled GitHub Actions workflow runs every morning and commits the small monthly CSVs, so the repository itself is the dataset's history and every change is reviewable in git.</p>
+<p><strong>Design decisions</strong></p>
+<ul>
+<li><strong>Aggregate at the source.</strong> Daily counts are computed by the Socrata API (<code>$group</code>), so two years of history arrive as about a quarter of a million small rows instead of seven million records.</li>
+<li><strong>Late data is expected.</strong> Requests keep arriving for days, so every run re-pulls the last ten days and the headline skips a day that is still well below its usual volume.</li>
+<li><strong>Weekday-aware anomalies.</strong> 311 has a strong weekly rhythm, so each day is compared with the same weekday over the previous eight weeks using a robust z-score (median and MAD), with a floor on small types so 3 requests instead of 1 never headlines.</li>
+<li><strong>Honest closure metrics.</strong> Measured only on requests at least eight days old (so "within a week" is final); closed dates earlier than created dates, a known artefact in this data, are treated as unknown rather than instant. "Closed" is the agency's status, not proof the problem was fixed.</li>
+<li><strong>Monthly files, upserted by day.</strong> Re-pulling a day replaces its rows, so runs are idempotent and a failed run never leaves duplicates.</li>
+</ul>
+<h3 id="wk-run-it">Run it</h3>
+<pre><code class="language-bash">pip install -e &quot;.[dev]&quot;
+pulse update        # first run pulls two years of daily counts (a few minutes)
+pulse build
+python -m http.server -d site     # open http://localhost:8000/?base=data/
+</code></pre>
+<p>An optional <code>SOCRATA_APP_TOKEN</code> environment variable raises the API's rate limits.</p>
+<p>Tests (<code>pytest</code>) run the whole pipeline against a seeded fake of the Socrata API with a weekly rhythm and a planted heating spike, which the anomaly ranking has to find.</p>
+<h3 id="wk-limits">Limits</h3>
+<p>311 measures what people report, not what happens: reporting rates differ by neighbourhood and by how easy an issue is to report. Complaint types are as categorised by the city. Data: NYC Open Data, <em>311 Service Requests from 2020 to Present</em>.</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/data-contract-guard/"><small>Previous project</small><b>Data Contract Guard</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/data-validation-framework/"><small>Next project</small><b>Data Validation</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>

@@ -1,0 +1,12 @@
+[
+ [
+  "CI",
+  "Runs every test on every push and pull request.",
+  "On every push"
+ ],
+ [
+  "Refresh",
+  "Monthly (CMS publishes a new data year each spring): download every release, build and test the dbt models on the full data, export the dashboard files and the dbt docs, and commit them.",
+  "Monthly, day 3"
+ ]
+]

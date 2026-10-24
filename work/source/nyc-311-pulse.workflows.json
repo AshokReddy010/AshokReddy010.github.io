@@ -1,0 +1,12 @@
+[
+ [
+  "CI",
+  "Runs every test on every push and pull request.",
+  "On every push"
+ ],
+ [
+  "Daily",
+  "Every morning (New York time): pull the newest 311 data, rebuild the dashboard files, commit them.",
+  "Daily, 13:17 UTC"
+ ]
+]

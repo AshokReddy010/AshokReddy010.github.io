@@ -1,0 +1,12 @@
+[
+ [
+  "CI",
+  "Runs every test on every push and pull request.",
+  "On every push"
+ ],
+ [
+  "Eval",
+  "Daily: run every available GitHub Models model on the benchmark (resumable, so free-tier daily quotas are fine: unfinished questions are picked up the next day), rebuild the report and commit it.",
+  "Daily, 06:23 UTC"
+ ]
+]

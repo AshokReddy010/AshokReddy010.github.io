@@ -126,7 +126,7 @@ footer p { margin: 0; max-width: 80ch; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Commands</dt><dd>validate, infer, diff</dd></div><div><dt>Formats</dt><dd>CSV, Parquet, JSON Lines</dd></div><div><dt>Reports</dt><dd>text, JSON, Markdown, JUnit</dd></div><div><dt>CI</dt><dd>composite GitHub Action</dd></div><div><dt>Tests</dt><dd>75, 95% coverage</dd></div><div><dt>Python</dt><dd>3.10 to 3.13</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b>Runs in your browser</b><span class="wk-meta">The real validator, in Python</span><span class="wk-meta">Nothing is sent anywhere</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Runs in your browser</b><span class="wk-meta">The real validator, in Python</span><span class="wk-meta">Nothing is sent anywhere</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="wrap">
   <header>
     <h1>Data Contract Guard</h1>
@@ -381,6 +381,160 @@ document.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>Upstream teams change data without warning: an enum gains a value, a column is renamed, negative quantities slip in. A contract makes the boundary between teams explicit and testable.</p></div>
 <div class="wk-grid solo"><div class="wk-note"><h3>Approach</h3><ul><li>CSV is read as text so a value like 12a in an integer column is caught, not silently converted.</li><li><b>A broken contract never passes data:</b> every contract mistake is reported before any row is read.</li><li>Breaking is defined from the consumer&#x27;s side, and diff enforces the semantic-version bump.</li><li>The action writes a Markdown report to the pull request&#x27;s job summary and can emit JUnit XML.</li></ul></div></div>
 </div></div>
+<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2><p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n2"><figure><a href="/dcg-validate.jpg" target="_blank" rel="noopener"><img src="/dcg-validate.jpg" alt="Ten planted problems, each caught" loading="lazy"></a><figcaption>Ten planted problems, each caught</figcaption></figure><figure><a href="/dcg-diff.jpg" target="_blank" rel="noopener"><img src="/dcg-diff.jpg" alt="Breaking vs safe contract changes" loading="lazy"></a><figcaption>Breaking vs safe contract changes</figcaption></figure></div></div></div>
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-why">Why</a></li><li><a href="#wk-quick-start">Quick start</a></li><li><a href="#wk-the-contract">The contract</a></li><li><a href="#wk-design-decisions">Design decisions</a></li><li><a href="#wk-in-github-actions">In GitHub Actions</a></li><li><a href="#wk-as-a-library">As a library</a></li><li><a href="#wk-project-layout">Project layout</a></li><li><a href="#wk-development">Development</a></li><li><a href="#wk-scope-and-limits">Scope and limits</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/data-contract-guard" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p><strong>Data contracts as YAML, enforced in CI before bad data reaches anyone downstream.</strong></p>
+<p><strong>▶ <a href="https://ashokreddy010.github.io/data-contract-guard/">Try it in your browser</a></strong>: the real package runs client-side in Pyodide. Paste a contract and a CSV; nothing is uploaded.</p>
+<p>A producer team writes down what its dataset promises (columns, types, keys, ranges, allowed values, business rules, freshness) in a YAML file that lives in the repo and is reviewed like code. <code>contract-guard</code> then does three jobs:</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>contract-guard validate</code></td>
+<td>Does this file keep every promise? If not, which rows break which promise, with examples.</td>
+</tr>
+<tr>
+<td><code>contract-guard infer</code></td>
+<td>What would a contract for this data look like? Drafts one from a sample to start from.</td>
+</tr>
+<tr>
+<td><code>contract-guard diff</code></td>
+<td>Will this contract change break consumers, and was the version bumped enough?</td>
+</tr>
+</tbody>
+</table></div>
+<figure><img loading="lazy" alt="playground" src="https://raw.githubusercontent.com/AshokReddy010/data-contract-guard/main/docs/playground.png" /></figure>
+<h3 id="wk-why">Why</h3>
+<p>Most data incidents are not exotic: a column gets renamed, an enum gains a value nobody handles, an upstream bug ships negative quantities, a feed silently stops updating. These are cheap to catch at the boundary between teams and expensive to catch in a dashboard a week later. A contract makes the boundary explicit, and this tool turns it into a failing check.</p>
+<h3 id="wk-quick-start">Quick start</h3>
+<pre><code class="language-bash">pip install &quot;git+https://github.com/AshokReddy010/data-contract-guard#egg=data-contract-guard[parquet]&quot;
+
+contract-guard validate -c examples/contracts/orders.yml examples/data/orders_broken.csv --as-of 2026-10-18
+</code></pre>
+<pre><code>contract: orders v1.2.0   data: examples/data/orders_broken.csv
+rows: 500
+
+  FAIL  dataset                primary_key       2 rows share a key, 0 have a blank key part
+        e.g. &quot;ORD-100002&quot;, &quot;ORD-100002&quot;
+  FAIL  order_id               pattern           1 value not matching ^ORD-[0-9]{6}$
+        e.g. &quot;ORD-12A&quot;
+  FAIL  customer_id            not_null          1 blank value
+        e.g. &quot;row 22&quot;
+  FAIL  quantity               type              1 value not of type integer
+        e.g. &quot;two&quot;
+  FAIL  status                 allowed_values    1 value not in the allowed list
+        e.g. &quot;lost_in_space&quot;
+  WARN  email                  pattern           1 value not matching ^[^@\s]+@[^@\s]+\.[a-z]{2,}$
+  FAIL  ships_on_or_after_order rule             'ship_date &gt;= order_date' is false on 1 row
+        e.g. {&quot;order_id&quot;: &quot;ORD-100050&quot;, &quot;order_date&quot;: &quot;2026-09-07&quot;, &quot;ship_date&quot;: &quot;2026-08-01&quot;}
+  ...
+FAILED: 10 errors, 1 warnings, 33 checks
+</code></pre>
+<p>Exit codes are built for CI: <code>0</code> passed, <code>1</code> the data broke the contract, <code>2</code> the contract or data file could not be used.</p>
+<h3 id="wk-the-contract">The contract</h3>
+<pre><code class="language-yaml">dataset: orders
+version: 1.2.0                       # semantic versioning; `diff` enforces the bump
+owner: data-platform@example.com
+columns:
+  - name: order_id
+    type: string                     # string | integer | float | boolean | date | timestamp
+    nullable: false
+    unique: true
+    pattern: &quot;^ORD-[0-9]{6}$&quot;
+  - name: status
+    type: string
+    allowed: [placed, shipped, delivered, returned, cancelled]
+  - name: discount
+    type: float
+    min: 0
+    max: 0.5
+  - name: email
+    pattern: &quot;^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$&quot;
+    severity: warn                   # reported, but does not fail the run
+rules:
+  - name: ships_on_or_after_order
+    expr: ship_date &gt;= order_date    # row-level rule; blanks are skipped
+dataset_checks:
+  row_count: {min: 100, max: 100000}
+  primary_key: [order_id]            # composite keys allowed
+  freshness: {column: order_date, max_age_days: 3}
+  allow_extra_columns: false
+</code></pre>
+<p>Column keys: <code>type</code>, <code>required</code>, <code>nullable</code>, <code>unique</code>, <code>min</code>, <code>max</code> (numbers or dates), <code>allowed</code>, <code>pattern</code>, <code>min_length</code>, <code>max_length</code>, <code>severity</code>, <code>description</code>. The full example is <a href="https://github.com/AshokReddy010/data-contract-guard/blob/main/examples/contracts/orders.yml"><code>examples/contracts/orders.yml</code></a>.</p>
+<p><strong>A broken contract never passes data.</strong> Unknown keys, a <code>min</code> above a <code>max</code>, a bad regular expression, a primary key that is not a column: all of them are collected and reported together before any data is read (<code>contract-guard check contracts/*.yml</code> does only this).</p>
+<h3 id="wk-design-decisions">Design decisions</h3>
+<ul>
+<li><strong>CSV is read as text.</strong> If pandas inferred types, <code>"12a"</code> in an integer column would silently become a string column and the type check would have nothing to catch. Every value is checked as written.</li>
+<li><strong>Blank means missing.</strong> Whitespace-only strings count as null, because that is how they behave downstream.</li>
+<li><strong>Each problem is reported once.</strong> A missing column is one <code>required_columns</code> failure, not ten column failures; rules skip rows whose inputs are blank or unreadable, since the column checks already report those.</li>
+<li><strong>Failures carry examples.</strong> Up to five offending values or rows per check, so the report is actionable without opening the file.</li>
+<li><strong>Breaking is defined from the consumer's side.</strong> In <code>diff</code>, removing a column, changing a type (even integer → float), making a column nullable, dropping uniqueness, widening a range, adding an allowed value, loosening a pattern or freshness limit, or downgrading a check from error to warn are all breaking and need a major version. Adding optional columns or tightening a promise is safe and needs a minor version.</li>
+</ul>
+<figure><img loading="lazy" alt="diff" src="https://raw.githubusercontent.com/AshokReddy010/data-contract-guard/main/docs/diff.png" /></figure>
+<h3 id="wk-in-github-actions">In GitHub Actions</h3>
+<p>The repo is also a composite action. It writes a Markdown report to the job summary, can emit JUnit XML for test-report actions, and can diff the contract against the base branch:</p>
+<pre><code class="language-yaml">- uses: actions/checkout@v4
+  with: {fetch-depth: 0}
+- uses: actions/setup-python@v5
+  with: {python-version: &quot;3.12&quot;}
+- uses: AshokReddy010/data-contract-guard@main
+  with:
+    contract: contracts/orders.yml
+    data: exports/orders.csv
+    junit-file: contract-report.xml
+    diff-against: origin/${{ github.base_ref }}   # fail on an unbumped breaking change
+    warn-only: &quot;false&quot;                             # &quot;true&quot; for a soft rollout
+</code></pre>
+<p>This repo's own CI dogfoods the action: the clean example must pass and the broken one must fail.</p>
+<h3 id="wk-as-a-library">As a library</h3>
+<pre><code class="language-python">from contractguard import load_contract, validate
+from contractguard.io import read_data
+
+report = validate(read_data(&quot;orders.parquet&quot;), load_contract(&quot;orders.yml&quot;))
+if not report.ok:
+    for check in report.errors:
+        print(check.target, check.check, check.message, check.examples)
+</code></pre>
+<p>Reports render as text, JSON, Markdown or JUnit (<code>contract-guard validate -f json|markdown|junit</code>).</p>
+<h3 id="wk-project-layout">Project layout</h3>
+<pre><code>src/contractguard/
+  contract.py   YAML -&gt; Contract, with every contract mistake collected
+  checks.py     dataset, column and rule checks -&gt; ValidationReport
+  infer.py      draft a contract from a sample
+  diff.py       breaking vs non-breaking changes, required version bump
+  report.py     text / JSON / Markdown / JUnit
+  io.py         CSV, TSV, Parquet, JSON Lines, JSON
+  cli.py        the contract-guard command
+action.yml      the GitHub Action
+playground/     the in-browser demo (Pyodide) and its build script
+examples/       orders contract, v1.3.0 proposal, clean and broken data (make_data.py regenerates them)
+tests/          75 tests, 95% line coverage
+</code></pre>
+<h3 id="wk-development">Development</h3>
+<pre><code class="language-bash">pip install -e &quot;.[dev]&quot;
+ruff check . &amp;&amp; ruff format --check . &amp;&amp; mypy src &amp;&amp; pytest --cov=contractguard
+python playground/build.py   # writes playground/site/ for the live demo
+</code></pre>
+<p>CI runs lint, format, type checks and tests on Python 3.10, 3.12 and 3.13, builds the wheel, and runs the action against the examples.</p>
+<h3 id="wk-scope-and-limits">Scope and limits</h3>
+<p>This is a single-node tool built on pandas: it is meant for files and extracts up to a few million rows, checked at the boundary between teams or in a pipeline step. It does not connect to warehouses directly; for very large tables, validate a sample or an export, or run the checks in the warehouse with dbt tests. The example data is synthetic and generated by <code>examples/make_data.py</code>.</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/pipeline-observability/"><small>Previous project</small><b>Feed Watch</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/nyc-311-pulse/"><small>Next project</small><b>NYC 311 Pulse</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>

@@ -80,7 +80,7 @@ footer p { margin: 0; max-width: 85ch; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Models</dt><dd>24 (staging, intermediate, marts)</dd></div><div><dt>Tests</dt><dd>80, run on every push</dd></div><div><dt>Orders</dt><dd>99,441</dd></div><div><dt>Leads</dt><dd>8,000</dd></div><div><dt>Dashboard</dt><dd>Power BI, 2 pages</dd></div><div><dt>ML</dt><dd>lead scoring, AUC 0.69</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b>Dashboard</b><span class="wk-meta">Built from dbt models</span><span class="wk-meta">Tested on every change</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>Dashboard</b><span class="wk-meta">Built from dbt models</span><span class="wk-meta">Tested on every change</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="wrap">
   <header>
     <h1>One late parcel undoes a five-star marketplace</h1>
@@ -231,6 +231,183 @@ fetch("data/olist.json").then((r) => r.json()).then((d) => {
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>A marketplace needs to know which marketing channels bring sellers who actually sign, whether customers come back after their first order, and which new leads the sales team should call first. The raw data is ten separate files that cannot answer any of that until it is cleaned, joined and tested.</p></div>
 <div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Staging:</b> one model per raw file to rename columns, fix types and clean keys.</li><li><b>Intermediate:</b> order items and payments summed per order, the latest review kept, products translated.</li><li><b>Marts:</b> fact and dimension tables plus reporting tables for the funnel and cohort retention. The orders table loads incrementally.</li><li><b>Quality:</b> 80 tests, including a custom check that payments reconcile to order value, run by GitHub Actions on every push.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>Raw CSV files</b><span>10 tables: orders, items, payments, reviews, products, sellers, leads, deals</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>dbt on DuckDB</b><span>staging, intermediate and marts, with 80 tests and CI</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Power BI</b><span>funnel and retention pages</span></div><div class="box"><b>Lead scoring</b><span>logistic regression in Python</span></div></div></div></div><div class="wk-note"><h3>What I found</h3><ul><li><b>Funnel:</b> 8,000 leads became 842 signed sellers (10.5%), and 379 of those went on to make a sale.</li><li><b>Channels:</b> paid search closes at 12.3%, social at 5.6%. Leads with an untracked origin close best at 16.6%, so fixing the tracking is the first recommendation.</li><li><b>Retention:</b> only 3.04% of 94,990 customers ever placed a second order, so sales depend on new customers.</li><li><b>Lead scoring:</b> tested on the 2,000 most recent leads, the top 10% of scores close at 23.0% against a 10.5% average (2.18x).</li></ul></div><div class="wk-note"><h3>What the tests caught</h3><ul><li><b>Payments:</b> 249 of 98,665 orders (0.25%) do not match their order value by more than 1.00.</li><li><b>Translations:</b> 2 product categories are missing an English name.</li><li><b>Dates:</b> 1 signed lead has a close date before its first contact date.</li></ul></div></div>
 </div></div>
+<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2><p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n3"><figure><a href="/ol-late.jpg" target="_blank" rel="noopener"><img src="/ol-late.jpg" alt="Late deliveries and reviews" loading="lazy"></a><figcaption>Late deliveries and reviews</figcaption></figure><figure><a href="/funnel.png" target="_blank" rel="noopener"><img src="/funnel.png" alt="Seller acquisition funnel" loading="lazy"></a><figcaption>Seller acquisition funnel</figcaption></figure><figure><a href="/retention.png" target="_blank" rel="noopener"><img src="/retention.png" alt="Customer retention by cohort" loading="lazy"></a><figcaption>Customer retention by cohort</figcaption></figure></div></div></div>
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-what-it-answers">What it answers</a></li><li><a href="#wk-findings">Findings</a></li><li><a href="#wk-data-quality-checks-that-found-something">Data quality checks that found something</a></li><li><a href="#wk-how-it-is-built">How it is built</a></li><li><a href="#wk-run-it-yourself">Run it yourself</a></li><li><a href="#wk-tools">Tools</a></li><li><a href="#wk-data">Data</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/olist-analytics-engineering" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p>An end-to-end analytics engineering project on the public Olist e-commerce and marketing funnel datasets. Raw CSV files are modelled with dbt into tested, documented tables in DuckDB, then used for a Power BI dashboard and a lead-scoring model.</p>
+<p>Everything runs on a laptop with no cloud account: clone, install, <code>dbt build</code>.</p>
+<p><strong>▶ <a href="https://ashokreddy010.github.io/olist-analytics-engineering/">Interactive dashboard</a></strong> (a web version of the findings, built from the marts by <code>scripts/export_web.py</code>) · <a href="https://ashokreddy010.github.io/olist-analytics-engineering/dbt-docs.html">dbt docs and lineage</a></p>
+<p>One more finding the web dashboard adds: delivery against the promised date drives reviews. Orders that arrive early average about 4.3 stars with 7% one-star reviews; orders four or more days late average 1.9 stars, and 65% of their reviews are one star.</p>
+<h3 id="wk-what-it-answers">What it answers</h3>
+<ol>
+<li><strong>Seller acquisition:</strong> which marketing channels bring leads that actually sign as sellers, and how many of those go on to make a sale?</li>
+<li><strong>Customer retention:</strong> do customers come back after their first order?</li>
+<li><strong>Lead scoring:</strong> can the sales team tell, on the day a lead arrives, which leads are worth calling first?</li>
+</ol>
+<h3 id="wk-findings">Findings</h3>
+<h4 id="wk-seller-acquisition-funnel">Seller acquisition funnel</h4>
+<figure><img loading="lazy" alt="Seller acquisition funnel dashboard" src="https://raw.githubusercontent.com/AshokReddy010/olist-analytics-engineering/main/dashboard/funnel.png" /></figure>
+<ul>
+<li>8,000 marketing leads became 842 signed sellers (10.5%), and 379 of those went on to make a sale.</li>
+<li>Paid search converts best of the named channels at 12.3%. Organic search brings the most leads (2,296) and closes at 11.8%.</li>
+<li>Social brings 17% of all leads but closes at 5.6%, about half the average. Email closes at 3.0%.</li>
+<li>Leads with an "unknown" origin close at 16.6%, the highest of all, so untracked sources are hiding some of the best leads. Fixing the tracking would be the first recommendation.</li>
+<li>The median signed lead takes 14 days from first contact to close.</li>
+</ul>
+<h4 id="wk-customer-retention">Customer retention</h4>
+<figure><img loading="lazy" alt="Customer retention dashboard" src="https://raw.githubusercontent.com/AshokReddy010/olist-analytics-engineering/main/dashboard/retention.png" /></figure>
+<ul>
+<li>Only 3.04% of customers ever placed a second order: 2,888 of 94,990.</li>
+<li>The few who return tend to do it early. Month 1 is usually the strongest column, peaking at 0.71% for the October 2017 cohort, and retention does not recover in later months.</li>
+<li>Sales in this marketplace depend almost entirely on new customers, not repeat ones.</li>
+</ul>
+<h4 id="wk-lead-scoring">Lead scoring</h4>
+<p>A logistic regression predicts whether a lead will sign, using only what is known on the day of first contact (channel, landing page and weekday). It is trained on the first 6,000 leads and tested on the 2,000 most recent ones, so it is always judged on leads that came after the ones it learned from.</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: right;">ROC AUC</th>
+<th style="text-align: right;">Average precision</th>
+<th style="text-align: right;">Close rate in top 10% of scores</th>
+<th style="text-align: right;">Lift over average</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Channel close rate only (baseline)</td>
+<td style="text-align: right;">0.613</td>
+<td style="text-align: right;">0.143</td>
+<td style="text-align: right;">19.5%</td>
+<td style="text-align: right;">1.85x</td>
+</tr>
+<tr>
+<td style="text-align: left;">Logistic regression</td>
+<td style="text-align: right;">0.690</td>
+<td style="text-align: right;">0.190</td>
+<td style="text-align: right;">23.0%</td>
+<td style="text-align: right;">2.18x</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>The average close rate in the test period is 10.5%. Calling only the 200 highest-scored leads would reach leads that close at 23.0%, about 46 sellers instead of 21.</li>
+<li>This is a modest model. A simple rule (rank leads by their channel's past close rate) already gives 1.85x, so the landing page and weekday add a real but limited improvement on top of the channel.</li>
+<li>With so few features it is a way to order a call list, not a replacement for sales judgement.</li>
+</ul>
+<h3 id="wk-data-quality-checks-that-found-something">Data quality checks that found something</h3>
+<p>The project has 80 dbt tests. Three are set to warn rather than fail, because they describe real problems in the source data that are worth reporting, not hiding:</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Check</th>
+<th style="text-align: left;">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Every product category has an English translation</td>
+<td style="text-align: left;">2 categories are missing from the translation file (13 products). The model falls back to the Portuguese name.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Payments reconcile to order value</td>
+<td style="text-align: left;">249 of 98,665 orders (0.25%) differ by more than 1.00, a net difference of 2,870.39.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Days to close is not negative</td>
+<td style="text-align: left;">1 of 842 signed leads has a close date 2 days before its first contact date.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="wk-how-it-is-built">How it is built</h3>
+<pre><code>data/raw (10 CSV files)
+   └─ staging        10 views   rename, cast types, clean keys
+       └─ intermediate  6 views   sum order items and payments, latest review, join
+           └─ marts         8 tables  facts, dimensions and reporting tables
+</code></pre>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Mart</th>
+<th style="text-align: right;">Rows</th>
+<th style="text-align: left;">What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>fct_orders</code></td>
+<td style="text-align: right;">99,441</td>
+<td style="text-align: left;">One row per order, with order number per customer. Incremental with a 3-day lookback.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>fct_order_items</code></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;">One row per item sold</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>dim_customers</code></td>
+<td style="text-align: right;">96,096</td>
+<td style="text-align: left;">One row per customer, with cohort month, lifetime value and repeat flag</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>dim_products</code>, <code>dim_sellers</code></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;">Product and seller attributes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>fct_lead_funnel</code></td>
+<td style="text-align: right;">8,000</td>
+<td style="text-align: left;">One row per marketing lead, from first contact to first sale</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>mart_funnel_by_origin</code></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Funnel counts and close rate per channel</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>mart_cohort_retention</code></td>
+<td style="text-align: right;">220</td>
+<td style="text-align: left;">Retention by first-order month and months since</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Tests:</strong> unique and not-null keys, relationships between tables, accepted values, <code>dbt_utils</code> checks, and a custom reconciliation test in <code>tests/</code>.</li>
+<li><strong>CI:</strong> GitHub Actions runs <code>dbt build</code> on every push, then builds <code>fct_orders</code> a second time to prove the incremental logic works.</li>
+<li><strong>Dashboard:</strong> <code>dashboard/olist_dashboard.pbix</code> (Power BI) with a custom theme and DAX measures.</li>
+</ul>
+<h3 id="wk-run-it-yourself">Run it yourself</h3>
+<p>Needs Python 3.10 or newer. Commands are for Windows CMD.</p>
+<pre><code>git clone https://github.com/AshokReddy010/olist-analytics-engineering.git
+cd olist-analytics-engineering
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+dbt deps
+dbt build
+</code></pre>
+<p>Expected result: <code>PASS=101 WARN=3 ERROR=0 TOTAL=104</code>.</p>
+<p>Optional extras:</p>
+<pre><code>pip install scikit-learn pandas tabulate
+python scripts\lead_scoring.py
+python scripts\export_marts.py
+</code></pre>
+<p><code>lead_scoring.py</code> writes its results to <code>analysis/</code>. <code>export_marts.py</code> writes CSV files to <code>exports/</code> for Power BI.</p>
+<h3 id="wk-tools">Tools</h3>
+<p>dbt-core, dbt-duckdb, DuckDB, dbt_utils, SQL, Python (pandas, scikit-learn), Power BI (DAX), GitHub Actions.</p>
+<h3 id="wk-data">Data</h3>
+<p><a href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce">Brazilian E-Commerce Public Dataset by Olist</a> and <a href="https://www.kaggle.com/datasets/olistbr/marketing-funnel-olist">Marketing Funnel by Olist</a>, both from Kaggle. Orders run from 2016 to 2018; marketing leads from June 2017 to May 2018.</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/data-validation-framework/"><small>Previous project</small><b>Data Validation</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/ab-testing-toolkit/"><small>Next project</small><b>A/B testing toolkit</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>

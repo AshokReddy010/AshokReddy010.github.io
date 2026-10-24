@@ -1,0 +1,17 @@
+[
+ [
+  "CI",
+  "Runs every test on every push and pull request.",
+  "On every push"
+ ],
+ [
+  "Live console",
+  "Every morning: rebuild the 60-day simulated window ending yesterday, inject the day's random faults, run the dbt checks, score them against the injections and publish site/data/status.json for the live page.",
+  "Daily, 10:23 UTC"
+ ],
+ [
+  "Scheduled validation",
+  "Every day at 11:00 UTC.",
+  "Daily, 11:00 UTC"
+ ]
+]

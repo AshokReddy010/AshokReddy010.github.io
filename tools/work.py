@@ -115,7 +115,7 @@ def top_block(p):
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl>{spec}</dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b>{pulse}{e(label)}</b>{"".join(f'<span class="wk-meta">{e(f)}</span>' for f in facts)}<a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b>{pulse}{e(label)}</b>{"".join(f'<span class="wk-meta">{e(f)}</span>' for f in facts)}<nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top -->"""
 
 
@@ -140,11 +140,165 @@ def bottom_block(p, prev, nxt):
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2>{lead}</div>
 <div class="wk-grid{" solo" if len(notes) == 1 else ""}">{"".join(notes)}</div>
 </div></div>
+{gallery_html(p)}
+{writeup_html(p)}
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/{slug_of(prev)}/"><small>Previous project</small><b>{e(SHORT[slug_of(prev)])}</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/{slug_of(nxt)}/"><small>Next project</small><b>{e(SHORT[slug_of(nxt)])}</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="{PROFILE['github']}" target="_blank" rel="noopener">GitHub</a><a href="{PROFILE['linkedin']}" target="_blank" rel="noopener">LinkedIn</a><a href="{PROFILE['resume']}" target="_blank" rel="noopener">Resume</a></nav></div>
 </div></div>
 <!-- /wk:bottom -->"""
+
+
+
+# ---------------------------------------------------------------- the full write-up, gallery and automation
+SRC = ROOT / "work" / "source"          # cached copies, so a rebuild works even when a fetch fails
+RAW = "https://raw.githubusercontent.com/AshokReddy010/{slug}/main/{path}"
+API = "https://api.github.com/repos/AshokReddy010/{slug}/contents/.github/workflows"
+DROP = {"author", "license", "licence"}
+
+
+def fetch(url, accept=None):
+    import urllib.request
+    req = urllib.request.Request(url, headers={"User-Agent": "ashokreddy010-work", **({"Accept": accept} if accept else {})})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return r.read().decode("utf-8")
+
+
+def readme_of(slug):
+    """The project's README: the clone next to this repo, else GitHub, else the last cached copy."""
+    SRC.mkdir(parents=True, exist_ok=True)
+    cache = SRC / f"{slug}.md"
+    local = ROOT.parent / slug / "README.md"
+    text = None
+    try:
+        text = local.read_text(encoding="utf-8") if local.exists() else fetch(RAW.format(slug=slug, path="README.md"))
+    except Exception:
+        text = None
+    if text:
+        cache.write_text(text, encoding="utf-8")
+        return text
+    return cache.read_text(encoding="utf-8") if cache.exists() else ""
+
+
+def workflows_of(slug):
+    """[(name, what it does, when)] from the project's GitHub Actions files (cached the same way)."""
+    cache = SRC / f"{slug}.workflows.json"
+    files = {}
+    local = ROOT.parent / slug / ".github" / "workflows"
+    try:
+        if local.exists():
+            files = {f.name: f.read_text(encoding="utf-8") for f in sorted(local.glob("*.yml"))}
+        else:
+            for it in json.loads(fetch(API.format(slug=slug), "application/vnd.github+json")):
+                if it["name"].endswith((".yml", ".yaml")):
+                    files[it["name"]] = fetch(it["download_url"])
+    except Exception:
+        files = {}
+    if not files:
+        return json.loads(cache.read_text()) if cache.exists() else []
+    out = []
+    for name, y in files.items():
+        title = (re.search(r"^name:\s*(.+)$", y, re.M) or [None, name])[1].strip().strip('"')
+        notes = []
+        for line in y.splitlines():
+            if line.startswith("#"):
+                notes.append(line.lstrip("# ").strip())
+            elif notes or line.startswith("name:"):
+                if notes:
+                    break
+        what = " ".join(notes) or ("Runs every test on every push and pull request." if re.search(r"^\s*(push|pull_request):", y, re.M) else "")
+        cron = re.findall(r'cron:\s*"([^"]+)"', y)
+        if not what:
+            m = re.search(r'cron:\s*"[^"]+"\s*#\s*(.+)$', y, re.M)
+            what = (m.group(1).strip()[:1].upper() + m.group(1).strip()[1:] + ".") if m else ""
+        when = cron_words(cron[0]) if cron else ("On every push" if re.search(r"^\s*push:", y, re.M) else "By hand")
+        out.append([key(title), what, when])
+    cache.write_text(json.dumps(out, indent=1))
+    return out
+
+
+def cron_words(c):
+    f = c.split()
+    if len(f) != 5:
+        return "On a schedule"
+    mi, h, dom, mon, dow = f
+    if h.startswith("*/") and dom == mon == dow == "*":
+        return f"Every {h[2:]} hours"
+    if dom == mon == dow == "*" and h.isdigit():
+        return f"Daily, {int(h):02d}:{int(mi):02d} UTC"
+    if dom.isdigit() and mon == dow == "*":
+        return f"Monthly, day {dom}"
+    if dow != "*" and dom == "*":
+        return "Weekly"
+    return "On a schedule"
+
+
+def _abs(slug, url, kind):
+    if re.match(r"^(https?:|mailto:|#|data:)", url):
+        return url
+    url = url.lstrip("./")
+    return RAW.format(slug=slug, path=url) if kind == "img" else f"https://github.com/AshokReddy010/{slug}/blob/main/{url}"
+
+
+def writeup(slug):
+    """README rendered for the page: title, badges, author and licence sections dropped; links made absolute;
+    headings moved down two levels under the page's own heading. Returns (toc, html)."""
+    import markdown
+    md = readme_of(slug)
+    if not md.strip():
+        return [], ""
+    lines = md.splitlines()
+    if lines and lines[0].startswith("# "):
+        lines = lines[1:]
+    md = "\n".join(l for l in lines if not re.search(r"(badge\.svg|img\.shields\.io)", l))
+    parts = re.split(r"(?m)^(?=## )", md)
+    md = "".join(x for x in parts if not (x.startswith("## ") and x[3:].split("\n")[0].strip().lower() in DROP))
+    body = markdown.markdown(md, extensions=["tables", "fenced_code", "sane_lists", "toc"],
+                             extension_configs={"toc": {"slugify": lambda v, sep: "wk-" + re.sub(r"[^a-z0-9]+", "-", v.lower()).strip("-")}})
+    for a, b in (("h4", "h6"), ("h3", "h5"), ("h2", "h4")):
+        body = body.replace(f"<{a}", f"<{b}").replace(f"</{a}>", f"</{b}>")
+    body = body.replace("<h4", "<h3").replace("</h4>", "</h3>").replace("<h5", "<h4").replace("</h5>", "</h4>").replace("<h6", "<h5").replace("</h6>", "</h5>")
+    body = re.sub(r'<img ([^>]*?)src="([^"]+)"', lambda m: f'<img loading="lazy" {m.group(1)}src="{_abs(slug, m.group(2), "img")}"', body)
+    body = re.sub(r'<a href="([^"]+)"', lambda m: f'<a href="{_abs(slug, m.group(1), "a")}"', body)
+    body = re.sub(r"<thead>\s*<tr>(?:\s*<th[^>]*>\s*</th>)+\s*</tr>\s*</thead>", "", body)      # tables with no header
+    body = re.sub(r"<table>", '<div class="wk-table"><table>', body).replace("</table>", "</table></div>")
+    body = re.sub(r"<p>(<img [^>]+>)</p>", r'<figure>\1</figure>', body)
+    toc = re.findall(r'<h3 id="([^"]+)">(.*?)</h3>', body)
+    return [(i, re.sub(r"<[^>]+>", "", t)) for i, t in toc], body
+
+
+def gallery_html(p):
+    shots = p.get("shots") or []
+    if not shots:
+        return ""
+    figs = "".join(f'<figure><a href="/{e(x["image"])}" target="_blank" rel="noopener"><img src="/{e(x["image"])}" alt="{e(x.get("caption", ""))}" loading="lazy"></a>'
+                   f'<figcaption>{e(x.get("caption", ""))}</figcaption></figure>' for x in shots)
+    return (f'<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2>'
+            f'<p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n{min(len(shots), 3)}">{figs}</div></div></div>')
+
+
+def writeup_html(p):
+    slug = slug_of(p)
+    toc, body = writeup(slug)
+    if not body:
+        return ""
+    jobs = workflows_of(slug)
+    nav = "".join(f'<li><a href="#{e(i)}">{t}</a></li>' for i, t in toc)
+    auto = "".join(f'<li><b>{e(n)}</b><span class="when">{e(w)}</span><span>{e(d)}</span></li>' for n, d, w in jobs)
+    return f"""<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol>{nav}</ol>
+<div class="wk-auto"><p>Automation</p><ul>{auto}</ul></div>
+<a class="wk-btn" href="{e(p["link"])}" target="_blank" rel="noopener">{GH} Repository</a></nav>
+<article class="wk-prose">{body}</article>
+</div></div></div>
+<script>(function () {{
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {{}}; links.forEach(function (a) {{ by[a.getAttribute('href').slice(1)] = a; }});
+  var io = new IntersectionObserver(function (es) {{ es.forEach(function (x) {{ if (x.isIntersecting) {{ links.forEach(function (a) {{ a.classList.remove('on'); }}); var a = by[x.target.id]; if (a) a.classList.add('on'); }} }}); }}, {{ rootMargin: '-90px 0px -70% 0px' }});
+  Object.keys(by).forEach(function (id) {{ var h = document.getElementById(id); if (h) io.observe(h); }});
+}})();</script>"""
 
 
 def put(s, name, block, anchor_re, where):

@@ -91,7 +91,7 @@ footer p { margin: 0; }
 </div>
 <div class="wk-spec" role="complementary" aria-label="Key facts"><p class="wk-spec-h">Key facts</p><dl><div><dt>Sources</dt><dd>transactions, client feed, billing</dd></div><div><dt>Data</dt><dd>12,000 invented transactions, 60 days</dd></div><div><dt>Planted errors</dt><dd>6, all found</dd></div><div><dt>False alarms</dt><dd>0 on 113 clean days</dd></div><div><dt>Tests</dt><dd>21 dbt and 10 pytest</dd></div><div><dt>Schedule</dt><dd>daily, on GitHub Actions</dd></div></dl></div>
 </div></div>
-<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live console</b><span class="wk-meta">dbt checks on public data</span><span class="wk-meta">Validated every day</span><a href="#wk-notes">Case notes</a></div></div>
+<div class="wk-strip" id="live"><div class="wk-wrap"><b><span class="wk-pulse" aria-hidden="true"></span>Live console</b><span class="wk-meta">dbt checks on public data</span><span class="wk-meta">Validated every day</span><nav class="wk-jump" aria-label="On this page"><a href="#wk-notes">Case notes</a><a href="#wk-doc">Full write-up</a></nav></div></div>
 <!-- /wk:top --><div class="wrap">
   <header>
     <h1>Reconciliation Console</h1>
@@ -188,6 +188,170 @@ fetch(BASE + "status.json?t=" + Math.floor(Date.now() / 600000), { cache: "no-st
 <div class="wk-notes-head"><h2 id="wk-notes-h">Case notes</h2><p>When the same transactions live in several systems, a late file, a double-billed record or a blank amount can reach a client report unnoticed. Checking by hand before every delivery is slow and misses small differences.</p></div>
 <div class="wk-grid"><div class="wk-note"><h3>Approach</h3><ul><li><b>Level 1:</b> count the rows and total the amounts per source per day, then compare each source with the transaction system.</li><li><b>Level 2:</b> for the days that differ, find the records behind the difference and name the reason: missing, duplicate, wrong date, blank amount or different amount.</li><li><b>Output:</b> one results table per source per day, a written report, a chart and an optional chat alert.</li><li><b>Proof:</b> the data generator plants six known errors, so the checks can be scored against them.</li></ul></div><div class="wk-note wide"><h3>Architecture</h3><div class="wk-flow"><div class="stage"><div class="box"><b>Three sources</b><span>invented transaction system, client file feed and billing database</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>dbt and DuckDB</b><span>daily totals, match or break per day, and the records behind each break</span></div></div><div class="arrow"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="stage"><div class="box"><b>Report and alert</b><span>summary, results table, chart and webhook</span></div><div class="box"><b>Daily schedule</b><span>GitHub Actions run, with the report saved</span></div></div></div></div><div class="wk-note"><h3>What it found</h3><ul><li><b>All six:</b> 37 missing records, 25 duplicates, 12 changed amounts, one missing day, 9 records filed under the wrong day and 5 blank amounts.</li><li><b>Totals matter:</b> on two of the days every record was present, so a row count alone would have passed them.</li><li><b>No noise:</b> none of the 113 clean source-days was flagged.</li></ul></div><div class="wk-note"><h3>What made it hard</h3><ul><li><b>Two days, one cause:</b> a record filed under the wrong day throws off the day it left and the day it landed on. My first drill-down explained only one, and a test I had written for the checks themselves caught it.</li><li><b>Testing the tester:</b> three dbt tests guard the checks, including one that fails if a clean-looking day hides errors that cancel out.</li><li><b>Limits:</b> the data is invented and small, the transaction system is assumed correct, and matching relies on a shared transaction ID.</li></ul></div></div>
 </div></div>
+<div class="wk-gallery" role="region" aria-labelledby="wk-gal-h"><div class="wk-wrap"><div class="wk-sec-head"><h2 id="wk-gal-h">In pictures</h2><p>Screens from the live page and the analysis. Select one to see it full size.</p></div><div class="wk-figs n2"><figure><a href="/dv-console.jpg" target="_blank" rel="noopener"><img src="/dv-console.jpg" alt="Live console: random faults injected daily" loading="lazy"></a><figcaption>Live console: random faults injected daily</figcaption></figure><figure><a href="/dv-differences.png" target="_blank" rel="noopener"><img src="/dv-differences.png" alt="Daily difference by source" loading="lazy"></a><figcaption>Daily difference by source</figcaption></figure></div></div></div>
+<div class="wk-doc" id="wk-doc" role="region" aria-labelledby="wk-doc-h"><div class="wk-wrap">
+<div class="wk-sec-head"><h2 id="wk-doc-h">The full write-up</h2><p>Everything in the project's documentation: the findings with their numbers, how it works, how to run it and where its limits are. Kept in step with GitHub every day.</p></div>
+<div class="wk-doc-grid">
+<nav class="wk-toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#wk-what-it-found">What it found</a></li><li><a href="#wk-how-it-works">How it works</a></li><li><a href="#wk-tests">Tests</a></li><li><a href="#wk-scheduling-and-alerts">Scheduling and alerts</a></li><li><a href="#wk-run-it-yourself">Run it yourself</a></li><li><a href="#wk-limitations">Limitations</a></li><li><a href="#wk-tools">Tools</a></li></ol>
+<div class="wk-auto"><p>Automation</p><ul><li><b>CI</b><span class="when">On every push</span><span>Runs every test on every push and pull request.</span></li><li><b>Live console</b><span class="when">Daily, 10:23 UTC</span><span>Every morning: rebuild the 60-day simulated window ending yesterday, inject the day&#x27;s random faults, run the dbt checks, score them against the injections and publish site/data/status.json for the live page.</span></li><li><b>Scheduled validation</b><span class="when">Daily, 11:00 UTC</span><span>Every day at 11:00 UTC.</span></li></ul></div>
+<a class="wk-btn" href="https://github.com/AshokReddy010/data-validation-framework" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg> Repository</a></nav>
+<article class="wk-prose"><p>Three systems hold the same transactions: the transaction system, a client file feed and the billing database. Before any report goes out, they should agree. This project checks that they do, every day, and says exactly which records are wrong when they do not.</p>
+<p>It is a public example of the kind of reconciliation checks I build at work. All data here is invented, and no employer code, data or business rule is used.</p>
+<p><strong>▶ <a href="https://ashokreddy010.github.io/data-validation-framework/">Live reconciliation console</a></strong>: every morning a scheduled job rebuilds the last 60 days of all three systems, injects random faults the checks are not told about (dropped and duplicated records, changed and blank amounts, a missing day, records filed a day late), runs the dbt checks, and scores them: every fault caught with the right reason, and no false alarms. Faults are seeded by date, so a day's faults are reproducible (<code>python scripts/live.py --end 2026-10-17</code>). <code>unit_tests/test_live.py</code> holds the checks to a perfect score on two windows.</p>
+<h3 id="wk-what-it-found">What it found</h3>
+<p>The data generator plants six errors in 60 days of invented transactions. The checks found all six, gave the right reason for each, and raised nothing on the 113 clean source-days.</p>
+<figure><img loading="lazy" alt="Daily difference by source" src="https://raw.githubusercontent.com/AshokReddy010/data-validation-framework/main/reports/figures/daily_differences.png" /></figure>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Day</th>
+<th style="text-align: left;">Source</th>
+<th style="text-align: right;">Count difference</th>
+<th style="text-align: right;">Amount difference</th>
+<th style="text-align: left;">Reason found</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">14 Jul</td>
+<td style="text-align: left;">Client feed</td>
+<td style="text-align: right;">-37</td>
+<td style="text-align: right;">-114,056.53</td>
+<td style="text-align: left;">37 records missing</td>
+</tr>
+<tr>
+<td style="text-align: left;">22 Jul</td>
+<td style="text-align: left;">Billing</td>
+<td style="text-align: right;">+25</td>
+<td style="text-align: right;">+63,481.27</td>
+<td style="text-align: left;">25 records billed twice</td>
+</tr>
+<tr>
+<td style="text-align: left;">3 Aug</td>
+<td style="text-align: left;">Client feed</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">+1,200.00</td>
+<td style="text-align: left;">12 amounts differ</td>
+</tr>
+<tr>
+<td style="text-align: left;">11 Aug</td>
+<td style="text-align: left;">Billing</td>
+<td style="text-align: right;">-200</td>
+<td style="text-align: right;">-502,825.44</td>
+<td style="text-align: left;">The whole day is missing</td>
+</tr>
+<tr>
+<td style="text-align: left;">19 Aug</td>
+<td style="text-align: left;">Billing</td>
+<td style="text-align: right;">-9</td>
+<td style="text-align: right;">-19,555.54</td>
+<td style="text-align: left;">9 records filed under the next day</td>
+</tr>
+<tr>
+<td style="text-align: left;">20 Aug</td>
+<td style="text-align: left;">Billing</td>
+<td style="text-align: right;">+9</td>
+<td style="text-align: right;">+19,555.54</td>
+<td style="text-align: left;">The same 9 records, landing a day late</td>
+</tr>
+<tr>
+<td style="text-align: left;">25 Aug</td>
+<td style="text-align: left;">Client feed</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">-12,219.57</td>
+<td style="text-align: left;">5 amounts are blank</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two of these would pass a row count: on 3 August and 25 August every record is present, and only the totals show a problem.</p>
+<h3 id="wk-how-it-works">How it works</h3>
+<p>The checks run in two levels, so most days cost one cheap comparison.</p>
+<div class="wk-table"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Level</th>
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><code>daily_totals</code></td>
+<td style="text-align: left;">Counts the rows and sums the amounts per source per day</td>
+</tr>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><code>recon_daily</code></td>
+<td style="text-align: left;">Compares each source with the transaction system and marks each day <code>match</code> or <code>break</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><code>recon_exceptions</code></td>
+<td style="text-align: left;">For records that disagree, names the reason: missing, duplicate, wrong date, blank amount or different amount</td>
+</tr>
+<tr>
+<td style="text-align: left;">Output</td>
+<td style="text-align: left;"><code>check_results</code></td>
+<td style="text-align: left;">One row per source per day with the status, the differences and the reasons, for a dashboard or an alert to read</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code>scripts/generate_data.py     three invented sources, six planted errors
+        │
+dbt (DuckDB)
+  ├─ staging                 cast types, treat blank amounts as null
+  ├─ daily_totals            level 1: counts and totals
+  ├─ recon_daily             level 1: match or break, per source per day
+  ├─ recon_exceptions        level 2: the records behind each break
+  └─ check_results           the table people read
+        │
+scripts/run_checks.py        report, chart and alert
+</code></pre>
+<h3 id="wk-tests">Tests</h3>
+<ul>
+<li><strong>21 dbt data tests.</strong> Keys are unique and present, every feed and billing record points to a real transaction, and three tests guard the checks themselves:</li>
+<li>every break has a record-level reason,</li>
+<li>no clean day hides exception records, which would mean two errors cancelled out in the totals,</li>
+<li>a warning is raised while any break is open.</li>
+<li><strong>10 pytest checks</strong> that the breaks found are exactly the planted ones, with the right reason and record count for each.</li>
+</ul>
+<p>The second of those tests caught a real gap while I was building this. A record filed under the wrong day throws off two days, the one it left and the one it landed on. My first drill-down explained only the first, and the test failed until it explained both.</p>
+<h3 id="wk-scheduling-and-alerts">Scheduling and alerts</h3>
+<ul>
+<li><code>scheduled-validation.yml</code> runs the checks every day on GitHub Actions and can be started by hand.</li>
+<li>The report is written to the run summary and saved as a file with the run.</li>
+<li>If an <code>ALERT_WEBHOOK_URL</code> secret is set, a break posts a message to that chat webhook.</li>
+</ul>
+<h3 id="wk-run-it-yourself">Run it yourself</h3>
+<p>Needs Python 3.10 or newer. Commands are for Windows CMD.</p>
+<pre><code>git clone https://github.com/AshokReddy010/data-validation-framework.git
+cd data-validation-framework
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+python scripts\run_checks.py
+pytest -q unit_tests
+</code></pre>
+<p><code>run_checks.py</code> creates the data, builds the checks and writes <code>reports/summary.md</code>, <code>reports/check_results.csv</code>, <code>reports/exceptions.csv</code> and the chart. Add <code>--fail-on-break</code> to make it exit with an error while any break is open.</p>
+<h3 id="wk-limitations">Limitations</h3>
+<ul>
+<li>The data is invented and small: 12,000 transactions over 60 days. It shows the method, not performance at scale.</li>
+<li>The transaction system is treated as correct. A record wrong in that system and repeated faithfully by the others would not be caught.</li>
+<li>Matching is by transaction ID. Sources without a shared key would need a matching step first.</li>
+<li>It runs on DuckDB. The models use standard SQL and dbt, so moving them to a cloud warehouse is a change of profile, which is the planned next step.</li>
+<li>A scheduler such as Airflow would replace the GitHub Actions schedule in a production set-up.</li>
+</ul>
+<h3 id="wk-tools">Tools</h3>
+<p>Python, SQL, dbt, DuckDB, pandas, Matplotlib, pytest, GitHub Actions.</p></article>
+</div></div></div>
+<script>(function () {
+  var links = [].slice.call(document.querySelectorAll('.wk-toc ol a')); if (!links.length || !('IntersectionObserver' in window)) return;
+  var by = {}; links.forEach(function (a) { by[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = by[x.target.id]; if (a) a.classList.add('on'); } }); }, { rootMargin: '-90px 0px -70% 0px' });
+  Object.keys(by).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+})();</script>
 <div class="wk-foot" role="contentinfo"><div class="wk-wrap">
 <nav class="wk-pn" aria-label="More projects"><a class="prev" href="/nyc-311-pulse/"><small>Previous project</small><b>NYC 311 Pulse</b></a><a class="mid" href="/work/"><small>Ashok Reddy Bhimavarapu</small><b>All work</b></a><a class="next" href="/olist-analytics-engineering/"><small>Next project</small><b>Olist analytics</b></a></nav>
 <div class="wk-sign"><span>Ashok Reddy Bhimavarapu, data analyst in New York</span><nav aria-label="Elsewhere"><a href="/">Profile</a><a href="https://github.com/AshokReddy010" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ashokreddy1" target="_blank" rel="noopener">LinkedIn</a><a href="/Ashok_Reddy_Bhimavarapu_Resume.pdf" target="_blank" rel="noopener">Resume</a></nav></div>
